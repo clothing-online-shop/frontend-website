@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
@@ -33,11 +33,11 @@ const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
 
 const PAGE_LIMIT = 12;
 
-export function ProductsPageClient() {
+export function ProductsPageClient({ category }: { category?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const category = searchParams.get("category") ?? undefined;
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
@@ -77,13 +77,13 @@ export function ProductsPageClient() {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
     params.delete("page");
-    router.push(`/products?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   function goToPage(nextPage: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(nextPage));
-    router.push(`/products?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -113,7 +113,7 @@ export function ProductsPageClient() {
       </Breadcrumb>
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
-        <ProductFilters categories={categoriesQuery.data ?? []} />
+        <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
           <div className="mb-6 flex items-center justify-between">

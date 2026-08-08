@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Minus, Plus } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
 import { COLOR_SWATCHES } from "@/lib/color-swatches";
 import { formatPrice } from "@/lib/format";
@@ -33,23 +33,24 @@ function FilterSection({
   );
 }
 
-function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
-  const searchParams = useSearchParams();
-  const activeCategory = searchParams.get("category");
-
+function CategoryLinks({
+  categories,
+  activeCategorySlug,
+}: {
+  categories: CategoryNode[];
+  activeCategorySlug?: string;
+}) {
   return (
     <ul className="space-y-1">
       {categories.map((category) => (
         <li key={category.id}>
           <Link
             href={
-              activeCategory === category.slug
-                ? "/products"
-                : `/products?category=${category.slug}`
+              activeCategorySlug === category.slug ? "/products" : `/danh-muc/${category.slug}`
             }
             className={cn(
               "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
-              activeCategory === category.slug
+              activeCategorySlug === category.slug
                 ? "bg-secondary font-bold text-primary"
                 : "text-muted-foreground",
             )}
@@ -62,13 +63,11 @@ function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
                 <li key={child.id}>
                   <Link
                     href={
-                      activeCategory === child.slug
-                        ? "/products"
-                        : `/products?category=${child.slug}`
+                      activeCategorySlug === child.slug ? "/products" : `/danh-muc/${child.slug}`
                     }
                     className={cn(
                       "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
-                      activeCategory === child.slug
+                      activeCategorySlug === child.slug
                         ? "bg-secondary font-bold text-primary"
                         : "text-muted-foreground",
                     )}
@@ -85,8 +84,15 @@ function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
   );
 }
 
-export function ProductFilters({ categories }: { categories: CategoryNode[] }) {
+export function ProductFilters({
+  categories,
+  activeCategorySlug,
+}: {
+  categories: CategoryNode[];
+  activeCategorySlug?: string;
+}) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const selectedSizes = searchParams.get("size")?.split(",").filter(Boolean) ?? [];
@@ -103,7 +109,7 @@ export function ProductFilters({ categories }: { categories: CategoryNode[] }) {
       else params.delete(key);
     }
     params.delete("page");
-    router.push(`/products?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   function toggleMultiValue(key: "size" | "color", value: string, current: string[]) {
@@ -124,7 +130,7 @@ export function ProductFilters({ categories }: { categories: CategoryNode[] }) {
   return (
     <aside>
       <FilterSection title="Danh mục">
-        <CategoryLinks categories={categories} />
+        <CategoryLinks categories={categories} activeCategorySlug={activeCategorySlug} />
       </FilterSection>
 
       <FilterSection title="Khoảng giá">

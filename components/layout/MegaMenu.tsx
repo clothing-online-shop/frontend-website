@@ -7,7 +7,7 @@ function MegaMenuColumn({ category }: { category: CategoryNode }) {
   return (
     <div className="min-w-40">
       <Link
-        href={`/products?category=${category.slug}`}
+        href={`/danh-muc/${category.slug}`}
         className="mb-2 block text-sm font-semibold text-foreground hover:text-primary"
       >
         {category.name}
@@ -17,7 +17,7 @@ function MegaMenuColumn({ category }: { category: CategoryNode }) {
           {category.children.map((child) => (
             <li key={child.id}>
               <Link
-                href={`/products?category=${child.slug}`}
+                href={`/danh-muc/${child.slug}`}
                 className="text-sm text-muted-foreground hover:text-primary"
               >
                 {child.name}
@@ -36,7 +36,7 @@ function MegaMenuItem({ category }: { category: CategoryNode }) {
   return (
     <li className="group relative">
       <Link
-        href={`/products?category=${category.slug}`}
+        href={`/danh-muc/${category.slug}`}
         className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background aria-expanded:bg-background/10 aria-expanded:text-background"
       >
         {category.name}

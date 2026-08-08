@@ -23,7 +23,7 @@ function MobileCategoryNode({
   if (category.children.length === 0) {
     return (
       <Link
-        href={`/products?category=${category.slug}`}
+        href={`/danh-muc/${category.slug}`}
         onClick={onNavigate}
         className="block rounded-md px-2 py-2 text-sm text-foreground/80 hover:bg-secondary hover:text-foreground"
       >
