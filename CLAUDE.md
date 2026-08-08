@@ -48,6 +48,11 @@ store/                  # zustand store (auth-store.ts, cart-store.ts)
 - Mỗi page hiển thị nội dung công khai (trang chủ, danh sách/chi tiết sản phẩm) phải có `export const metadata` hoặc `generateMetadata` — không để Next tự sinh title mặc định.
 - Ảnh sản phẩm dùng `next/image`, không dùng thẻ `<img>` thường.
 
+## Bắt đầu tính năng mới
+
+- Trước khi code: `git checkout develop && git pull` để lấy code mới nhất, sau đó tạo branch mới từ `develop` với tên phù hợp tính năng đang làm (`feature/<mo-ta-ngan>`, `fix/<mo-ta-ngan>`) — không code thẳng trên `develop`.
+- Sau khi code xong, trước khi báo hoàn thành/mở PR: chủ động tự review lại toàn bộ diff theo đúng quy ước trong `CLAUDE.md` này và `README.md` của repo — không chỉ dựa vào lint/build pass.
+
 ## Trước khi mở PR
 
 1. `pnpm --filter @clothing-shop/web lint` — 0 lỗi.
