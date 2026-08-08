@@ -158,14 +158,14 @@ export default async function ProductDetailPage({
           {(product.category.ancestors ?? []).map((ancestor) => (
             <BreadcrumbItem key={ancestor.id}>
               <BreadcrumbSeparator />
-              <BreadcrumbLink href={`/products?category=${ancestor.slug}`}>
+              <BreadcrumbLink href={`/danh-muc/${ancestor.slug}`}>
                 {ancestor.name}
               </BreadcrumbLink>
             </BreadcrumbItem>
           ))}
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/products?category=${product.category.slug}`}>
+            <BreadcrumbLink href={`/danh-muc/${product.category.slug}`}>
               {product.category.name}
             </BreadcrumbLink>
           </BreadcrumbItem>

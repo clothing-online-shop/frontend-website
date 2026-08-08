@@ -19,7 +19,7 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
       <h2 className="mb-6 font-heading text-2xl font-extrabold uppercase">Danh mục nổi bật</h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {featured.map((category) => (
-          <Link key={category.id} href={`/products?category=${category.slug}`} className="group block">
+          <Link key={category.id} href={`/danh-muc/${category.slug}`} className="group block">
             <div className="relative aspect-square overflow-hidden bg-secondary">
               <Image
                 src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
