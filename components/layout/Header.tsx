@@ -1,30 +1,10 @@
-import Link from "next/link";
+import { getCategoryTree } from "@/lib/categories-api";
+import { HeaderClient } from "@/components/layout/HeaderClient";
 
-const NAV_ITEMS = [
-  { href: "/products", label: "Sản phẩm" },
-  { href: "/cart", label: "Giỏ hàng" },
-  { href: "/account", label: "Tài khoản" },
-];
+export async function Header() {
+  // Header render ở mọi trang qua MainLayout — nếu API danh mục lỗi/timeout thì vẫn phải
+  // render được header (menu rỗng) thay vì làm sập toàn bộ trang.
+  const categories = await getCategoryTree().catch(() => []);
 
-export function Header() {
-  return (
-    <header className="border-b border-border bg-background">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-heading text-xl font-semibold tracking-wide uppercase">
-          Clothing Shop
-        </Link>
-        <nav className="flex items-center gap-6 text-sm">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-foreground/80 transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </header>
-  );
+  return <HeaderClient categories={categories} />;
 }

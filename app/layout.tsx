@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Be_Vietnam_Pro, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const fontHeading = Playfair_Display({
+// Đổi từ Playfair Display (serif, boutique) sang Be Vietnam Pro (sans-serif đậm) —
+// bám theo tông thương mại/fast-fashion tham khảo từ Canifa thay vì "quiet luxury".
+const fontHeading = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
-  weight: ["500", "600"],
+  weight: ["600", "700", "800"],
   variable: "--font-heading",
 });
 
