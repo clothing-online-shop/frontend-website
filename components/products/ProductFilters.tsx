@@ -1,19 +1,37 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { Minus, Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { COLOR_SWATCHES } from "@/lib/color-swatches";
+import { formatPrice } from "@/lib/format";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
 const SIZES = ["S", "M", "L", "XL"];
-const COLOR_SWATCHES: Record<string, string> = {
-  Đen: "#1a1a1a",
-  Trắng: "#ffffff",
-  Xanh: "#3b5fa0",
-};
+const PRICE_MAX = 2_000_000;
+const PRICE_STEP = 50_000;
+
+function FilterSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="group border-b border-border py-4 first:pt-0" open>
+      <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-bold uppercase [&::-webkit-details-marker]:hidden">
+        {title}
+        <Plus className="size-4 text-muted-foreground group-open:hidden" />
+        <Minus className="hidden size-4 text-muted-foreground group-open:block" />
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
+  );
+}
 
 function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
   const searchParams = useSearchParams();
@@ -30,9 +48,9 @@ function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
                 : `/products?category=${category.slug}`
             }
             className={cn(
-              "block rounded-md px-2 py-1 text-sm transition-colors hover:bg-secondary",
+              "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
               activeCategory === category.slug
-                ? "bg-secondary font-medium text-foreground"
+                ? "bg-secondary font-bold text-primary"
                 : "text-muted-foreground",
             )}
           >
@@ -49,9 +67,9 @@ function CategoryLinks({ categories }: { categories: CategoryNode[] }) {
                         : `/products?category=${child.slug}`
                     }
                     className={cn(
-                      "block rounded-md px-2 py-1 text-sm transition-colors hover:bg-secondary",
+                      "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
                       activeCategory === child.slug
-                        ? "bg-secondary font-medium text-foreground"
+                        ? "bg-secondary font-bold text-primary"
                         : "text-muted-foreground",
                     )}
                   >
@@ -73,8 +91,10 @@ export function ProductFilters({ categories }: { categories: CategoryNode[] }) {
 
   const selectedSizes = searchParams.get("size")?.split(",").filter(Boolean) ?? [];
   const selectedColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
-  const minPrice = searchParams.get("minPrice") ?? "";
-  const maxPrice = searchParams.get("maxPrice") ?? "";
+  const minPrice = Number(searchParams.get("minPrice") ?? 0);
+  const maxPrice = Number(searchParams.get("maxPrice") ?? PRICE_MAX);
+
+  const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice]);
 
   function updateParams(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -93,81 +113,86 @@ export function ProductFilters({ categories }: { categories: CategoryNode[] }) {
     updateParams({ [key]: next.length > 0 ? next.join(",") : null });
   }
 
-  function handlePriceSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  function commitPriceRange(value: number[]) {
+    const [next0, next1] = value;
     updateParams({
-      minPrice: (formData.get("minPrice") as string) || null,
-      maxPrice: (formData.get("maxPrice") as string) || null,
+      minPrice: next0 > 0 ? String(next0) : null,
+      maxPrice: next1 < PRICE_MAX ? String(next1) : null,
     });
   }
 
   return (
-    <aside className="space-y-8">
-      <div>
-        <h3 className="mb-3 font-heading text-sm font-semibold">Danh mục</h3>
+    <aside>
+      <FilterSection title="Danh mục">
         <CategoryLinks categories={categories} />
-      </div>
+      </FilterSection>
 
-      <div>
-        <h3 className="mb-3 font-heading text-sm font-semibold">Khoảng giá</h3>
-        <form onSubmit={handlePriceSubmit} className="flex items-center gap-2">
-          <Input
-            name="minPrice"
-            type="number"
+      <FilterSection title="Khoảng giá">
+        <div className="px-1">
+          <Slider
+            value={priceRange}
             min={0}
-            placeholder="Từ"
-            defaultValue={minPrice}
-            aria-label="Giá tối thiểu"
+            max={PRICE_MAX}
+            step={PRICE_STEP}
+            onValueChange={(value) => setPriceRange(value as [number, number])}
+            onValueCommitted={(value) => commitPriceRange(value as number[])}
           />
-          <span className="text-muted-foreground">-</span>
-          <Input
-            name="maxPrice"
-            type="number"
-            min={0}
-            placeholder="Đến"
-            defaultValue={maxPrice}
-            aria-label="Giá tối đa"
-          />
-          <Button type="submit" size="sm" variant="outline">
-            Áp dụng
-          </Button>
-        </form>
-      </div>
+          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+            <span>{formatPrice(priceRange[0])}</span>
+            <span>{formatPrice(priceRange[1])}</span>
+          </div>
+        </div>
+      </FilterSection>
 
-      <div>
-        <h3 className="mb-3 font-heading text-sm font-semibold">Kích cỡ</h3>
-        <div className="space-y-2">
+      <FilterSection title="Kích cỡ">
+        <div className="flex flex-wrap gap-2">
           {SIZES.map((size) => (
-            <label key={size} className="flex items-center gap-2 text-sm">
-              <Checkbox
-                checked={selectedSizes.includes(size)}
-                onCheckedChange={() => toggleMultiValue("size", size, selectedSizes)}
-              />
+            <button
+              key={size}
+              type="button"
+              onClick={() => toggleMultiValue("size", size, selectedSizes)}
+              className={cn(
+                "flex h-9 min-w-9 items-center justify-center rounded-sm border px-2.5 text-sm font-medium transition-colors",
+                selectedSizes.includes(size)
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border hover:border-primary",
+              )}
+            >
               {size}
-            </label>
+            </button>
           ))}
         </div>
-      </div>
+      </FilterSection>
 
-      <div>
-        <h3 className="mb-3 font-heading text-sm font-semibold">Màu sắc</h3>
-        <div className="space-y-2">
-          {Object.keys(COLOR_SWATCHES).map((color) => (
-            <label key={color} className="flex items-center gap-2 text-sm">
-              <Checkbox
-                checked={selectedColors.includes(color)}
-                onCheckedChange={() => toggleMultiValue("color", color, selectedColors)}
-              />
+      <FilterSection title="Màu sắc">
+        <div className="flex flex-wrap gap-3">
+          {Object.entries(COLOR_SWATCHES).map(([color, hex]) => (
+            <button
+              key={color}
+              type="button"
+              onClick={() => toggleMultiValue("color", color, selectedColors)}
+              aria-label={color}
+              aria-pressed={selectedColors.includes(color)}
+              className={cn(
+                "flex flex-col items-center gap-1 text-xs text-muted-foreground",
+              )}
+            >
               <span
-                className="size-4 rounded-full border border-border"
-                style={{ backgroundColor: COLOR_SWATCHES[color] }}
-              />
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full border-2",
+                  selectedColors.includes(color) ? "border-primary" : "border-transparent",
+                )}
+              >
+                <span
+                  className="size-6 rounded-full border border-border"
+                  style={{ backgroundColor: hex }}
+                />
+              </span>
               {color}
-            </label>
+            </button>
           ))}
         </div>
-      </div>
+      </FilterSection>
     </aside>
   );
 }

@@ -62,9 +62,11 @@ export interface ProductListItem {
   slug: string;
   thumbnail: string | null;
   basePrice: number;
+  salePrice: number | null;
   status: ProductStatus;
   categoryId: string;
   totalStock: number;
+  colors: string[];
   createdAt: string;
 }
 
@@ -89,8 +91,15 @@ export interface ProductReview {
 
 export interface ProductDetail extends ProductListItem {
   description: string | null;
+  material: string | null;
+  careInstructions: string | null;
   images: string[];
-  category: { id: string; name: string; slug: string };
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+    ancestors: { id: string; name: string; slug: string }[];
+  };
   variants: ProductVariant[];
   reviews: ProductReview[];
   relatedProducts: ProductListItem[];

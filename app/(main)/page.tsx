@@ -1,29 +1,29 @@
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { getCategoryTree } from "@/lib/categories-api";
+import { getProducts } from "@/lib/products-api";
+import { BannerSlider } from "@/components/home/BannerSlider";
+import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { FlashSaleSection } from "@/components/home/FlashSaleSection";
+import { FeaturedCategories } from "@/components/home/FeaturedCategories";
+import { PromoPopup } from "@/components/home/PromoPopup";
+import { HOME_BANNERS, FLASH_SALE_PRODUCTS, PROMO_POPUP } from "@/lib/home-mock";
 
-export default function HomePage() {
+const FEATURED_PRODUCTS_LIMIT = 8;
+
+export default async function HomePage() {
+  const [categories, featuredProducts] = await Promise.all([
+    getCategoryTree().catch(() => []),
+    getProducts({ sort: "best_selling", limit: FEATURED_PRODUCTS_LIMIT })
+      .then((result) => result.data)
+      .catch(() => []),
+  ]);
+
   return (
     <div>
-      {/* Mock tạm cho UAT — thay bằng banner/danh mục/sản phẩm nổi bật thật ở Sprint 2 */}
-      <section className="bg-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-24">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Bộ sưu tập mới đã về
-          </h1>
-          <p className="max-w-xl text-muted-foreground">
-            Khám phá các sản phẩm thời trang mới nhất với giá ưu đãi trong mùa này.
-          </p>
-          <Link href="/products" className={buttonVariants({ size: "lg" })}>
-            Mua sắm ngay
-          </Link>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <p className="text-muted-foreground">
-          Danh mục nổi bật và sản phẩm nổi bật sẽ hiển thị ở đây (Sprint 2).
-        </p>
-      </div>
+      <BannerSlider banners={HOME_BANNERS} />
+      <FeaturedProducts products={featuredProducts} />
+      <FlashSaleSection products={FLASH_SALE_PRODUCTS} />
+      <FeaturedCategories categories={categories} />
+      <PromoPopup config={PROMO_POPUP} />
     </div>
   );
 }
