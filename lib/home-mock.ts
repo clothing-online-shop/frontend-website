@@ -47,7 +47,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-1",
     name: "Áo thun cotton basic",
     slug: "ao-thun-cotton-basic",
-    thumbnail: "https://picsum.photos/seed/fs-1/600/800",
+    thumbnail: "https://loremflickr.com/600/800/tshirt,fashion?lock=101",
     basePrice: 259000,
     salePrice: 129000,
     soldPercent: 72,
@@ -57,7 +57,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-2",
     name: "Quần jean slim fit",
     slug: "quan-jean-slim-fit",
-    thumbnail: "https://picsum.photos/seed/fs-2/600/800",
+    thumbnail: "https://loremflickr.com/600/800/jeans,fashion?lock=102",
     basePrice: 599000,
     salePrice: 359000,
     soldPercent: 45,
@@ -67,7 +67,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-3",
     name: "Váy midi hoa nhí",
     slug: "vay-midi-hoa-nhi",
-    thumbnail: "https://picsum.photos/seed/fs-3/600/800",
+    thumbnail: "https://loremflickr.com/600/800/dress,floral?lock=103",
     basePrice: 459000,
     salePrice: 275000,
     soldPercent: 88,
@@ -77,7 +77,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-4",
     name: "Áo sơ mi linen",
     slug: "ao-so-mi-linen",
-    thumbnail: "https://picsum.photos/seed/fs-4/600/800",
+    thumbnail: "https://loremflickr.com/600/800/shirt,linen?lock=104",
     basePrice: 399000,
     salePrice: 239000,
     soldPercent: 30,
@@ -87,7 +87,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-5",
     name: "Chân váy xếp ly",
     slug: "chan-vay-xep-ly",
-    thumbnail: "https://picsum.photos/seed/fs-5/600/800",
+    thumbnail: "https://loremflickr.com/600/800/skirt,fashion?lock=105",
     basePrice: 349000,
     salePrice: 199000,
     soldPercent: 60,
@@ -97,7 +97,7 @@ export const FLASH_SALE_PRODUCTS: MockFlashSaleProduct[] = [
     id: "fs-6",
     name: "Áo khoác bomber",
     slug: "ao-khoac-bomber",
-    thumbnail: "https://picsum.photos/seed/fs-6/600/800",
+    thumbnail: "https://loremflickr.com/600/800/jacket,bomber?lock=106",
     basePrice: 799000,
     salePrice: 479000,
     soldPercent: 20,
@@ -112,8 +112,19 @@ export interface MockFeaturedCategory {
   imageUrl: string;
 }
 
-export const FEATURED_CATEGORY_FALLBACK_IMAGE = (seed: string) =>
-  `https://picsum.photos/seed/cat-${seed}/400/400`;
+// Suy ra từ khoá thời trang theo slug danh mục (nu/nam) để loremflickr trả ảnh liên quan
+// thay vì random hoàn toàn — lock là số ổn định suy từ slug để cùng 1 danh mục luôn ra
+// cùng 1 ảnh (không đổi mỗi lần render).
+function slugToLock(slug: string): number {
+  let hash = 0;
+  for (const char of slug) hash = (hash * 31 + char.charCodeAt(0)) % 100000;
+  return hash;
+}
+
+export const FEATURED_CATEGORY_FALLBACK_IMAGE = (slug: string) => {
+  const keyword = slug.includes("nu") ? "women,fashion" : slug.includes("nam") ? "men,fashion" : "fashion,clothing";
+  return `https://loremflickr.com/400/400/${keyword}?lock=${slugToLock(slug)}`;
+};
 
 export interface PromoPopupConfig {
   title: string;
@@ -125,6 +136,6 @@ export interface PromoPopupConfig {
 export const PROMO_POPUP: PromoPopupConfig = {
   title: "Ưu đãi thành viên mới",
   description: "Nhập mã WELCOME10 để được giảm 10% cho đơn hàng đầu tiên",
-  imageUrl: "https://picsum.photos/seed/promo-popup/900/1100",
+  imageUrl: "https://loremflickr.com/900/1100/fashion,sale?lock=201",
   linkUrl: "/san-pham",
 };
