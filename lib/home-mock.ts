@@ -16,7 +16,7 @@ export const HOME_BANNERS: HomeBanner[] = [
     title: "Bộ sưu tập Thu Đông 2026",
     description: "Item len, dạ, khoác dày ấm áp cho mùa lạnh",
     imageUrl: "https://picsum.photos/seed/banner-autumn/1600/700",
-    linkUrl: "/products?category=ao-khoac",
+    linkUrl: "/danh-muc/ao-khoac",
     ctaLabel: "Mua ngay",
   },
   {
@@ -24,7 +24,7 @@ export const HOME_BANNERS: HomeBanner[] = [
     title: "Sale cuối tuần đến 50%",
     description: "Áp dụng toàn bộ sản phẩm nữ, số lượng có hạn",
     imageUrl: "https://picsum.photos/seed/banner-sale/1600/700",
-    linkUrl: "/products",
+    linkUrl: "/san-pham",
     ctaLabel: "Săn sale ngay",
   },
   {
@@ -32,7 +32,7 @@ export const HOME_BANNERS: HomeBanner[] = [
     title: "Hàng mới về mỗi tuần",
     description: "Cập nhật xu hướng thời trang mới nhất",
     imageUrl: "https://picsum.photos/seed/banner-newin/1600/700",
-    linkUrl: "/products?sort=newest",
+    linkUrl: "/san-pham?sort=newest",
     ctaLabel: "Khám phá ngay",
   },
 ];
@@ -132,5 +132,5 @@ export const PROMO_POPUP: PromoPopupConfig = {
   title: "Ưu đãi thành viên mới",
   description: "Nhập mã WELCOME10 để được giảm 10% cho đơn hàng đầu tiên",
   imageUrl: "https://picsum.photos/seed/promo-popup/900/1100",
-  linkUrl: "/products",
+  linkUrl: "/san-pham",
 };

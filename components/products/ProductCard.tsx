@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     : 0;
 
   return (
-    <Link href={`/products/${product.slug}`} className="group block">
+    <Link href={`/san-pham/${product.slug}`} className="group block">
       <div className="relative aspect-3/4 overflow-hidden bg-secondary">
         {product.thumbnail ? (
           <Image

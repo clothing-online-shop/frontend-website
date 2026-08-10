@@ -43,7 +43,7 @@ export function FlashSaleSection({ products }: { products: MockFlashSaleProduct[
               ((product.basePrice - product.salePrice) / product.basePrice) * 100,
             );
             return (
-              <Link key={product.id} href={`/products/${product.slug}`} className="group block">
+              <Link key={product.id} href={`/san-pham/${product.slug}`} className="group block">
                 <div className="relative aspect-3/4 overflow-hidden bg-secondary">
                   <Image
                     src={product.thumbnail}

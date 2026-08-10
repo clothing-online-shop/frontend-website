@@ -67,7 +67,7 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-2 pb-4">
           <Link
-            href="/products"
+            href="/san-pham"
             onClick={close}
             className="block rounded-md px-2 py-2 text-sm font-medium hover:bg-secondary"
           >

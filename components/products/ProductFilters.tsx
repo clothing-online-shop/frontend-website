@@ -46,7 +46,7 @@ function CategoryLinks({
         <li key={category.id}>
           <Link
             href={
-              activeCategorySlug === category.slug ? "/products" : `/danh-muc/${category.slug}`
+              activeCategorySlug === category.slug ? "/san-pham" : `/danh-muc/${category.slug}`
             }
             className={cn(
               "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
@@ -63,7 +63,7 @@ function CategoryLinks({
                 <li key={child.id}>
                   <Link
                     href={
-                      activeCategorySlug === child.slug ? "/products" : `/danh-muc/${child.slug}`
+                      activeCategorySlug === child.slug ? "/san-pham" : `/danh-muc/${child.slug}`
                     }
                     className={cn(
                       "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
