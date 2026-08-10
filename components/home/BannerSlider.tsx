@@ -52,7 +52,11 @@ export function BannerSlider({ banners }: { banners: HomeBanner[] }) {
         <CarouselContent className="ml-0">
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="basis-full pl-0">
-              <Link href={banner.linkUrl} className="group relative block aspect-21/9 w-full overflow-hidden sm:aspect-2/1 lg:aspect-21/8">
+              <Link
+                href={banner.linkUrl}
+                aria-label={banner.title}
+                className="group relative block aspect-3/1 w-full overflow-hidden"
+              >
                 <Image
                   src={banner.imageUrl}
                   alt={banner.title}
@@ -61,14 +65,6 @@ export function BannerSlider({ banners }: { banners: HomeBanner[] }) {
                   sizes="100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                <div className="absolute bottom-6 left-6 max-w-lg text-white sm:bottom-12 sm:left-10">
-                  <h2 className="font-heading text-2xl font-extrabold sm:text-4xl">{banner.title}</h2>
-                  <p className="mt-2 text-sm text-white/90 sm:text-base">{banner.description}</p>
-                  <span className="mt-5 inline-block bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors group-hover:bg-primary/90">
-                    {banner.ctaLabel}
-                  </span>
-                </div>
               </Link>
             </CarouselItem>
           ))}

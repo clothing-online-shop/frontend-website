@@ -4,36 +4,30 @@
 export interface HomeBanner {
   id: string;
   title: string;
-  description: string;
   imageUrl: string;
   linkUrl: string;
-  ctaLabel: string;
 }
 
+// Ảnh banner đã có sẵn tiêu đề/nút CTA thiết kế ngay trong ảnh (xem BannerSlider) —
+// title ở đây chỉ dùng làm alt/aria-label, không render đè chữ lên ảnh nữa.
 export const HOME_BANNERS: HomeBanner[] = [
   {
     id: "banner-1",
-    title: "Bộ sưu tập Thu Đông 2026",
-    description: "Item len, dạ, khoác dày ấm áp cho mùa lạnh",
-    imageUrl: "https://picsum.photos/seed/banner-autumn/1600/700",
-    linkUrl: "/danh-muc/ao-khoac",
-    ctaLabel: "Mua ngay",
+    title: "Trạm Hè Đa Sắc — Together Station",
+    imageUrl: "/image/banner_1.webp",
+    linkUrl: "/san-pham",
   },
   {
     id: "banner-2",
-    title: "Sale cuối tuần đến 50%",
-    description: "Áp dụng toàn bộ sản phẩm nữ, số lượng có hạn",
-    imageUrl: "https://picsum.photos/seed/banner-sale/1600/700",
+    title: "Back To School",
+    imageUrl: "/image/banner_2.webp",
     linkUrl: "/san-pham",
-    ctaLabel: "Săn sale ngay",
   },
   {
     id: "banner-3",
-    title: "Hàng mới về mỗi tuần",
-    description: "Cập nhật xu hướng thời trang mới nhất",
-    imageUrl: "https://picsum.photos/seed/banner-newin/1600/700",
-    linkUrl: "/san-pham?sort=newest",
-    ctaLabel: "Khám phá ngay",
+    title: "Happy Week — Ưu đãi tới 50%",
+    imageUrl: "/image/banner_3.webp",
+    linkUrl: "/san-pham",
   },
 ];
 
