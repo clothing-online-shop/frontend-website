@@ -18,7 +18,7 @@ export function SearchBar({
     e.preventDefault();
     const keyword = (new FormData(e.currentTarget).get("q") as string)?.trim();
     if (!keyword) return;
-    router.push(`/products?search=${encodeURIComponent(keyword)}`);
+    router.push(`/san-pham?search=${encodeURIComponent(keyword)}`);
   }
 
   return (

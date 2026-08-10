@@ -236,7 +236,7 @@ export default async function ProductDetailPage({
       ) : null}
 
       <div className="mt-10">
-        <Link href="/products" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/san-pham" className="text-sm text-muted-foreground hover:text-foreground">
           ← Quay lại danh sách sản phẩm
         </Link>
       </div>

@@ -13,7 +13,7 @@ export function FeaturedProducts({ products }: { products: ProductListItem[] }) 
           <p className="mt-1 text-sm text-muted-foreground">Được mua nhiều nhất gần đây</p>
         </div>
         <Link
-          href="/products?sort=best_selling"
+          href="/san-pham?sort=best_selling"
           className="text-sm font-bold text-primary hover:underline"
         >
           Xem tất cả

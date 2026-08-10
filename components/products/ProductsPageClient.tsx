@@ -97,7 +97,7 @@ export function ProductsPageClient({ category }: { category?: string }) {
           {activeCategory ? (
             <>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/products">Sản phẩm</BreadcrumbLink>
+                <BreadcrumbLink href="/san-pham">Sản phẩm</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -133,7 +133,11 @@ export function ProductsPageClient({ category }: { category?: string }) {
             </div>
             <Select value={sort} onValueChange={updateSort}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Sắp xếp" />
+                <SelectValue placeholder="Sắp xếp">
+                  {(value: ProductSort) =>
+                    SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {SORT_OPTIONS.map((option) => (

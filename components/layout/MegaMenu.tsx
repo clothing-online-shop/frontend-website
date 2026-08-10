@@ -60,7 +60,7 @@ export function MegaMenu({ categories }: { categories: CategoryNode[] }) {
       <ul className="flex items-center">
         <li>
           <Link
-            href="/products"
+            href="/san-pham"
             className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background"
           >
             Tất cả sản phẩm
