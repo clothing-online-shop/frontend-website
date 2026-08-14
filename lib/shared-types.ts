@@ -17,12 +17,13 @@ export interface AuthUser {
   fullName: string;
   role: "CUSTOMER" | "ADMIN";
   status: "ACTIVE" | "INACTIVE" | "BANNED";
+  emailVerifiedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface LoginPayload {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -41,6 +42,24 @@ export interface RegisterPayload {
 
 export interface ForgotPasswordPayload {
   email: string;
+}
+
+export interface VerifyOtpPayload {
+  email: string;
+  code: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface LogoutPayload {
+  refreshToken: string;
 }
 
 export interface CategoryNode {

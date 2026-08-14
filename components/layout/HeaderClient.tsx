@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingBag, User } from "lucide-react";
+import { LogOut, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { Logo } from "@/components/layout/Logo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
+import { useLogout } from "@/hooks/useLogout";
 
 function HeaderIconLink({
   href,
@@ -27,6 +29,38 @@ function HeaderIconLink({
       <Icon className="size-5" />
       <span className="text-[11px] font-medium">{label}</span>
     </Link>
+  );
+}
+
+function AccountMenu() {
+  const user = useAuthStore((state) => state.user);
+  const logout = useLogout();
+
+  if (!user) {
+    return <HeaderIconLink href="/login" label="Đăng nhập" icon={User} />;
+  }
+
+  const firstName = user.fullName.trim().split(/\s+/).pop() ?? user.fullName;
+
+  return (
+    <div className="flex items-center gap-1">
+      <Link
+        href="/account"
+        className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+      >
+        <User className="size-5" />
+        <span className="max-w-16 truncate text-[11px] font-medium">{firstName}</span>
+      </Link>
+      <button
+        type="button"
+        onClick={() => logout()}
+        aria-label="Đăng xuất"
+        className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+      >
+        <LogOut className="size-5" />
+        <span className="text-[11px] font-medium">Đăng xuất</span>
+      </button>
+    </div>
   );
 }
 
@@ -52,7 +86,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
         <SearchBar className="mx-2 hidden max-w-xl flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1">
-          <HeaderIconLink href="/account" label="Tài khoản" icon={User} />
+          <AccountMenu />
           <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} />
         </div>
       </div>
