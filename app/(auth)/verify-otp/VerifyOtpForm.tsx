@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { verifyOtp, resendOtp } from "@/lib/auth-api";
 import { getErrorMessage } from "@/lib/error";
@@ -55,62 +55,65 @@ export function VerifyOtpForm() {
 
   if (!email) {
     return (
-      <Card className="w-full">
-        <CardContent className="pt-6 text-center text-sm text-muted-foreground">
-          Thiếu thông tin email. Vui lòng quay lại trang đăng ký.
-        </CardContent>
-      </Card>
+      <div>
+        <h1 className="font-heading text-2xl font-extrabold uppercase">Xác thực email</h1>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Thiếu thông tin email. Vui lòng quay lại trang{" "}
+          <Link href="/register" className="font-medium underline underline-offset-2">
+            đăng ký
+          </Link>
+          .
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Xác thực email</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          Nhập mã 6 số vừa được gửi tới <strong>{email}</strong>. Mã có hiệu lực trong 5
-          phút.
+    <div>
+      <h1 className="font-heading text-2xl font-extrabold uppercase">Xác thực email</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Nhập mã 6 số vừa được gửi tới <strong className="text-foreground">{email}</strong>.
+        Mã có hiệu lực trong 5 phút.
+      </p>
+
+      <div className="mt-6 flex justify-center">
+        <InputOTP maxLength={6} value={code} onChange={setCode}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} className="h-12 w-11 text-lg" />
+            <InputOTPSlot index={1} className="h-12 w-11 text-lg" />
+            <InputOTPSlot index={2} className="h-12 w-11 text-lg" />
+            <InputOTPSlot index={3} className="h-12 w-11 text-lg" />
+            <InputOTPSlot index={4} className="h-12 w-11 text-lg" />
+            <InputOTPSlot index={5} className="h-12 w-11 text-lg" />
+          </InputOTPGroup>
+        </InputOTP>
+      </div>
+
+      {verifyMutation.isError && (
+        <p className="mt-4 text-center text-sm text-destructive">
+          {getErrorMessage(verifyMutation.error)}
         </p>
+      )}
 
-        <div className="flex justify-center">
-          <InputOTP maxLength={6} value={code} onChange={setCode}>
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-        </div>
+      <Button
+        size="lg"
+        className="mt-6 w-full text-base font-bold uppercase"
+        disabled={code.length !== 6 || verifyMutation.isPending}
+        onClick={() => verifyMutation.mutate({ email, code })}
+      >
+        {verifyMutation.isPending ? "Đang xác thực..." : "Xác thực"}
+      </Button>
 
-        {verifyMutation.isError && (
-          <p className="text-center text-sm text-destructive">
-            {getErrorMessage(verifyMutation.error)}
-          </p>
-        )}
-
-        <Button
-          className="w-full"
-          disabled={code.length !== 6 || verifyMutation.isPending}
-          onClick={() => verifyMutation.mutate({ email, code })}
-        >
-          {verifyMutation.isPending ? "Đang xác thực..." : "Xác thực"}
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          disabled={cooldown > 0 || resendMutation.isPending}
-          onClick={() => resendMutation.mutate({ email })}
-        >
-          {cooldown > 0 ? `Gửi lại mã (${cooldown}s)` : "Gửi lại mã"}
-        </Button>
-      </CardContent>
-    </Card>
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        className="mt-3 w-full text-base font-bold uppercase"
+        disabled={cooldown > 0 || resendMutation.isPending}
+        onClick={() => resendMutation.mutate({ email })}
+      >
+        {cooldown > 0 ? `Gửi lại mã (${cooldown}s)` : "Gửi lại mã"}
+      </Button>
+    </div>
   );
 }
