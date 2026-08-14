@@ -1,12 +1,13 @@
 import { Suspense } from "react";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { VerifyOtpForm } from "./VerifyOtpForm";
 
 export default function VerifyOtpPage() {
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
+    <AuthLayout>
       <Suspense>
         <VerifyOtpForm />
       </Suspense>
-    </div>
+    </AuthLayout>
   );
 }

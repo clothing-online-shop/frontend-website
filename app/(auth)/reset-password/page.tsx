@@ -1,12 +1,13 @@
 import { Suspense } from "react";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export default function ResetPasswordPage() {
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
+    <AuthLayout>
       <Suspense>
         <ResetPasswordForm />
       </Suspense>
-    </div>
+    </AuthLayout>
   );
 }
