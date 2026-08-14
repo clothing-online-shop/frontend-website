@@ -19,7 +19,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
       <div className="relative hidden w-1/2 lg:block">
         <Image
-          src="/image/banner_1.webp"
+          src="/authen-img.jpg"
           alt=""
           fill
           sizes="50vw"
