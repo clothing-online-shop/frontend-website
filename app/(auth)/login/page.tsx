@@ -10,10 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/lib/auth-api";
+import { getErrorMessage } from "@/lib/error";
 import { useAuthStore } from "@/store/auth-store";
 
 const loginSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
+  identifier: z.string().min(1, "Vui lòng nhập email hoặc số điện thoại"),
   password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự"),
 });
 
@@ -49,9 +50,9 @@ export default function LoginPage() {
             onSubmit={handleSubmit((values) => mutation.mutate(values))}
           >
             <div className="space-y-1">
-              <Input placeholder="Email" type="email" {...register("email")} />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+              <Input placeholder="Email hoặc số điện thoại" {...register("identifier")} />
+              {errors.identifier && (
+                <p className="text-sm text-destructive">{errors.identifier.message}</p>
               )}
             </div>
             <div className="space-y-1">
@@ -61,9 +62,7 @@ export default function LoginPage() {
               )}
             </div>
             {mutation.isError && (
-              <p className="text-sm text-destructive">
-                Đăng nhập thất bại. Vui lòng kiểm tra lại email/mật khẩu.
-              </p>
+              <p className="text-sm text-destructive">{getErrorMessage(mutation.error)}</p>
             )}
             <Button type="submit" className="w-full" disabled={mutation.isPending}>
               {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
@@ -73,7 +72,9 @@ export default function LoginPage() {
             <Link href="/register" className="hover:underline">
               Tạo tài khoản mới
             </Link>
-            <span className="text-muted-foreground">Quên mật khẩu?</span>
+            <Link href="/forgot-password" className="text-muted-foreground hover:underline">
+              Quên mật khẩu?
+            </Link>
           </div>
         </CardContent>
       </Card>
