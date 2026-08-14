@@ -10,19 +10,19 @@ import { Logo } from "@/components/layout/Logo";
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      <div className="flex w-full flex-col px-6 py-8 sm:px-10 lg:w-1/2 lg:px-16 lg:py-10">
+      <div className="flex w-full flex-col px-6 py-8 sm:px-10 lg:w-[35%] lg:px-16 lg:py-10">
         <Logo className="text-base" />
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>
 
-      <div className="relative hidden w-1/2 lg:block">
+      <div className="relative hidden w-[65%] lg:block">
         <Image
           src="/authen-img.jpg"
           alt=""
           fill
-          sizes="50vw"
+          sizes="65vw"
           priority
           className="object-cover"
         />
