@@ -48,6 +48,13 @@ store/                  # zustand store (auth-store.ts, cart-store.ts)
 - Mỗi page hiển thị nội dung công khai (trang chủ, danh sách/chi tiết sản phẩm) phải có `export const metadata` hoặc `generateMetadata` — không để Next tự sinh title mặc định.
 - Ảnh sản phẩm dùng `next/image`, không dùng thẻ `<img>` thường.
 
+## Bắt đầu tính năng mới
+
+- Trước khi code: `git checkout develop && git pull` để lấy code mới nhất, sau đó tạo branch mới từ `develop` với tên phù hợp tính năng đang làm (`feature/<mo-ta-ngan>`, `fix/<mo-ta-ngan>`) — không code thẳng trên `develop`.
+- Trước khi bắt tay vào tính năng mới (không áp dụng cho fix nhỏ đang dở): rà soát nhanh phần code liên quan ở nhánh làm việc hiện tại của **cả `frontend-website` lẫn `backend-user`** (2 repo luôn đi cùng nhau — FE khách hàng gọi trực tiếp BE user), tìm lỗi logic còn tồn đọng quanh khu vực tính năng sắp đụng tới (UI hiển thị sai state, gọi API sai contract Swagger hiện tại, SEO/metadata thiếu...). Có lỗi thì sửa trước — commit riêng, có thể trên nhánh `fix/...` tách biệt — rồi mới bắt đầu code tính năng mới, không dồn việc dọn nợ này tới lúc tính năng mới xong mới làm. Mục tiêu: code không bug, logic đúng, dễ maintain, không lặp code.
+- Trước khi viết 1 hàm/component mới: rà lại codebase xem đã có sẵn cái làm việc tương tự chưa (grep trong `lib/`, `components/`) — có thì dùng lại, không viết mới. Nếu thấy 1 hàm/component sắp viết ra nhiều khả năng còn dùng lại ở trang khác thì viết thẳng vào `lib/`/`components/` ngay từ đầu, không đợi phát hiện trùng lặp rồi mới refactor sau.
+- Sau khi code xong, trước khi báo hoàn thành/mở PR: chủ động tự review lại toàn bộ diff theo đúng quy ước trong `CLAUDE.md` này và `AGENTS.md`/`README.md` của repo — không chỉ dựa vào lint/build pass.
+
 ## Trước khi mở PR
 
 1. `pnpm --filter @clothing-shop/web lint` — 0 lỗi.
