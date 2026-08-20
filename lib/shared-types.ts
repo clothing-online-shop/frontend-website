@@ -17,12 +17,13 @@ export interface AuthUser {
   fullName: string;
   role: "CUSTOMER" | "ADMIN";
   status: "ACTIVE" | "INACTIVE" | "BANNED";
+  emailVerifiedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface LoginPayload {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -41,6 +42,24 @@ export interface RegisterPayload {
 
 export interface ForgotPasswordPayload {
   email: string;
+}
+
+export interface VerifyOtpPayload {
+  email: string;
+  code: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface LogoutPayload {
+  refreshToken: string;
 }
 
 export interface CategoryNode {
@@ -62,9 +81,11 @@ export interface ProductListItem {
   slug: string;
   thumbnail: string | null;
   basePrice: number;
+  salePrice: number | null;
   status: ProductStatus;
   categoryId: string;
   totalStock: number;
+  colors: string[];
   createdAt: string;
 }
 
@@ -89,8 +110,15 @@ export interface ProductReview {
 
 export interface ProductDetail extends ProductListItem {
   description: string | null;
+  material: string | null;
+  careInstructions: string | null;
   images: string[];
-  category: { id: string; name: string; slug: string };
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+    ancestors: { id: string; name: string; slug: string }[];
+  };
   variants: ProductVariant[];
   reviews: ProductReview[];
   relatedProducts: ProductListItem[];

@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
+import { useLogout } from "@/hooks/useLogout";
 
 export default function AccountPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const logout = useLogout();
 
   useEffect(() => {
     if (!user) router.push("/login");
@@ -27,14 +28,7 @@ export default function AccountPage() {
       <p className="mt-4 text-muted-foreground">
         Sổ địa chỉ và lịch sử đơn hàng sẽ được triển khai ở sprint sau.
       </p>
-      <Button
-        className="mt-6"
-        variant="outline"
-        onClick={() => {
-          logout();
-          router.push("/login");
-        }}
-      >
+      <Button className="mt-6" variant="outline" onClick={() => logout()}>
         Đăng xuất
       </Button>
     </div>

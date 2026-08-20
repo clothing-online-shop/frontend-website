@@ -1,18 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
+import { Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 import type { ProductDetail } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
+import { getColorSwatch } from "@/lib/color-swatches";
 import { cn } from "@/lib/utils";
 
-const COLOR_SWATCHES: Record<string, string> = {
-  Đen: "#1a1a1a",
-  Trắng: "#ffffff",
-  Xanh: "#3b5fa0",
-};
-
-export function ProductVariantPicker({ product }: { product: ProductDetail }) {
+export function ProductVariantPicker({
+  product,
+  initialColor,
+}: {
+  product: ProductDetail;
+  initialColor?: string;
+}) {
   const sizes = useMemo(
     () => Array.from(new Set(product.variants.map((v) => v.size))),
     [product],
@@ -23,8 +27,10 @@ export function ProductVariantPicker({ product }: { product: ProductDetail }) {
   );
 
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(colors[0] ?? null);
-  const [added, setAdded] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string | null>(
+    (initialColor && colors.includes(initialColor) ? initialColor : colors[0]) ?? null,
+  );
+  const [skuCopied, setSkuCopied] = useState(false);
 
   const selectedVariant =
     product.variants.find((v) => v.size === selectedSize && v.color === selectedColor) ??
@@ -42,47 +48,86 @@ export function ProductVariantPicker({ product }: { product: ProductDetail }) {
     );
   }
 
-  function handleAddToCart() {
-    if (!selectedVariant) return;
-    // Sprint 3 sẽ nối API giỏ hàng thật; hiện log lại lựa chọn để xác nhận luồng chọn variant.
-    console.log("Thêm vào giỏ hàng:", {
-      productId: product.id,
-      productName: product.name,
-      variantId: selectedVariant.id,
-      size: selectedVariant.size,
-      color: selectedVariant.color,
-      price: selectedVariant.price,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+  function colorSwatchImage(color: string): string | null {
+    return product.variants.find((v) => v.color === color && v.imageUrl)?.imageUrl ?? null;
   }
 
-  const displayPrice = selectedVariant?.price ?? product.basePrice;
+  function handleAddToCart() {
+    if (!selectedVariant) return;
+    // Sprint 3 sẽ nối API giỏ hàng thật — hiện tại chưa có store giỏ hàng thật (xem
+    // store/cart-store.ts), chỉ báo xác nhận luồng chọn variant.
+    toast.success(`Đã chọn ${selectedVariant.color} - ${selectedVariant.size}. Giỏ hàng sẽ sớm ra mắt!`);
+  }
+
+  async function handleCopySku() {
+    if (!selectedVariant) return;
+    await navigator.clipboard.writeText(selectedVariant.sku);
+    setSkuCopied(true);
+    setTimeout(() => setSkuCopied(false), 1500);
+  }
+
+  const hasDiscount = product.salePrice != null && product.salePrice < product.basePrice;
+  const discountPercent = hasDiscount
+    ? Math.round(((product.basePrice - product.salePrice!) / product.basePrice) * 100)
+    : 0;
+  const displayPrice = selectedVariant?.price ?? product.salePrice ?? product.basePrice;
   const outOfStock = selectedVariant ? selectedVariant.stockQuantity <= 0 : false;
 
   return (
     <div className="space-y-6">
-      <p className="text-2xl font-medium text-foreground">{formatPrice(displayPrice)}</p>
+      {selectedVariant ? (
+        <button
+          type="button"
+          onClick={handleCopySku}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <span>
+            SKU: <span className="font-medium text-foreground">{selectedVariant.sku}</span>
+          </span>
+          {skuCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+        </button>
+      ) : null}
+
+      <div className="flex items-center gap-3">
+        {hasDiscount ? (
+          <>
+            <p className="text-sm text-muted-foreground line-through">
+              {formatPrice(product.basePrice)}
+            </p>
+            <span className="text-xs font-bold text-primary">-{discountPercent}%</span>
+          </>
+        ) : null}
+      </div>
+      <p className={cn("text-2xl font-extrabold", hasDiscount ? "text-primary" : "text-foreground")}>
+        {formatPrice(displayPrice)}
+      </p>
 
       <div>
         <p className="mb-2 text-sm font-medium">
           Màu sắc{selectedColor ? `: ${selectedColor}` : ""}
         </p>
         <div className="flex gap-2">
-          {colors.map((color) => (
-            <button
-              key={color}
-              type="button"
-              disabled={!isColorAvailable(color)}
-              onClick={() => setSelectedColor(color)}
-              aria-label={color}
-              className={cn(
-                "size-9 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
-                selectedColor === color ? "border-foreground" : "border-border",
-              )}
-              style={{ backgroundColor: COLOR_SWATCHES[color] ?? "#cccccc" }}
-            />
-          ))}
+          {colors.map((color) => {
+            const swatchImage = colorSwatchImage(color);
+            return (
+              <button
+                key={color}
+                type="button"
+                disabled={!isColorAvailable(color)}
+                onClick={() => setSelectedColor(color)}
+                aria-label={color}
+                className={cn(
+                  "relative size-12 overflow-hidden rounded-sm border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
+                  selectedColor === color ? "border-primary" : "border-border",
+                )}
+                style={swatchImage ? undefined : { backgroundColor: getColorSwatch(color) }}
+              >
+                {swatchImage ? (
+                  <Image src={swatchImage} alt={color} fill sizes="48px" className="object-cover" />
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -90,7 +135,7 @@ export function ProductVariantPicker({ product }: { product: ProductDetail }) {
         <p className="mb-2 text-sm font-medium">
           Kích cỡ{selectedSize ? `: ${selectedSize}` : ""}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {sizes.map((size) => (
             <button
               key={size}
@@ -98,10 +143,10 @@ export function ProductVariantPicker({ product }: { product: ProductDetail }) {
               disabled={!isSizeAvailable(size)}
               onClick={() => setSelectedSize(size)}
               className={cn(
-                "flex h-10 min-w-10 items-center justify-center rounded-md border px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:text-muted-foreground/50 disabled:line-through",
+                "flex h-11 min-w-11 items-center justify-center rounded-sm border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-muted-foreground/50 disabled:line-through",
                 selectedSize === size
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border hover:border-foreground",
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border hover:border-primary",
               )}
             >
               {size}
@@ -120,11 +165,11 @@ export function ProductVariantPicker({ product }: { product: ProductDetail }) {
 
       <Button
         size="lg"
-        className="w-full"
+        className="w-full text-base font-bold"
         disabled={!selectedVariant || outOfStock}
         onClick={handleAddToCart}
       >
-        {added ? "Đã thêm vào giỏ" : "Thêm vào giỏ"}
+        Thêm vào giỏ hàng
       </Button>
     </div>
   );

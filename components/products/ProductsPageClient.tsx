@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
@@ -33,15 +33,16 @@ const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
 
 const PAGE_LIMIT = 12;
 
-export function ProductsPageClient() {
+export function ProductsPageClient({ category }: { category?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const category = searchParams.get("category") ?? undefined;
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
   const color = searchParams.get("color") ?? undefined;
+  const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
   const page = Number(searchParams.get("page") ?? "1");
 
@@ -51,6 +52,7 @@ export function ProductsPageClient() {
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
     color,
+    search,
     sort,
     page,
     limit: PAGE_LIMIT,
@@ -75,13 +77,13 @@ export function ProductsPageClient() {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
     params.delete("page");
-    router.push(`/products?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   function goToPage(nextPage: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(nextPage));
-    router.push(`/products?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -95,7 +97,7 @@ export function ProductsPageClient() {
           {activeCategory ? (
             <>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/products">Sản phẩm</BreadcrumbLink>
+                <BreadcrumbLink href="/san-pham">Sản phẩm</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -111,16 +113,31 @@ export function ProductsPageClient() {
       </Breadcrumb>
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
-        <ProductFilters categories={categoriesQuery.data ?? []} />
+        <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <h1 className="font-heading text-2xl font-semibold">
-              {activeCategory ? activeCategory.name : "Tất cả sản phẩm"}
-            </h1>
+            <div>
+              <h1 className="font-heading text-2xl font-extrabold uppercase">
+                {search
+                  ? `Kết quả tìm kiếm cho "${search}"`
+                  : activeCategory
+                    ? activeCategory.name
+                    : "Tất cả sản phẩm"}
+              </h1>
+              {productsQuery.data ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {productsQuery.data.meta.total} sản phẩm
+                </p>
+              ) : null}
+            </div>
             <Select value={sort} onValueChange={updateSort}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Sắp xếp" />
+                <SelectValue placeholder="Sắp xếp">
+                  {(value: ProductSort) =>
+                    SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {SORT_OPTIONS.map((option) => (
@@ -136,7 +153,7 @@ export function ProductsPageClient() {
             <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="space-y-3">
-                  <Skeleton className="aspect-3/4 w-full rounded-xl" />
+                  <Skeleton className="aspect-3/4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/3" />
                 </div>
@@ -175,7 +192,7 @@ export function ProductsPageClient() {
               ) : null}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-24 text-center">
+            <div className="flex flex-col items-center justify-center border border-dashed border-border py-24 text-center">
               <p className="text-muted-foreground">
                 Không tìm thấy sản phẩm phù hợp với bộ lọc hiện tại.
               </p>
