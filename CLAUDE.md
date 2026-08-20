@@ -51,7 +51,9 @@ store/                  # zustand store (auth-store.ts, cart-store.ts)
 ## Bắt đầu tính năng mới
 
 - Trước khi code: `git checkout develop && git pull` để lấy code mới nhất, sau đó tạo branch mới từ `develop` với tên phù hợp tính năng đang làm (`feature/<mo-ta-ngan>`, `fix/<mo-ta-ngan>`) — không code thẳng trên `develop`.
-- Sau khi code xong, trước khi báo hoàn thành/mở PR: chủ động tự review lại toàn bộ diff theo đúng quy ước trong `CLAUDE.md` này và `README.md` của repo — không chỉ dựa vào lint/build pass.
+- Trong lúc code tính năng mới (không phải việc soát lại sau khi xong) — đây là lúc quyết định code có bug/khó maintain hay không: bám sát đúng quy ước Server/Client Component, gọi API, Form, SEO ở trên ngay từ đầu; xử lý đủ trạng thái loading/error cho mọi API call, không để lại phần UI "làm tạm" rồi quên sửa. Mục tiêu: code không bug, logic đúng, dễ maintain, không lặp code.
+- Trước khi viết 1 hàm/component mới: rà lại codebase xem đã có sẵn cái làm việc tương tự chưa (grep trong `lib/`, `components/`) — có thì dùng lại, không viết mới. Nếu thấy 1 hàm/component sắp viết ra nhiều khả năng còn dùng lại ở trang khác thì viết thẳng vào `lib/`/`components/` ngay từ đầu, không đợi phát hiện trùng lặp rồi mới refactor sau.
+- Sau khi code xong, trước khi báo hoàn thành/mở PR: chủ động tự review lại toàn bộ diff theo đúng quy ước trong `CLAUDE.md` này và `AGENTS.md`/`README.md` của repo — không chỉ dựa vào lint/build pass.
 
 ## Trước khi mở PR
 
