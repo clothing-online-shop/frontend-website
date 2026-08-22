@@ -126,11 +126,16 @@ export interface ProductDetail extends ProductListItem {
 
 export type OrderStatus = "PENDING" | "CONFIRMED" | "SHIPPING" | "COMPLETED" | "CANCELLED";
 export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED" | "FAILED";
-export type CheckoutPaymentMethod = "COD" | "VNPAY" | "BANK_TRANSFER";
+export type CheckoutPaymentMethod = "COD" | "VNPAY" | "MOMO" | "STRIPE" | "BANK_TRANSFER";
 
 export interface OrderItem {
   id: string;
   productVariantId: string;
+  productName: string;
+  variantSku: string;
+  size: string;
+  color: string;
+  thumbnail: string | null;
   quantity: number;
   priceAtPurchase: number;
 }
@@ -151,6 +156,7 @@ export interface Order {
 
 export interface CreateOrderPayload {
   addressId: string;
+  cartItemIds: string[];
   paymentMethod: CheckoutPaymentMethod;
 }
 
