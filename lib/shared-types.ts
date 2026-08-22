@@ -124,6 +124,55 @@ export interface ProductDetail extends ProductListItem {
   relatedProducts: ProductListItem[];
 }
 
+export type OrderStatus = "PENDING" | "CONFIRMED" | "SHIPPING" | "COMPLETED" | "CANCELLED";
+export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED" | "FAILED";
+export type CheckoutPaymentMethod = "COD" | "VNPAY" | "BANK_TRANSFER";
+
+export interface OrderItem {
+  id: string;
+  productVariantId: string;
+  quantity: number;
+  priceAtPurchase: number;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  orderCode: string;
+  status: OrderStatus;
+  totalAmount: number;
+  shippingAddress: string;
+  paymentMethod: string;
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+}
+
+export interface CreateOrderPayload {
+  addressId: string;
+  paymentMethod: CheckoutPaymentMethod;
+}
+
+export interface InitiateVnpayResponse {
+  paymentUrl: string;
+}
+
+export interface VerifyVnpayReturnResponse {
+  success: boolean;
+  orderId: string | null;
+  orderCode: string;
+  message: string;
+}
+
+export interface BankTransferInfo {
+  bankAccountNumber: string;
+  bankAccountName: string;
+  bankName: string;
+  transferContent: string;
+  amount: number;
+}
+
 export interface PaginatedResult<T> {
   data: T[];
   meta: {
