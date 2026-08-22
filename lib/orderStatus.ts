@@ -18,5 +18,7 @@ export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
 export const PAYMENT_METHOD_LABEL: Record<CheckoutPaymentMethod, string> = {
   COD: "Thanh toán khi nhận hàng",
   VNPAY: "VNPay",
+  MOMO: "Ví MoMo",
+  STRIPE: "Thẻ quốc tế (Stripe)",
   BANK_TRANSFER: "Chuyển khoản ngân hàng",
 };

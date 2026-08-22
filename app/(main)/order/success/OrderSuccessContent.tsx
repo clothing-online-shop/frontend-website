@@ -18,7 +18,7 @@ import { useAuthStore } from "@/store/auth-store";
 export function OrderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("orderId") ?? "";
+  const orderCode = searchParams.get("orderCode") ?? "";
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
@@ -32,12 +32,12 @@ export function OrderSuccessContent() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["order", orderId],
-    queryFn: () => getOrder(orderId),
-    enabled: !!orderId && !!user,
+    queryKey: ["order", orderCode],
+    queryFn: () => getOrder(orderCode),
+    enabled: !!orderCode && !!user,
   });
 
-  if (!orderId) {
+  if (!orderCode) {
     return (
       <StatusPage
         title="Không tìm thấy đơn hàng"

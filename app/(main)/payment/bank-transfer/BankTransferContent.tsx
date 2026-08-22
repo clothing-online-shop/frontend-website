@@ -115,7 +115,7 @@ export function BankTransferContent() {
       <div className="mt-8 flex justify-center gap-4">
         <Button
           nativeButton={false}
-          render={<Link href={`/order/success?orderId=${orderId}`} />}
+          render={<Link href={`/order/success?orderCode=${info.transferContent}`} />}
         >
           Tôi đã chuyển khoản
         </Button>
