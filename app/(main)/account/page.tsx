@@ -9,13 +9,14 @@ import { useLogout } from "@/hooks/useLogout";
 export default function AccountPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const logout = useLogout();
 
   useEffect(() => {
-    if (!user) router.push("/login");
-  }, [user, router]);
+    if (hasHydrated && !user) router.push("/login");
+  }, [hasHydrated, user, router]);
 
-  if (!user) return null;
+  if (!hasHydrated || !user) return null;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16">
