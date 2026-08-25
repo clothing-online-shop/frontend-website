@@ -42,6 +42,15 @@
   --color-card: var(--card);
   --color-success: var(--success);
   --color-danger: var(--destructive);
+  --color-brand-7: var(--brand-7);
+  --color-brand-10: var(--brand-10);
+  --color-brand-38: var(--brand-38);
+  --color-brand-83: var(--brand-83);
+  --color-brand-88: var(--brand-88);
+  --color-neutral-33: var(--neutral-33);
+  --color-neutral-84: var(--neutral-84);
+  --color-neutral-92: var(--neutral-92);
+  --color-neutral-96: var(--neutral-96);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 6px;
@@ -54,26 +63,37 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #17181a;
+  /* Brand palette lấy từ Figma (webSite bán quần áo) — thang màu orange (thương hiệu) và grey (trung tính) đặt tên theo lightness giống biến Figma. */
+  --brand-7: #17130e;
+  --brand-10: #1e1a15;
+  --brand-38: #8b5339;
+  --brand-83: #e2d0c4;
+  --brand-88: #ecdfd4;
+  --neutral-33: #5a544e;
+  --neutral-84: #d9d7d5;
+  --neutral-92: #eeeae7;
+  --neutral-96: #f7f5f2;
+
+  --background: var(--neutral-96);
+  --foreground: var(--brand-10);
   --card: #ffffff;
-  --card-foreground: #17181a;
+  --card-foreground: var(--brand-10);
   --popover: #ffffff;
-  --popover-foreground: #17181a;
-  --primary: #e0342b;
+  --popover-foreground: var(--brand-10);
+  --primary: var(--brand-38);
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #17181a;
-  --muted: #f4f4f5;
-  --muted-foreground: #6b6b70;
-  --accent: #22c3bd;
-  --accent-foreground: #ffffff;
-  --accent-soft: #e3faf8;
+  --secondary: var(--brand-88);
+  --secondary-foreground: var(--brand-10);
+  --muted: var(--neutral-92);
+  --muted-foreground: var(--neutral-33);
+  --accent: var(--brand-83);
+  --accent-foreground: var(--brand-10);
+  --accent-soft: var(--brand-88);
   --destructive: #c81e1e;
   --success: #1f9254;
-  --border: #e6e6e8;
-  --input: #e6e6e8;
-  --ring: #e0342b;
+  --border: var(--neutral-84);
+  --input: var(--neutral-84);
+  --ring: var(--brand-38);
   --chart-1: #e0342b;
   --chart-2: #17181a;
   --chart-3: #22c3bd;

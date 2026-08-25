@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Inter } from "next/font/google";
+import { Lora, Mulish } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Đổi từ Playfair Display (serif, boutique) sang Be Vietnam Pro (sans-serif đậm) —
-// bám theo tông thương mại/fast-fashion tham khảo từ Canifa thay vì "quiet luxury".
-const fontHeading = Be_Vietnam_Pro({
+// Theo design Figma: Lora (serif) cho heading/logo, Mulish cho phần nội dung —
+// cả hai đều có subset "vietnamese" đầy đủ (khác Instrument Serif/Sans trong Figma gốc).
+const fontHeading = Lora({
   subsets: ["latin", "vietnamese"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-heading",
 });
 
-const fontBody = Inter({
+const fontBody = Mulish({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
 });
 
