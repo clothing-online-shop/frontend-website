@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogOut, ShoppingBag, User } from "lucide-react";
+import { Bell, LogOut, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { Logo } from "@/components/layout/Logo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
@@ -16,19 +16,42 @@ function HeaderIconLink({
   href,
   label,
   icon: Icon,
+  badge,
 }: {
   href: string;
   label: string;
   icon: typeof User;
+  badge?: number;
 }) {
   return (
     <Link
       href={href}
-      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+      className="relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
     >
-      <Icon className="size-5" />
+      <span className="relative">
+        <Icon className="size-5" />
+        {badge !== undefined && (
+          <span className="absolute -top-1.5 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+            {badge}
+          </span>
+        )}
+      </span>
       <span className="text-[11px] font-medium">{label}</span>
     </Link>
+  );
+}
+
+function NotificationButton() {
+  // Chưa có tính năng thông báo thật (không có API/store) — hiển thị theo design nhưng
+  // không điều hướng đi đâu, tránh link chết tới trang chưa tồn tại.
+  return (
+    <button
+      type="button"
+      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+    >
+      <Bell className="size-5" />
+      <span className="text-[11px] font-medium">Thông báo</span>
+    </button>
   );
 }
 
@@ -77,17 +100,19 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   }, []);
 
   return (
-    <header className={cn("sticky top-0 z-50 bg-background transition-shadow", scrolled && "shadow-md")}>
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
+    <header className={cn("sticky top-0 z-50 bg-white transition-shadow", scrolled && "shadow-md")}>
+      <div className="mx-auto flex h-18 max-w-6xl items-center gap-3 px-4">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-lg" />
+        <Logo className="shrink-0 text-xl sm:text-2xl" />
 
         <SearchBar className="mx-2 hidden max-w-xl flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1">
+          <NotificationButton />
           <AccountMenu />
-          <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} />
+          {/* Chưa có API giỏ hàng thật (Sprint 3, xem store/cart-store.ts) — số lượng tạm để 0 */}
+          <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} badge={0} />
         </div>
       </div>
 

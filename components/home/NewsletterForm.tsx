@@ -34,13 +34,14 @@ export function NewsletterForm() {
       <div className="flex gap-2">
         <Input
           type="email"
-          placeholder="Nhập email của bạn"
+          placeholder="Email của bạn"
           aria-label="Email đăng ký nhận bản tin"
           aria-invalid={!!errors.email}
+          className="h-9 border-white/20 bg-white/5 text-white placeholder:text-white/50 focus-visible:border-white/40 focus-visible:ring-white/20"
           {...register("email")}
         />
-        <Button type="submit" variant="secondary" disabled={isSubmitting}>
-          Đăng ký
+        <Button type="submit" className="h-9 shrink-0" disabled={isSubmitting}>
+          Gửi
         </Button>
       </div>
       {errors.email ? <p className="text-xs text-destructive">{errors.email.message}</p> : null}

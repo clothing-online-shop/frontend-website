@@ -1,55 +1,53 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/layout/SocialIcons";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
 
-const POLICY_LINKS = [
-  { label: "Chính sách đổi trả", href: "#" },
-  { label: "Chính sách vận chuyển", href: "#" },
-  { label: "Chính sách bảo mật", href: "#" },
-  { label: "Điều khoản sử dụng", href: "#" },
+const SHOP_LINKS = [
+  { label: "Sản phẩm mới", href: "/san-pham?sort=newest" },
+  // Chưa có trang riêng cho bộ sưu tập/thương hiệu — giữ chỗ theo design, nối link thật khi có trang.
+  { label: "Bộ sưu tập", href: "#" },
+  { label: "Thương hiệu", href: "#" },
+  { label: "Flash Sale", href: "/#flash-sale" },
 ];
 
-const SOCIAL_LINKS = [
-  { label: "Facebook", href: "#", icon: FacebookIcon },
-  { label: "Instagram", href: "#", icon: InstagramIcon },
-  { label: "Youtube", href: "#", icon: YoutubeIcon },
+const POLICY_LINKS = [
+  { label: "Điều khoản sử dụng", href: "#" },
+  { label: "Chính sách bảo mật", href: "#" },
+  { label: "Chính sách đổi trả", href: "#" },
+  { label: "Chính sách vận chuyển", href: "#" },
 ];
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-secondary">
-      <div className="mx-auto max-w-6xl px-4 py-12">
+    <footer className="bg-brand-7 text-neutral-84">
+      <div className="mx-auto max-w-6xl px-4 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
-            <Logo className="text-base" />
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <Phone className="mt-0.5 size-4 shrink-0" />
-                <a href="tel:19001234" className="hover:text-foreground">
-                  1900 1234
+            <Logo className="text-lg text-white" />
+            <ul className="space-y-1.5 text-sm">
+              <li>
+                Hotline{" "}
+                <a href="tel:19006868" className="hover:text-white">
+                  1900 6868
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <Mail className="mt-0.5 size-4 shrink-0" />
-                <a href="mailto:hotro@clothingshop.vn" className="hover:text-foreground">
-                  hotro@clothingshop.vn
+              <li>
+                <a href="mailto:cskh@phuongphuong.vn" className="hover:text-white">
+                  cskh@phuongphuong.vn
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="mt-0.5 size-4 shrink-0" />
-                <span>Số 1 Đường ABC, Quận 1, TP. Hồ Chí Minh</span>
-              </li>
+              <li>Số 8 Tràng Thi, Hoàn Kiếm, Hà Nội</li>
             </ul>
+            {/* Placeholder logo "Đã đăng ký Bộ Công Thương" — cần thay bằng ảnh + link xác nhận thật khi có */}
+            <p className="pt-2 text-xs text-neutral-84/50">Logo Bộ Công Thương 200x76</p>
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold uppercase">Chính sách</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {POLICY_LINKS.map((link) => (
+            <h3 className="mb-3 text-xs font-bold tracking-wide text-white uppercase">Mua sắm</h3>
+            <ul className="space-y-2 text-sm">
+              {SHOP_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="hover:text-foreground">
+                  <Link href={link.href} className="hover:text-white">
                     {link.label}
                   </Link>
                 </li>
@@ -58,38 +56,31 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold uppercase">Kết nối với chúng tôi</h3>
-            <div className="flex items-center gap-3">
-              {SOCIAL_LINKS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                >
-                  <social.icon className="size-4" />
-                </a>
+            <h3 className="mb-3 text-xs font-bold tracking-wide text-white uppercase">Chính sách</h3>
+            <ul className="space-y-2 text-sm">
+              {POLICY_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold uppercase">Đăng ký nhận bản tin</h3>
-            <p className="mb-3 text-sm text-muted-foreground">
-              Nhận thông tin ưu đãi và bộ sưu tập mới sớm nhất.
-            </p>
+            <h3 className="mb-1 text-xs font-bold tracking-wide text-white uppercase">Nhận bản tin</h3>
+            <p className="mb-3 text-sm">Mẫu mới và ưu đãi, 2 email mỗi tháng.</p>
             <NewsletterForm />
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} Clothing Shop. All rights reserved.</p>
-          <div className="flex items-center gap-2">
-            {/* Placeholder logo "Đã đăng ký Bộ Công Thương" — cần thay bằng ảnh + link xác nhận thật khi có */}
-            <span className="rounded-sm border border-border px-2 py-1">
-              Đã đăng ký Bộ Công Thương
-            </span>
-          </div>
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs sm:flex-row">
+          <p>© {new Date().getFullYear()} Phương Phương</p>
+          <Link href="#" className="hover:text-white">
+            Liên hệ
+          </Link>
+          <p>Thanh toán: COD · Chuyển khoản · VNPay</p>
         </div>
       </div>
     </footer>

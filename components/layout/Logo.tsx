@@ -3,15 +3,8 @@ import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/" className="inline-block">
-      <span
-        className={cn(
-          "inline-block bg-primary px-2.5 py-1 font-heading font-extrabold text-primary-foreground uppercase",
-          className,
-        )}
-      >
-        Clothing Shop
-      </span>
+    <Link href="/" className={cn("inline-flex items-baseline whitespace-nowrap font-heading text-xl", className)}>
+      <span className="italic">Phương Phương</span>
     </Link>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { HomeBanner } from "@/lib/home-mock";
+import type { HeroBanner } from "@/lib/shared-types";
 import {
   Carousel,
   CarouselContent,
@@ -12,11 +12,12 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_INTERVAL_MS = 4500;
 
-export function BannerSlider({ banners }: { banners: HomeBanner[] }) {
+export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
   const [api, setApi] = useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const isHoveringRef = useRef(false);
@@ -52,20 +53,52 @@ export function BannerSlider({ banners }: { banners: HomeBanner[] }) {
         <CarouselContent className="ml-0">
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="basis-full pl-0">
-              <Link
-                href={banner.linkUrl}
-                aria-label={banner.title}
-                className="group relative block aspect-3/1 w-full overflow-hidden"
-              >
+              <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-3/1">
                 <Image
                   src={banner.imageUrl}
                   alt={banner.title}
                   fill
                   priority={index === 0}
                   sizes="100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover"
                 />
-              </Link>
+                {/* Scrim tối phía dưới ảnh để chữ đè lên luôn đọc được kể cả trên ảnh sáng màu. */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                <div className="absolute inset-0 flex flex-col items-start justify-end gap-3 p-6 text-white sm:max-w-md sm:gap-4 sm:p-10 lg:p-14">
+                  <h2 className="font-heading text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
+                    {banner.title}
+                  </h2>
+                  {banner.subtitle && (
+                    <p className="text-sm text-white/90 sm:text-base">{banner.subtitle}</p>
+                  )}
+                  {(banner.linkUrl || banner.ctaLinkUrl) && (
+                    <div className="flex w-full flex-col gap-2.5 pt-1 sm:w-auto sm:flex-row">
+                      {banner.linkUrl && (
+                        <Button
+                          size="lg"
+                          className="h-11 w-full px-6 sm:w-auto"
+                          nativeButton={false}
+                          render={<Link href={banner.linkUrl} />}
+                        >
+                          Mua ngay
+                        </Button>
+                      )}
+                      {banner.ctaLinkUrl && (
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="h-11 w-full border-white/70 bg-transparent px-6 text-white hover:bg-white/10 hover:text-white sm:w-auto"
+                          nativeButton={false}
+                          render={<Link href={banner.ctaLinkUrl} />}
+                        >
+                          {banner.ctaLabel || "Xem thêm"}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
