@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogOut, ShoppingBag, User } from "lucide-react";
+import { Bell, LogOut, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { Logo } from "@/components/layout/Logo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
@@ -29,6 +29,21 @@ function HeaderIconLink({
       <Icon className="size-5" />
       <span className="text-[11px] font-medium">{label}</span>
     </Link>
+  );
+}
+
+// Trang trí theo thiết kế mới — chưa có tính năng thông báo thật (không có API/store nào
+// khác), nên KHÔNG bọc Link (tránh dẫn tới trang không tồn tại/gây hiểu nhầm đã có tính
+// năng). Chỉ hiện icon, chưa nhận click.
+function NotificationBellPlaceholder() {
+  return (
+    <span
+      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70"
+      aria-hidden="true"
+    >
+      <Bell className="size-5" />
+      <span className="text-[11px] font-medium">Thông báo</span>
+    </span>
   );
 }
 
@@ -78,14 +93,15 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
 
   return (
     <header className={cn("sticky top-0 z-50 bg-background transition-shadow", scrolled && "shadow-md")}>
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
+      <div className="mx-auto flex h-20 max-w-6xl items-center gap-3 px-4">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-lg" />
+        <Logo className="shrink-0 text-foreground text-xl md:text-2xl" />
 
-        <SearchBar className="mx-2 hidden max-w-xl flex-1 md:block" />
+        <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1">
+          <NotificationBellPlaceholder />
           <AccountMenu />
           <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} />
         </div>
