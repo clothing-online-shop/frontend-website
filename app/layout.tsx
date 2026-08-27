@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Lora, Mulish } from "next/font/google";
+import { Lora } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Theo design Figma: Lora (serif) cho heading/logo, Mulish cho phần nội dung —
-// cả hai đều có subset "vietnamese" đầy đủ (khác Instrument Serif/Sans trong Figma gốc).
+// Đổi theo yêu cầu: Lora (serif) dùng cho TOÀN BỘ site, không chỉ heading/logo nữa — bỏ
+// Mulish (trước đây là --font-body, không còn nơi nào dùng riêng nữa sau khi --font-sans
+// ở globals.css trỏ thẳng sang --font-heading, xem comment ở đó).
 const fontHeading = Lora({
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-heading",
-});
-
-const fontBody = Mulish({
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -29,10 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="vi"
-      className={`${fontHeading.variable} ${fontBody.variable} h-full antialiased`}
-    >
+    <html lang="vi" className={`${fontHeading.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>

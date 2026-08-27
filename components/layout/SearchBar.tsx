@@ -26,15 +26,15 @@ export function SearchBar({
       <Input
         name="q"
         type="search"
-        placeholder="Tìm kiếm sản phẩm..."
+        placeholder="Tìm áo, váy, mã SKU..."
         defaultValue={defaultValue}
-        className="h-9 pr-9"
+        className="h-11 rounded-full bg-background pr-10 pl-4"
         aria-label="Từ khóa tìm kiếm"
       />
       <button
         type="submit"
         aria-label="Tìm kiếm"
-        className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
       >
         <Search className="size-4" />
       </button>
