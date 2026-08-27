@@ -80,6 +80,7 @@ export interface ProductListItem {
   name: string;
   slug: string;
   thumbnail: string | null;
+  brandName: string | null;
   basePrice: number;
   salePrice: number | null;
   status: ProductStatus;
@@ -87,6 +88,21 @@ export interface ProductListItem {
   totalStock: number;
   colors: string[];
   createdAt: string;
+}
+
+export interface WishlistItem {
+  id: string;
+  productId: string;
+  createdAt: string;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    thumbnail: string | null;
+    basePrice: number;
+    salePrice: number | null;
+    status: ProductStatus;
+  };
 }
 
 export interface ProductVariant {
@@ -177,6 +193,54 @@ export interface BankTransferInfo {
   bankName: string;
   transferContent: string;
   amount: number;
+}
+
+export interface HeroBanner {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  imageUrl: string;
+  linkUrl: string | null;
+  ctaLabel: string | null;
+  ctaLinkUrl: string | null;
+  sortOrder: number;
+}
+
+export interface ActivePopup {
+  id: string;
+  eyebrow: string | null;
+  title: string;
+  description: string | null;
+  discountCode: string | null;
+  imageUrl: string;
+  ctaLabel: string;
+  ctaLinkUrl: string;
+}
+
+export interface ActiveFlashSaleProduct {
+  id: string;
+  name: string;
+  slug: string;
+  thumbnail: string | null;
+  basePrice: number;
+  salePrice: number;
+  soldPercent: number;
+  colors: string[];
+}
+
+export interface ActiveFlashSale {
+  id: string;
+  name: string;
+  endDate: string;
+  products: ActiveFlashSaleProduct[];
+}
+
+export interface BlogPostSummary {
+  id: string;
+  title: string;
+  slug: string;
+  coverImage: string | null;
+  createdAt: string;
 }
 
 export interface PaginatedResult<T> {

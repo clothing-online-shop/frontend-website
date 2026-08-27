@@ -57,18 +57,27 @@ function MegaMenuItem({ category }: { category: CategoryNode }) {
 export function MegaMenu({ categories }: { categories: CategoryNode[] }) {
   return (
     <nav className="hidden md:block" aria-label="Danh mục sản phẩm">
-      <ul className="flex items-center">
+      <ul className="flex items-center justify-start">
         <li>
           <Link
-            href="/san-pham"
-            className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background"
+            href="/"
+            className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background uppercase transition-colors hover:bg-background/10"
           >
-            Tất cả sản phẩm
+            Thu 2026
           </Link>
         </li>
         {categories.map((category) => (
           <MegaMenuItem key={category.id} category={category} />
         ))}
+        <li>
+          {/* Chưa có trang bộ sưu tập riêng — giữ chỗ theo design, nối link thật khi có trang */}
+          <Link
+            href="#"
+            className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background"
+          >
+            Bộ sưu tập
+          </Link>
+        </li>
       </ul>
     </nav>
   );

@@ -4,14 +4,15 @@ import { Logo } from "@/components/layout/Logo";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/layout/SocialIcons";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
 
-// "Sản phẩm mới" trỏ /san-pham (trang thật, đã có) — 3 mục còn lại chưa có trang riêng
-// (không có route /bo-suu-tap, /thuong-hieu, /flash-sale) nên để "#" giống cách
+// "Sản phẩm mới" trỏ /san-pham?sort=newest (trang thật, đã có) — "Flash Sale" trỏ thẳng tới
+// section cùng tên ở trang chủ (xem id="flash-sale" ở FlashSaleSection.tsx). 2 mục còn lại
+// chưa có trang riêng (không có route /bo-suu-tap, /thuong-hieu) nên để "#" giống cách
 // POLICY_LINKS bên dưới đã làm với các trang chính sách chưa có nội dung thật.
 const SHOP_LINKS = [
-  { label: "Sản phẩm mới", href: "/san-pham" },
+  { label: "Sản phẩm mới", href: "/san-pham?sort=newest" },
   { label: "Bộ sưu tập", href: "#" },
   { label: "Thương hiệu", href: "#" },
-  { label: "Flash Sale", href: "#" },
+  { label: "Flash Sale", href: "/#flash-sale" },
 ];
 
 const POLICY_LINKS = [
@@ -39,19 +40,19 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-background/70">
               <li className="flex items-start gap-2">
                 <Phone className="mt-0.5 size-4 shrink-0" />
-                <a href="tel:19001234" className="hover:text-background">
-                  1900 1234
+                <a href="tel:19006868" className="hover:text-background">
+                  1900 6868
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="mt-0.5 size-4 shrink-0" />
-                <a href="mailto:hotro@clothingshop.vn" className="hover:text-background">
-                  hotro@clothingshop.vn
+                <a href="mailto:cskh@phuongphuong.vn" className="hover:text-background">
+                  cskh@phuongphuong.vn
                 </a>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="mt-0.5 size-4 shrink-0" />
-                <span>Số 1 Đường ABC, Quận 1, TP. Hồ Chí Minh</span>
+                <span>Số 8 Tràng Thi, Hoàn Kiếm, Hà Nội</span>
               </li>
             </ul>
             {/* Placeholder logo "Đã thông báo Bộ Công Thương" — cần thay bằng ảnh + link
@@ -104,7 +105,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-background/15 pt-6 text-xs text-background/60 sm:flex-row">
-          <p>© 2026 Phương Phương</p>
+          <p>© {new Date().getFullYear()} Phương Phương</p>
 
           <div className="flex items-center gap-4">
             <Link href="#" className="hover:text-background">

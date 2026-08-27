@@ -16,17 +16,26 @@ function HeaderIconLink({
   href,
   label,
   icon: Icon,
+  badge,
 }: {
   href: string;
   label: string;
   icon: typeof User;
+  badge?: number;
 }) {
   return (
     <Link
       href={href}
-      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+      className="relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
     >
-      <Icon className="size-5" />
+      <span className="relative">
+        <Icon className="size-5" />
+        {badge !== undefined && (
+          <span className="absolute -top-1.5 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+            {badge}
+          </span>
+        )}
+      </span>
       <span className="text-[11px] font-medium">{label}</span>
     </Link>
   );
@@ -103,7 +112,8 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
         <div className="ml-auto flex items-center gap-1">
           <NotificationBellPlaceholder />
           <AccountMenu />
-          <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} />
+          {/* Chưa có API giỏ hàng thật (Sprint 3, xem store/cart-store.ts) — số lượng tạm để 0 */}
+          <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} badge={0} />
         </div>
       </div>
 

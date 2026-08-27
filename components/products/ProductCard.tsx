@@ -4,6 +4,7 @@ import type { ProductListItem } from "@/lib/shared-types";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
 import { getColorSwatch } from "@/lib/color-swatches";
+import { WishlistButton } from "@/components/products/WishlistButton";
 
 export function ProductCard({ product }: { product: ProductListItem }) {
   const outOfStock = product.totalStock <= 0;
@@ -13,17 +14,19 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     : 0;
 
   return (
-    <Link href={`/san-pham/${product.slug}`} className="group block">
+    <div className="group">
       <div className="relative aspect-3/4 overflow-hidden bg-secondary">
-        {product.thumbnail ? (
-          <Image
-            src={product.thumbnail}
-            alt={product.name}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : null}
+        <Link href={`/san-pham/${product.slug}`} className="absolute inset-0 block">
+          {product.thumbnail ? (
+            <Image
+              src={product.thumbnail}
+              alt={product.name}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : null}
+        </Link>
         {outOfStock ? (
           <Badge
             variant="secondary"
@@ -36,8 +39,14 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             -{discountPercent}%
           </Badge>
         ) : null}
+        <WishlistButton productId={product.id} />
       </div>
-      <div className="mt-3 space-y-1.5">
+      <Link href={`/san-pham/${product.slug}`} className="mt-3 block space-y-1.5">
+        {product.brandName && (
+          <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+            {product.brandName}
+          </p>
+        )}
         <h3 className="line-clamp-1 text-sm text-foreground">{product.name}</h3>
 
         {product.colors && product.colors.length > 0 ? (
@@ -62,7 +71,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         ) : (
           <p className="text-sm font-bold text-foreground">{formatPrice(product.basePrice)}</p>
         )}
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
