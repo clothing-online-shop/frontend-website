@@ -41,17 +41,18 @@ function HeaderIconLink({
   );
 }
 
-function NotificationButton() {
-  // Chưa có tính năng thông báo thật (không có API/store) — hiển thị theo design nhưng
-  // không điều hướng đi đâu, tránh link chết tới trang chưa tồn tại.
+// Trang trí theo thiết kế mới — chưa có tính năng thông báo thật (không có API/store nào
+// khác), nên KHÔNG bọc Link (tránh dẫn tới trang không tồn tại/gây hiểu nhầm đã có tính
+// năng). Chỉ hiện icon, chưa nhận click.
+function NotificationBellPlaceholder() {
   return (
-    <button
-      type="button"
-      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
+    <span
+      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70"
+      aria-hidden="true"
     >
       <Bell className="size-5" />
       <span className="text-[11px] font-medium">Thông báo</span>
-    </button>
+    </span>
   );
 }
 
@@ -100,16 +101,16 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   }, []);
 
   return (
-    <header className={cn("sticky top-0 z-50 bg-white transition-shadow", scrolled && "shadow-md")}>
-      <div className="mx-auto flex h-18 max-w-6xl items-center gap-3 px-4">
+    <header className={cn("sticky top-0 z-50 bg-background transition-shadow", scrolled && "shadow-md")}>
+      <div className="mx-auto flex h-20 max-w-6xl items-center gap-3 px-4">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-xl sm:text-2xl" />
+        <Logo className="shrink-0 text-foreground text-xl md:text-2xl" />
 
-        <SearchBar className="mx-2 hidden max-w-xl flex-1 md:block" />
+        <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1">
-          <NotificationButton />
+          <NotificationBellPlaceholder />
           <AccountMenu />
           {/* Chưa có API giỏ hàng thật (Sprint 3, xem store/cart-store.ts) — số lượng tạm để 0 */}
           <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} badge={0} />

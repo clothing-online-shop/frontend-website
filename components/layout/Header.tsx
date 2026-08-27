@@ -1,5 +1,6 @@
 import { getCategoryTree } from "@/lib/categories-api";
 import { HeaderClient } from "@/components/layout/HeaderClient";
+import { PromoBar } from "@/components/layout/PromoBar";
 
 export async function Header() {
   // Header render ở mọi trang qua MainLayout — nếu API danh mục lỗi/timeout thì vẫn phải
@@ -8,11 +9,9 @@ export async function Header() {
 
   return (
     <>
-      <div className="flex items-center justify-center gap-3 bg-primary px-4 py-1.5 text-center text-xs text-primary-foreground">
-        <span className="font-bold tracking-wide">THU 2026</span>
-        <span className="font-bold">GIẢM 30 – 50%</span>
-        <span className="text-primary-foreground/75">11/08 – 23/08</span>
-      </div>
+      {/* Nằm ngoài HeaderClient (sticky) có chủ đích — cuộn trôi đi bình thường, không
+          chiếm vĩnh viễn không gian sticky cùng thanh điều hướng bên dưới. */}
+      <PromoBar />
       <HeaderClient categories={categories} />
     </>
   );

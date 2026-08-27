@@ -7,7 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-body);
+  /* Lora dùng cho toàn site (không chỉ heading) — trỏ thẳng --font-sans sang --font-heading
+     thay vì --font-body (Mulish, đã bỏ ở layout.tsx) để mọi chỗ dùng font-sans mặc định
+     (html { @apply font-sans } bên dưới) cũng ra Lora, không cần sửa từng component. */
+  --font-sans: var(--font-heading);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
