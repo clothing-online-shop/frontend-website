@@ -8,7 +8,7 @@ export function FeaturedProducts({ products }: { products: ProductListItem[] }) 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <h2 className="font-heading text-2xl font-extrabold uppercase">Bán chạy 30 ngày</h2>
+        <h2 className="font-heading text-size-30 font-normal">Bán chạy 30 ngày</h2>
         <Link
           href="/san-pham?sort=best_selling"
           className="text-sm font-bold text-primary hover:underline"

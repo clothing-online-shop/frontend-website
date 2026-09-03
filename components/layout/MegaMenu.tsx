@@ -1,7 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
+import { cn } from "@/lib/utils";
+
+// Style dùng chung cho mọi tab trong thanh mega menu (kể cả tab "Bộ sưu tập").
+const NAV_ITEM_CLASS =
+  "flex h-[46px] items-center px-[18px] text-size-12 leading-none font-semibold tracking-[0.96px] uppercase transition-colors";
+
+function navItemClass(isActive: boolean) {
+  return cn(
+    NAV_ITEM_CLASS,
+    isActive
+      ? "bg-background text-brand-7"
+      : "text-background/85 hover:bg-background/10 hover:text-background aria-expanded:bg-background/10 aria-expanded:text-background"
+  );
+}
+
+// Tab cha coi là active khi đang ở đúng trang của nó hoặc trang của 1 category con (mega
+// menu chỉ hiện 2 cấp: tab cha + children trong dropdown), khớp breadcrumb dạng Trang chủ/Nữ/...
+function isCategoryActive(category: CategoryNode, pathname: string) {
+  const slugs = [category.slug, ...category.children.map((child) => child.slug)];
+  return slugs.some((slug) => pathname === `/danh-muc/${slug}`);
+}
 
 function MegaMenuColumn({ category }: { category: CategoryNode }) {
   return (
@@ -30,15 +52,12 @@ function MegaMenuColumn({ category }: { category: CategoryNode }) {
   );
 }
 
-function MegaMenuItem({ category }: { category: CategoryNode }) {
+function MegaMenuItem({ category, isActive }: { category: CategoryNode; isActive: boolean }) {
   const hasChildren = category.children.length > 0;
 
   return (
     <li className="group relative">
-      <Link
-        href={`/danh-muc/${category.slug}`}
-        className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background aria-expanded:bg-background/10 aria-expanded:text-background"
-      >
+      <Link href={`/danh-muc/${category.slug}`} className={navItemClass(isActive)}>
         {category.name}
       </Link>
       {hasChildren ? (
@@ -55,26 +74,17 @@ function MegaMenuItem({ category }: { category: CategoryNode }) {
 }
 
 export function MegaMenu({ categories }: { categories: CategoryNode[] }) {
+  const pathname = usePathname();
+
   return (
     <nav className="hidden md:block" aria-label="Danh mục sản phẩm">
       <ul className="flex items-center justify-start">
-        <li>
-          <Link
-            href="/"
-            className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background uppercase transition-colors hover:bg-background/10"
-          >
-            Thu 2026
-          </Link>
-        </li>
         {categories.map((category) => (
-          <MegaMenuItem key={category.id} category={category} />
+          <MegaMenuItem key={category.id} category={category} isActive={isCategoryActive(category, pathname)} />
         ))}
         <li>
           {/* Chưa có trang bộ sưu tập riêng — giữ chỗ theo design, nối link thật khi có trang */}
-          <Link
-            href="#"
-            className="flex h-11 items-center px-3 text-xs font-bold tracking-wide text-background/85 uppercase transition-colors hover:bg-background/10 hover:text-background"
-          >
+          <Link href="#" className={navItemClass(false)}>
             Bộ sưu tập
           </Link>
         </li>

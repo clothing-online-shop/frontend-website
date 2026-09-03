@@ -7,11 +7,10 @@ export function BlogSection({ posts }: { posts: BlogPostSummary[] }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
-      <h2 className="mb-6 font-heading text-2xl font-extrabold uppercase">Góc tư vấn</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {posts.map((post) => (
           <article key={post.id}>
-            <div className="relative aspect-4/3 overflow-hidden bg-secondary">
+            <div className="relative aspect-[4/2.2] overflow-hidden bg-secondary">
               {post.coverImage && (
                 <Image
                   src={post.coverImage}
@@ -22,8 +21,10 @@ export function BlogSection({ posts }: { posts: BlogPostSummary[] }) {
                 />
               )}
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
-            <h3 className="mt-1 line-clamp-2 text-sm font-medium text-foreground">{post.title}</h3>
+            <div className="p-4 bg-white min-h-[130px]">
+              <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
+              <h3 className="mt-1 line-clamp-2 text-size-22 font-medium text-foreground">{post.title}</h3>
+            </div>
           </article>
         ))}
       </div>
