@@ -56,7 +56,7 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
               <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-3/1">
                 <Image
                   src={banner.imageUrl}
-                  alt={banner.title}
+                  alt=""
                   fill
                   priority={index === 0}
                   sizes="100vw"
@@ -65,17 +65,21 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
                 {/* Scrim tối phía dưới ảnh để chữ đè lên luôn đọc được kể cả trên ảnh sáng màu. */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                <div className="absolute inset-0 flex flex-col items-start justify-end gap-3 p-6 text-white sm:max-w-md sm:gap-4 sm:p-10 lg:p-14">
-                  <h2 className="font-heading text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
+                <div className="absolute left-[13%] top-1/2 -translate-y-1/2 inset-0 flex flex-col items-start justify-end gap-2 bg-white p-6 sm:max-w-md sm:gap-3 sm:p-10 lg:p-14 h-[400px]">
+                  {banner.eyebrow && (
+                    <p className="text-xs font-semibold tracking-wide text-brand-38 uppercase">{banner.eyebrow}</p>
+                  )}
+                  <h2 className="font-heading text-size-24 leading-tight font-normal sm:text-size-32 lg:text-size-40 text-brand-10">
                     {banner.title}
                   </h2>
-                  {banner.subtitle && (
-                    <p className="text-sm text-white/90 sm:text-base">{banner.subtitle}</p>
+                  {banner.description && (
+                    <p className="text-size-14 text-neutral-3F3A34 sm:text-size-16">{banner.description}</p>
                   )}
                   {(banner.linkUrl || banner.ctaLinkUrl) && (
-                    <div className="flex w-full flex-col gap-2.5 pt-1 sm:w-auto sm:flex-row">
+                    <div className="mt-2 flex w-full flex-col gap-2.5 sm:mt-3 sm:w-auto sm:flex-row">
                       {banner.linkUrl && (
                         <Button
+                          variant="dark"
                           size="lg"
                           className="h-11 w-full px-6 sm:w-auto"
                           nativeButton={false}
@@ -88,7 +92,7 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
                         <Button
                           size="lg"
                           variant="outline"
-                          className="h-11 w-full border-white/70 bg-transparent px-6 text-white hover:bg-white/10 hover:text-white sm:w-auto"
+                          className="h-11 w-full border-brand-10 text-brand-10 rounded-none bg-transparent px-6 hover:bg-white/10 sm:w-auto"
                           nativeButton={false}
                           render={<Link href={banner.ctaLinkUrl} />}
                         >

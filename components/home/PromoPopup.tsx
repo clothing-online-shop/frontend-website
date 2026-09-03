@@ -31,12 +31,12 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-sm gap-0 overflow-hidden p-0 sm:max-w-2xl">
+      <DialogContent className="max-w-sm gap-0 overflow-hidden p-0 sm:max-w-[760px] rounded-none">
         <DialogTitle className="sr-only">{popup.title}</DialogTitle>
         {popup.description && <DialogDescription className="sr-only">{popup.description}</DialogDescription>}
 
-        <div className="flex flex-col sm:flex-row">
-          <div className="relative aspect-4/3 w-full sm:aspect-auto sm:w-1/2">
+        <div className="flex flex-col sm:flex-row min-h-[440px]">
+          <div className="relative aspect-4/3 w-full sm:aspect-auto sm:w-[65%]">
             <Image
               src={popup.imageUrl}
               alt={popup.title}
@@ -50,10 +50,10 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
             {popup.eyebrow && (
               <p className="text-xs font-semibold tracking-wide text-primary uppercase">{popup.eyebrow}</p>
             )}
-            <h2 className="font-heading text-xl leading-tight font-bold text-foreground sm:text-2xl">
+            <h2 className="font-normal text-xl leading-tight text-foreground sm:text-size-30 sm:leading-[34.5px]">
               {popup.title}
             </h2>
-            {popup.description && <p className="text-sm text-muted-foreground">{popup.description}</p>}
+            {popup.description && <p className="text-size-14 leading-[22px] text-neutral-33">{popup.description}</p>}
             {popup.discountCode && (
               <p className="self-center rounded-md border border-dashed border-border px-3 py-1.5 text-sm font-semibold tracking-wide text-foreground sm:self-start">
                 {popup.discountCode}
@@ -61,15 +61,16 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
             )}
 
             <Button
-              size="lg"
+              variant="dark"
+              size="xl"
               className="mt-1 w-full"
               nativeButton={false}
               render={<Link href={popup.ctaLinkUrl} onClick={() => handleOpenChange(false)} />}
             >
               {popup.ctaLabel}
             </Button>
-            <DialogClose render={<Button variant="ghost" className="w-full text-muted-foreground" />}>
-              Để sau
+            <DialogClose render={<Button variant="ghost" className="cursor-pointer w-full text-muted-foreground" />}>
+              <span className="cursor-pointer">Để sau</span>
             </DialogClose>
           </div>
         </div>

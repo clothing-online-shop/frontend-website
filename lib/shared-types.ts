@@ -197,8 +197,9 @@ export interface BankTransferInfo {
 
 export interface HeroBanner {
   id: string;
+  eyebrow: string | null;
   title: string;
-  subtitle: string | null;
+  description: string | null;
   imageUrl: string;
   linkUrl: string | null;
   ctaLabel: string | null;

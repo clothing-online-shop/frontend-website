@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 export function Logo({ className }: { className?: string }) {
   return (
     <Link href="/" className="inline-block">
-      <span className={cn("font-heading text-2xl font-semibold tracking-tight", className)}>
-        Phương <span className="font-normal italic">Phương</span>
+      <span className={cn("font-heading text-size-30 tracking-tight", className)}>
+         <span className="font-normal italic">Phương Phương</span>
       </span>
     </Link>
   );

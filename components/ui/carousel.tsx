@@ -179,7 +179,11 @@ function CarouselPrevious({
   size = "icon-sm",
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const { orientation, scrollPrev, canScrollPrev, canScrollNext } = useCarousel()
+
+  // Không đủ slide để cuộn (canScrollPrev/canScrollNext đều false) → ẩn hẳn nút thay vì
+  // hiện disabled, tránh hiểu lầm đây là carousel dù nội dung vừa đủ 1 hàng không cần trượt.
+  if (!canScrollPrev && !canScrollNext) return null
 
   return (
     <Button
@@ -209,7 +213,9 @@ function CarouselNext({
   size = "icon-sm",
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const { orientation, scrollNext, canScrollPrev, canScrollNext } = useCarousel()
+
+  if (!canScrollPrev && !canScrollNext) return null
 
   return (
     <Button

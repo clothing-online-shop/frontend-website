@@ -28,7 +28,7 @@ export function SearchBar({
         type="search"
         placeholder="Tìm áo, váy, mã SKU..."
         defaultValue={defaultValue}
-        className="h-11 rounded-full bg-background pr-10 pl-4"
+        className="h-11 rounded-full bg-white pr-10 pl-4"
         aria-label="Từ khóa tìm kiếm"
       />
       <button

@@ -6,6 +6,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-header: var(--background-header);
   --color-foreground: var(--foreground);
   /* Lora dùng cho toàn site (không chỉ heading) — trỏ thẳng --font-sans sang --font-heading
      thay vì --font-body (Mulish, đã bỏ ở layout.tsx) để mọi chỗ dùng font-sans mặc định
@@ -46,6 +47,7 @@
   --color-success: var(--success);
   --color-danger: var(--destructive);
   --color-brand-7: var(--brand-7);
+  --color-brand-9: var(--brand-9);
   --color-brand-10: var(--brand-10);
   --color-brand-38: var(--brand-38);
   --color-brand-83: var(--brand-83);
@@ -54,6 +56,10 @@
   --color-neutral-84: var(--neutral-84);
   --color-neutral-92: var(--neutral-92);
   --color-neutral-96: var(--neutral-96);
+  --color-neutral-68625C: var(--neutral-68625C);
+  --color-neutral-37322C: var(--neutral-37322C);
+  --color-neutral-3F3A34: var(--neutral-3F3A34);
+  --color-neutral-7F7973: var(--neutral-7F7973);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 6px;
@@ -63,11 +69,37 @@
   --radius-4xl: 16px;
   /* Container chuẩn toàn site (Header/Footer/trang chủ/trang sản phẩm đều dùng max-w-6xl) — 1440px thay vì mặc định 1152px của Tailwind. */
   --container-6xl: 1440px;
+
+  /* Bộ font-size dùng chung (vd: text-size-30) — dùng thay cho text-[30px] tự do để đồng bộ toàn site.
+     Chỉ set font-size, KHÔNG bake sẵn line-height: tỉ lệ line-height/font-size không cố định
+     giữa các thành phần (heading dùng ~1.15, nhãn compact như PromoBar dùng đúng 1) nên set
+     line-height riêng theo từng chỗ dùng bằng leading-none/leading-[Xpx] cạnh text-size-*. */
+  --text-size-46: 46px;
+  --text-size-44: 44px;
+  --text-size-42: 42px;
+  --text-size-40: 40px;
+  --text-size-38: 38px;
+  --text-size-36: 36px;
+  --text-size-34: 34px;
+  --text-size-32: 32px;
+  --text-size-30: 30px;
+  --text-size-28: 28px;
+  --text-size-26: 26px;
+  --text-size-24: 24px;
+  --text-size-22: 22px;
+  --text-size-20: 20px;
+  --text-size-19: 19px;
+  --text-size-18: 18px;
+  --text-size-16: 16px;
+  --text-size-15: 15px;
+  --text-size-14: 14px;
+  --text-size-12: 12px;
 }
 
 :root {
   /* Brand palette lấy từ Figma (webSite bán quần áo) — thang màu orange (thương hiệu) và grey (trung tính) đặt tên theo lightness giống biến Figma. */
   --brand-7: #17130e;
+  --brand-9: #1c1712;
   --brand-10: #1e1a15;
   --brand-38: #8b5339;
   --brand-83: #e2d0c4;
@@ -76,8 +108,14 @@
   --neutral-84: #d9d7d5;
   --neutral-92: #eeeae7;
   --neutral-96: #f7f5f2;
+  --neutral-68625C: #68625C;
+  --neutral-FEFDFB: #FEFDFB;
+  --neutral-37322C: #37322C;
+  --neutral-3F3A34: #3F3A34;
+  --neutral-7F7973: #7F7973;
 
   --background: var(--neutral-96);
+  --background-header: var(--neutral-FEFDFB);
   --foreground: var(--brand-10);
   --card: #ffffff;
   --card-foreground: var(--brand-10);
@@ -153,9 +191,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -164,19 +204,24 @@
 .rich-content {
   line-height: 1.7;
 }
+
 .rich-content p {
   margin-bottom: 0.75em;
 }
+
 .rich-content ul,
 .rich-content ol {
   margin: 0.5em 0 0.75em 1.25em;
 }
+
 .rich-content ul {
   list-style: disc;
 }
+
 .rich-content ol {
   list-style: decimal;
 }
+
 .rich-content strong {
   font-weight: 600;
 }

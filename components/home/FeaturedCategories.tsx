@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import type { CategoryNode } from "@/lib/shared-types";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const MAX_FEATURED_CATEGORIES = 8;
 
@@ -16,26 +19,31 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
-      <h2 className="mb-6 font-heading text-2xl font-extrabold uppercase">Danh mục nổi bật</h2>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {featured.map((category) => (
-          <Link key={category.id} href={`/danh-muc/${category.slug}`} className="group block">
-            <div className="relative aspect-square overflow-hidden bg-secondary">
-              <Image
-                src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
-                alt={category.name}
-                fill
-                sizes="(min-width: 640px) 25vw, 50vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/25 transition-colors group-hover:bg-black/35" />
-              <span className="absolute bottom-3 left-3 font-heading text-sm font-extrabold text-white uppercase sm:text-base">
-                {category.name}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <h2 className="mb-6 font-heading text-size-30 font-normal">Danh mục nổi bật</h2>
+      <Carousel opts={{ align: "start" }} className="w-full">
+        <CarouselContent>
+          {featured.map((category) => (
+            <CarouselItem key={category.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6">
+              <Link href={`/danh-muc/${category.slug}`} className="group flex flex-col items-center gap-3 text-center">
+                <div className="relative aspect-square w-full overflow-hidden rounded-full bg-secondary">
+                  <Image
+                    src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
+                    alt={category.name}
+                    fill
+                    sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 40vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <span className="font-heading text-sm font-bold uppercase transition-colors group-hover:text-primary sm:text-base">
+                  {category.name}
+                </span>
+              </Link>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
     </section>
   );
 }

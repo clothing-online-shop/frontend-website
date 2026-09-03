@@ -5,12 +5,12 @@
 // bình thường, không chiếm chỗ cố định cùng thanh điều hướng.
 export function PromoBar() {
   return (
-    <div className="bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground sm:text-sm">
-      <span className="font-heading font-bold tracking-wide uppercase">Thu 2026</span>
+    <div className="bg-primary px-4 py-3 text-center text-size-15 leading-none text-primary-foreground">
+      <span className="text-size-19 leading-none font-normal tracking-[0.76px] uppercase">Thu 2026</span>
       <span className="mx-2 opacity-60">•</span>
-      <span>Giảm 30 – 50%</span>
+      <span className="text-size-15 leading-none font-bold tracking-[0.3px] uppercase">Giảm 30 – 50%</span>
       <span className="mx-2 hidden opacity-60 sm:inline">•</span>
-      <span className="hidden text-primary-foreground/80 sm:inline">11/08 – 23/08</span>
+      <span className="hidden text-size-12 leading-none font-medium sm:inline">11/08 – 23/08</span>
     </div>
   );
 }

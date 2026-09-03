@@ -36,7 +36,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
-            <Logo className="text-background text-xl" />
+            <Logo className="text-background text-size-26" />
             <ul className="space-y-2 text-sm text-background/70">
               <li className="flex items-start gap-2">
                 <Phone className="mt-0.5 size-4 shrink-0" />
@@ -104,7 +104,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-background/15 pt-6 text-xs text-background/60 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-background/15 pt-6 text-size-14 text-background/60 sm:flex-row">
           <p>© {new Date().getFullYear()} Phương Phương</p>
 
           <div className="flex items-center gap-4">
