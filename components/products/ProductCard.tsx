@@ -14,7 +14,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     : 0;
 
   return (
-    <div className="group">
+    <div className="group bg-white">
       <div className="relative aspect-3/4 overflow-hidden bg-secondary">
         <Link href={`/san-pham/${product.slug}`} className="absolute inset-0 block">
           {product.thumbnail ? (
@@ -35,19 +35,30 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             Hết hàng
           </Badge>
         ) : hasDiscount ? (
-          <Badge className="absolute top-2 left-2 rounded-sm bg-primary font-bold text-primary-foreground">
+          <Badge className="absolute top-2 left-2 rounded-sm bg-brand-10 font-bold text-primary-foreground">
             -{discountPercent}%
           </Badge>
         ) : null}
         <WishlistButton productId={product.id} />
       </div>
-      <Link href={`/san-pham/${product.slug}`} className="mt-3 block space-y-1.5">
+      <Link href={`/san-pham/${product.slug}`} className="block space-y-1.5 p-4">
         {product.brandName && (
           <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
             {product.brandName}
           </p>
         )}
-        <h3 className="line-clamp-1 text-sm text-foreground">{product.name}</h3>
+        <h3 className="line-clamp-1 text-size-16 text-foreground text-brand-10 font-semibold">{product.name}</h3>
+
+        {hasDiscount ? (
+          <div className="flex items-center gap-2">
+            <p className="text-size-16 font-bold text-brand-10">{formatPrice(product.salePrice!)}</p>
+            <p className="text-xs text-muted-foreground line-through">
+              {formatPrice(product.basePrice)}
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm font-bold text-foreground">{formatPrice(product.basePrice)}</p>
+        )}
 
         {product.colors && product.colors.length > 0 ? (
           <div className="flex items-center gap-1">
@@ -60,17 +71,6 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             ))}
           </div>
         ) : null}
-
-        {hasDiscount ? (
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-primary">{formatPrice(product.salePrice!)}</p>
-            <p className="text-xs text-muted-foreground line-through">
-              {formatPrice(product.basePrice)}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm font-bold text-foreground">{formatPrice(product.basePrice)}</p>
-        )}
       </Link>
     </div>
   );

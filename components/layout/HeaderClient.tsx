@@ -12,84 +12,62 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { useLogout } from "@/hooks/useLogout";
 
-function HeaderIconLink({
-  href,
-  label,
-  icon: Icon,
-  badge,
-}: {
-  href: string;
-  label: string;
-  icon: typeof User;
-  badge?: number;
-}) {
-  return (
-    <Link
-      href={href}
-      className="relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
-    >
-      <span className="relative">
-        <Icon className="size-5" />
-        {badge !== undefined && (
-          <span className="absolute -top-1.5 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-            {badge}
-          </span>
-        )}
-      </span>
-      <span className="text-[11px] font-medium">{label}</span>
-    </Link>
-  );
-}
+// Badge số lượng dùng chung cho các icon ở header (thông báo, giỏ hàng...) — quá MAX_COUNT
+// thì rút gọn thành "99+" thay vì hiện số dài tràn khỏi hình tròn.
+const MAX_COUNT = 99;
 
-// Trang trí theo thiết kế mới — chưa có tính năng thông báo thật (không có API/store nào
-// khác), nên KHÔNG bọc Link (tránh dẫn tới trang không tồn tại/gây hiểu nhầm đã có tính
-// năng). Chỉ hiện icon, chưa nhận click.
-function NotificationBellPlaceholder() {
+function CountBadge({ count }: { count: number }) {
   return (
-    <span
-      className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70"
-      aria-hidden="true"
-    >
-      <Bell className="size-5" />
-      <span className="text-[11px] font-medium">Thông báo</span>
+    <span className="absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-bold text-primary-foreground">
+      {count > MAX_COUNT ? `${MAX_COUNT}+` : count}
     </span>
   );
 }
 
-function AccountMenu() {
-  const user = useAuthStore((state) => state.user);
-  const logout = useLogout();
+type HeaderActionItemData = {
+  key: string;
+  label: string;
+  icon: typeof User;
+  href?: string;
+  badge?: number;
+  onAction?: () => void;
+  labelClassName?: string;
+};
 
-  if (!user) {
-    return <HeaderIconLink href="/login" label="Đăng nhập" icon={User} />;
+// 1 component dùng chung cho mọi icon-action ở header (Thông báo, Đăng nhập/Tài khoản, Đăng
+// xuất, Giỏ hàng...) — có href thì render Link (điều hướng thật), không có thì render button
+// (chưa có trang/API thật, vd Thông báo). onAction luôn được nơi gọi truyền vào riêng biệt.
+function HeaderActionItem({ label, icon: Icon, href, badge, onAction, labelClassName }: Omit<HeaderActionItemData, "key">) {
+  const className = "relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground cursor-pointer";
+  const children = (
+    <>
+      <span className="relative">
+        <Icon className="size-5" />
+        {badge !== undefined && badge > 0 && <CountBadge count={badge} />}
+      </span>
+      <span className={labelClassName ?? "text-neutral-37322C text-size-12 font-medium"}>{label}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} onClick={onAction} className={className}>
+        {children}
+      </Link>
+    );
   }
 
-  const firstName = user.fullName.trim().split(/\s+/).pop() ?? user.fullName;
-
   return (
-    <div className="flex items-center gap-1">
-      <Link
-        href="/account"
-        className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
-      >
-        <User className="size-5" />
-        <span className="max-w-16 truncate text-[11px] font-medium">{firstName}</span>
-      </Link>
-      <button
-        type="button"
-        onClick={() => logout()}
-        aria-label="Đăng xuất"
-        className="flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground"
-      >
-        <LogOut className="size-5" />
-        <span className="text-[11px] font-medium">Đăng xuất</span>
-      </button>
-    </div>
+    <button type="button" onClick={onAction} className={className}>
+      {children}
+    </button>
   );
 }
 
 export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   const [scrolled, setScrolled] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const logout = useLogout();
 
   useEffect(() => {
     function onScroll() {
@@ -100,20 +78,53 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Mỗi icon nhận 1 hàm onAction riêng — tách để nơi khác (vd. analytics, mở panel thông
+  // báo khi có API thật) có thể thay đổi hành vi từng nút mà không đụng vào component hiển thị.
+  function handleNotificationAction() {
+    // TODO: mở panel thông báo khi có API/store thông báo thật.
+  }
+
+  function handleLoginAction() {
+    // Điều hướng /login đã do Link đảm nhiệm — hook này dành cho logic phụ (vd. analytics).
+  }
+
+  function handleCartAction() {
+    // Điều hướng /cart đã do Link đảm nhiệm — hook này dành cho logic phụ (vd. analytics).
+  }
+
+  const accountItems: HeaderActionItemData[] = user
+    ? [
+        {
+          key: "account",
+          label: user.fullName.trim().split(/\s+/).pop() ?? user.fullName,
+          icon: User,
+          href: "/account",
+          labelClassName: "max-w-16 truncate text-neutral-37322C text-size-12 font-medium",
+        },
+        { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => logout() },
+      ]
+    : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
+
+  // Chưa có API thông báo/giỏ hàng thật (Sprint 3, xem store/cart-store.ts) nên badge tạm để 0.
+  const actionItems: HeaderActionItemData[] = [
+    { key: "notification", label: "Thông báo", icon: Bell, badge: 0, onAction: handleNotificationAction },
+    ...accountItems,
+    { key: "cart", label: "Giỏ hàng", icon: ShoppingBag, href: "/cart", badge: 0, onAction: handleCartAction },
+  ];
+
   return (
-    <header className={cn("sticky top-0 z-50 bg-background transition-shadow", scrolled && "shadow-md")}>
+    <header className={cn("sticky top-0 z-50 bg-background-header transition-shadow", scrolled && "shadow-md")}>
       <div className="mx-auto flex h-20 max-w-6xl items-center gap-3 px-4">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-foreground text-xl md:text-2xl" />
+        <Logo className="shrink-0 text-foreground" />
 
         <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
 
         <div className="ml-auto flex items-center gap-1">
-          <NotificationBellPlaceholder />
-          <AccountMenu />
-          {/* Chưa có API giỏ hàng thật (Sprint 3, xem store/cart-store.ts) — số lượng tạm để 0 */}
-          <HeaderIconLink href="/cart" label="Giỏ hàng" icon={ShoppingBag} badge={0} />
+          {actionItems.map(({ key, ...item }) => (
+            <HeaderActionItem key={key} {...item} />
+          ))}
         </div>
       </div>
 
@@ -121,7 +132,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
         <SearchBar />
       </div>
 
-      <div className="hidden bg-foreground md:block">
+      <div className="hidden bg-brand-9 md:block">
         <div className="mx-auto max-w-6xl px-4">
           <MegaMenu categories={categories} />
         </div>

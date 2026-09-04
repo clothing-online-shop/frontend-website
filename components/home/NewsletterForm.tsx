@@ -37,10 +37,10 @@ export function NewsletterForm() {
           placeholder="Email của bạn"
           aria-label="Email đăng ký nhận bản tin"
           aria-invalid={!!errors.email}
-          className="h-9 border-white/20 bg-white/5 text-white placeholder:text-white/50 focus-visible:border-white/40 focus-visible:ring-white/20"
+          className="h-10 rounded-none border-white/20 bg-white/5 text-white placeholder:text-white/50 focus-visible:border-white/40 focus-visible:ring-white/20"
           {...register("email")}
         />
-        <Button type="submit" className="h-9 shrink-0" disabled={isSubmitting}>
+        <Button type="submit" variant="outline" className="min-w-[60px] cursor-pointer h-10 shrink-0 rounded-none text-brand-10" disabled={isSubmitting}>
           Gửi
         </Button>
       </div>
