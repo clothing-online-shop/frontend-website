@@ -152,6 +152,12 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Reset margin/padding mặc định của trình duyệt cho MỌI thẻ (h1-h6, p, ul/ol, form,
+       fieldset...) — Tailwind Preflight (đi kèm @import "tailwindcss") đã zero-out phần lớn
+       heading/paragraph/list rồi, nhưng vẫn còn vài thẻ (fieldset, legend, dd...) giữ
+       margin/padding mặc định của user-agent stylesheet nếu không khai báo thêm ở đây. */
+    margin: 0;
+    padding: 0;
   }
   body {
     @apply bg-background text-foreground;
