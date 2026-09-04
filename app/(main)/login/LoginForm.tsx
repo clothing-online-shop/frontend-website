@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,13 +29,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export function LoginForm({
-  onForgotPassword,
-  onRegister,
-}: {
-  onForgotPassword: () => void;
-  onRegister: () => void;
-}) {
+export function LoginForm() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
 
@@ -55,7 +51,8 @@ export function LoginForm({
       {
         onSuccess: (data) => {
           setSession(data.user, data.accessToken, data.refreshToken, values.remember);
-          router.push("/account");
+          toast.success(`Chào mừng trở lại, ${data.user.fullName}!`);
+          router.push("/");
         },
       },
     );
@@ -75,11 +72,11 @@ export function LoginForm({
           {...register("identifier")}
         />
         {errors.identifier && (
-          <p className="text-xs text-destructive">{errors.identifier.message}</p>
+          <p className="text-size-12 text-destructive mt-1">{errors.identifier.message}</p>
         )}
       </div>
 
-      <div className="my-4">
+      <div className="mt-2 my-4">
         <label htmlFor="login-password" className={AUTH_LABEL_CLASS}>
           Mật khẩu
         </label>
@@ -91,11 +88,11 @@ export function LoginForm({
           autoComplete="current-password"
           {...register("password")}
         />
-        {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+        {errors.password && <p className="text-size-12 text-destructive mt-1">{errors.password.message}</p>}
       </div>
 
-      <div className="flex items-center justify-between text-sm mb-4">
-        <label className="flex items-center gap-2 text-[#4C4741] text-xs">
+      <div className="flex items-center justify-between text-size-14 mb-4">
+        <label className="flex items-center gap-2 text-[#4C4741] text-size-12">
           <Controller
             name="remember"
             control={control}
@@ -105,9 +102,9 @@ export function LoginForm({
           />
           Ghi nhớ đăng nhập
         </label>
-        <button type="button" onClick={onForgotPassword} className={AUTH_LINK_CLASS}>
+        <Link href="/forgot-password" className={AUTH_LINK_CLASS}>
           Quên mật khẩu?
-        </button>
+        </Link>
       </div>
 
       <Button
