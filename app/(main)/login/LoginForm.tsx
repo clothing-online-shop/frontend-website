@@ -52,6 +52,17 @@ export function LoginForm() {
 
   const mutation = useMutation({ mutationFn: login });
 
+  // Box lỗi (kể cả message khoá tài khoản) chỉ tự mất khi bấm lại "Đăng nhập" (React Query
+  // reset state lúc gọi mutate() mới) — người dùng không có cách nào chủ động xoá đi ngay
+  // khi họ đang sửa lại thông tin. Xoá lỗi cũ ngay khi gõ lại 1 trong 2 ô, để box biến mất
+  // đúng lúc người dùng bắt đầu thao tác tiếp theo thay vì treo mãi tới lần submit sau.
+  const identifierField = register("identifier");
+  const passwordField = register("password");
+
+  function clearErrorOnEdit() {
+    if (mutation.isError) mutation.reset();
+  }
+
   const onValid = (values: LoginFormValues) => {
     mutation.mutate(
       { identifier: values.identifier, password: values.password },
@@ -77,7 +88,11 @@ export function LoginForm() {
           className={cn(AUTH_INPUT_CLASS, "placeholder:text-size-13")}
           placeholder="Nhập số điện thoại hoặc email"
           autoComplete="username"
-          {...register("identifier")}
+          {...identifierField}
+          onChange={(event) => {
+            identifierField.onChange(event);
+            clearErrorOnEdit();
+          }}
         />
         {errors.identifier && (
           <p className="text-size-12 text-destructive mt-1">{errors.identifier.message}</p>
@@ -97,7 +112,11 @@ export function LoginForm() {
             className={cn(AUTH_INPUT_CLASS, "pr-10 placeholder:text-size-13")}
             placeholder="Nhập mật khẩu"
             autoComplete="current-password"
-            {...register("password")}
+            {...passwordField}
+            onChange={(event) => {
+              passwordField.onChange(event);
+              clearErrorOnEdit();
+            }}
           />
           <button
             type="button"
