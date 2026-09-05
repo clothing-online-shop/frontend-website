@@ -16,10 +16,13 @@ export function AccountLayout({ children }: { children: (user: AuthUser) => Reac
   if (!ready || !user) return null;
 
   return (
-    <div className="mx-auto max-w-7xl p-8">
-      <div className="flex gap-9">
+    // Mobile: p-4, cột sidebar+content xếp chồng dọc (flex-col). Tablet (md:) đã đủ rộng
+    // để 2 cột nằm cạnh nhau như desktop, chỉ nới lỏng padding/gap ít hơn. Desktop (lg:)
+    // giữ đúng p-8/gap-9 như thiết kế gốc, không đổi.
+    <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-5 lg:gap-9">
         <AccountSidebar user={user} />
-        <div className="bg-white w-full py-8 px-9">{children(user)}</div>
+        <div className="bg-white w-full py-5 px-4 md:py-6 md:px-6 lg:py-8 lg:px-9">{children(user)}</div>
       </div>
     </div>
   );

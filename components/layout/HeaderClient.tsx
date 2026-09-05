@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bell, LogOut, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
@@ -10,7 +11,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
-import { useLogout } from "@/hooks/useLogout";
+import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 
 // Badge số lượng dùng chung cho các icon ở header (thông báo, giỏ hàng...) — quá MAX_COUNT
 // thì rút gọn thành "99+" thay vì hiện số dài tràn khỏi hình tròn.
@@ -28,6 +29,11 @@ type HeaderActionItemData = {
   key: string;
   label: string;
   icon: typeof User;
+  // true = mục "Tài khoản" — luôn có khung tròn nền/viền riêng (Figma: 18x18, bg
+  // #DAE2FD, border 1px #C6C6CD) chứa ảnh đại diện thật nếu có, hoặc icon fallback nếu
+  // chưa có avatar — khác các icon phẳng còn lại (Thông báo/Giỏ hàng/Đăng xuất...).
+  isAvatar?: boolean;
+  avatarUrl?: string | null;
   href?: string;
   badge?: number;
   onAction?: () => void;
@@ -37,12 +43,22 @@ type HeaderActionItemData = {
 // 1 component dùng chung cho mọi icon-action ở header (Thông báo, Đăng nhập/Tài khoản, Đăng
 // xuất, Giỏ hàng...) — có href thì render Link (điều hướng thật), không có thì render button
 // (chưa có trang/API thật, vd Thông báo). onAction luôn được nơi gọi truyền vào riêng biệt.
-function HeaderActionItem({ label, icon: Icon, href, badge, onAction, labelClassName }: Omit<HeaderActionItemData, "key">) {
+function HeaderActionItem({ label, icon: Icon, isAvatar, avatarUrl, href, badge, onAction, labelClassName }: Omit<HeaderActionItemData, "key">) {
   const className = "relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground cursor-pointer";
   const children = (
     <>
       <span className="relative">
-        <Icon className="size-5" />
+        {isAvatar ? (
+          <span className="relative flex size-4.5 items-center justify-center overflow-hidden rounded-full border border-header-avatar-border bg-header-avatar-bg">
+            {avatarUrl ? (
+              <Image src={avatarUrl} alt="" fill className="object-cover" />
+            ) : (
+              <Icon className="size-3" />
+            )}
+          </span>
+        ) : (
+          <Icon className="size-5" />
+        )}
         {badge !== undefined && badge > 0 && <CountBadge count={badge} />}
       </span>
       <span className={labelClassName ?? "text-neutral-37322C text-size-12 font-medium"}>{label}</span>
@@ -66,8 +82,8 @@ function HeaderActionItem({ label, icon: Icon, href, badge, onAction, labelClass
 
 export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   const [scrolled, setScrolled] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
-  const logout = useLogout();
 
   useEffect(() => {
     function onScroll() {
@@ -96,12 +112,13 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
     ? [
         {
           key: "account",
-          label: user.fullName.trim().split(/\s+/).pop() ?? user.fullName,
+          label: "Tài khoản",
           icon: User,
+          isAvatar: true,
+          avatarUrl: user.avatarUrl,
           href: "/account",
-          labelClassName: "max-w-16 truncate text-neutral-37322C text-size-12 font-medium",
         },
-        { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => logout() },
+        { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => setLogoutOpen(true) },
       ]
     : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
 
@@ -137,6 +154,8 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
           <MegaMenu categories={categories} />
         </div>
       </div>
+
+      <LogoutConfirmDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </header>
   );
 }

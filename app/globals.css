@@ -63,8 +63,11 @@
   --color-neutral-76706A: var(--neutral-76706A);
   --color-neutral-4C4741: var(--neutral-4C4741);
   --color-neutral-E0DDDA: var(--neutral-E0DDDA);
+  --color-neutral-EDEBE8: var(--neutral-EDEBE8);
   --color-error-soft: var(--error-soft);
   --color-login-card-bg: var(--login-card-bg);
+  --color-header-avatar-bg: var(--header-avatar-bg);
+  --color-header-avatar-border: var(--header-avatar-border);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 6px;
@@ -122,8 +125,13 @@
   --neutral-76706A: #76706A;
   --neutral-4C4741: #4C4741;
   --neutral-E0DDDA: #E0DDDA;
+  --neutral-EDEBE8: #EDEBE8;
   --error-soft: #FFF0EE;
   --login-card-bg: #E4EBE6;
+  /* Khung avatar "Tài khoản" ở Header (Figma: 18x18, bo tròn, nền + viền riêng, không thuộc
+     palette brand/neutral chung — chỉ dùng cho đúng chỗ này). */
+  --header-avatar-bg: #DAE2FD;
+  --header-avatar-border: #C6C6CD;
 
   --background: var(--neutral-96);
   --background-header: var(--neutral-FEFDFB);

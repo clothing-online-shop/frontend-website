@@ -6,13 +6,22 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { EditableField } from "@/components/account/EditableField";
+import { ChangeContactDialog } from "@/components/account/ChangeContactDialog";
 import { cn } from "@/lib/utils";
+import { maskPhone } from "@/lib/format";
 import type { AuthUser } from "@/lib/shared-types";
 import { updateProfile } from "@/lib/users-api";
+import { deleteImage, uploadImage } from "@/lib/upload-api";
 import { useAuthStore } from "@/store/auth-store";
 
+// phone/email KHÔNG còn trong schema này — đổi 2 field đó phải qua OTP (xem
+// ChangeContactDialog), không đi qua submit chung của form nữa (trước đây "Lưu thay đổi"
+// coi như thành công dù gõ số/email mới nhưng thực chất không gửi lên BE, vì
+// UpdateProfileDto không nhận 2 field này).
 const profileSchema = z.object({
   fullName: z.string().min(2, "Vui lòng nhập họ tên"),
   dateOfBirth: z
@@ -23,8 +32,6 @@ const profileSchema = z.object({
       { message: "Ngày sinh không được là ngày trong tương lai" },
     ),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
-  phone: z.string().optional(),
-  email: z.string().email("Email không hợp lệ").optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -35,32 +42,27 @@ const GENDER_LABELS: Record<string, string> = {
   OTHER: "Khác",
 };
 
-// Che bớt SĐT lúc chưa bấm "Đổi" — giữ nguyên 4 số đầu + 2 số cuối, phần giữa thay bằng
-// "••••" bất kể còn lại bao nhiêu số, đúng kiểu hiển thị trong mockup.
-function maskPhone(phone: string): string {
-  if (!phone || phone.length <= 6) return phone;
-  return `${phone.slice(0, 4)} •••• ${phone.slice(-2)}`;
-}
-
 const LABEL_CLASS = "text-size-12 font-medium text-muted-foreground";
 const INPUT_CLASS = "h-11 mt-1.5 placeholder:text-size-13";
 
 export function ProfileForm({ user }: { user: AuthUser }) {
-  const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl);
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
+  // Đi kèm avatarUrl — cần publicId để xóa đúng ảnh trên Cloudinary khi đổi/gỡ avatar.
+  const [avatarPublicId, setAvatarPublicId] = useState(user.avatarPublicId);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
-  // SĐT/Email mặc định khoá (disabled, nền xám) — bấm "Đổi" mới mở khoá cho nhập; bấm lại
-  // lần nữa ("Huỷ") thì khoá lại và trả input về giá trị gốc, không giữ phần đang gõ dở.
-  const [editingField, setEditingField] = useState<"phone" | "email" | null>(null);
+  // Field nào đang mở dialog đổi SĐT/Email — null nghĩa là không dialog nào đang mở. Khác
+  // avatar (chỉnh xong nhấn "Lưu thay đổi" mới ghi), đổi SĐT/Email tự ghi thẳng qua OTP nên
+  // không cần state theo dõi trong RHF nữa, chỉ cần biết đang mở dialog cho field nào.
+  const [contactDialogField, setContactDialogField] = useState<"phone" | "email" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, control, handleSubmit, resetField, formState: { errors } } = useForm<ProfileFormValues>({
+  const { register, control, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user.fullName,
       dateOfBirth: user.dateOfBirth ? user.dateOfBirth.slice(0, 10) : "",
       gender: user.gender ?? undefined,
-      phone: user.phone ?? "",
-      email: user.email,
     },
   });
 
@@ -71,6 +73,11 @@ export function ProfileForm({ user }: { user: AuthUser }) {
         fullName: values.fullName,
         dateOfBirth: values.dateOfBirth || undefined,
         gender: values.gender as "MALE" | "FEMALE" | "OTHER" | undefined,
+        // Avatar đã tải lên/xóa thật trên Cloudinary ngay lúc bấm (xem onPickAvatar/
+        // onRemoveAvatar) — gửi kèm ở đây chỉ để lưu url/publicId hiện tại vào hồ sơ,
+        // null nghĩa là user đã gỡ avatar.
+        avatarUrl,
+        avatarPublicId,
       });
       setUser(updated);
       toast.success("Lưu hồ sơ thành công!");
@@ -81,21 +88,44 @@ export function ProfileForm({ user }: { user: AuthUser }) {
     }
   }
 
-  function onPickAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickAvatar(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    event.target.value = ""; // cho phép chọn lại đúng file cũ ở lần sau
     if (!file) return;
-    // Chỉ xem trước cục bộ — chưa có API upload avatar nên chưa gửi file đi đâu cả.
-    setAvatarPreview(URL.createObjectURL(file));
-    toast.info("Chức năng tải ảnh đại diện sẽ hoàn thiện khi có API upload ở backend.");
+
+    const previousPublicId = avatarPublicId;
+    setUploadingAvatar(true);
+    try {
+      const result = await uploadImage(file);
+      setAvatarUrl(result.url);
+      setAvatarPublicId(result.publicId);
+      // Ảnh cũ (nếu có) đã bị thay — dọn luôn trên Cloudinary, tránh rác. Không chặn
+      // UI vì đằng nào avatar mới cũng đã nhận, lỗi dọn rác không nên làm hỏng thao tác
+      // của người dùng.
+      if (previousPublicId) {
+        deleteImage(previousPublicId).catch(() => undefined);
+      }
+    } catch {
+      toast.error("Tải ảnh đại diện thất bại, vui lòng thử lại.");
+    } finally {
+      setUploadingAvatar(false);
+    }
   }
 
-  function toggleEditing(field: "phone" | "email") {
-    if (editingField === field) {
-      resetField(field);
-      setEditingField(null);
-    } else {
-      setEditingField(field);
+  async function onRemoveAvatar() {
+    const publicId = avatarPublicId;
+    // Xóa trên Cloudinary trước, chỉ gỡ khỏi UI khi chắc chắn đã xóa xong — tránh trường
+    // hợp API lỗi mà UI vẫn coi như đã gỡ, để lại rác trên Cloudinary mà không ai biết.
+    if (publicId) {
+      try {
+        await deleteImage(publicId);
+      } catch {
+        toast.error("Xóa ảnh trên Cloudinary thất bại, vui lòng thử lại.");
+        return;
+      }
     }
+    setAvatarUrl(null);
+    setAvatarPublicId(null);
   }
 
   return (
@@ -131,61 +161,28 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               )}
             </div>
 
-            <div>
-              <p className={cn(LABEL_CLASS, "mt-2.25")}>Số điện thoại</p>
-              <div className="relative mt-1.5">
-                <Controller
-                  name="phone"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="profile-phone"
-                      aria-label="Số điện thoại"
-                      disabled={editingField !== "phone"}
-                      className="h-11 pr-14"
-                      placeholder="Nhập số điện thoại"
-                      value={editingField === "phone" ? (field.value ?? "") : maskPhone(field.value ?? "")}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-                <button
-                  type="button"
-                  onClick={() => toggleEditing("phone")}
-                  className={cn(
-                    "absolute top-1/2 cursor-pointer right-3 -translate-y-1/2 text-size-12",
-                    editingField === "phone" ? "text-muted-foreground" : "text-[#8B5339]",
-                  )}
-                >
-                  {editingField === "phone" ? "Huỷ" : "Đổi"}
-                </button>
-              </div>
-            </div>
+            {/* isEditing luôn false — field này giờ chỉ hiển thị, không gõ trực tiếp được
+                nữa. Bấm "Đổi" mở ChangeContactDialog (flow OTP riêng, xem component đó),
+                không còn gộp vào submit chung của form như trước (giá trị gõ tạm trước đây
+                không thực sự được gửi lên BE dù toast báo "Lưu thành công"). */}
+            <EditableField
+              label="Số điện thoại"
+              value={user.phone ?? ""}
+              onChange={() => undefined}
+              isEditing={false}
+              onToggleEdit={() => setContactDialogField("phone")}
+              formatDisplay={maskPhone}
+              inputProps={{ id: "profile-phone", placeholder: "Chưa cập nhật" }}
+            />
 
-            <div>
-              <p className= {cn(LABEL_CLASS, "mt-2.25")}>Email</p>
-              <div className="relative mt-1.5">
-                <Input
-                  id="profile-email"
-                  type="email"
-                  aria-label="Email"
-                  disabled={editingField !== "email"}
-                  className="h-11 pr-14"
-                  placeholder="Nhập email"
-                  {...register("email")}
-                />
-                <button
-                  type="button"
-                  onClick={() => toggleEditing("email")}
-                  className={cn(
-                    "absolute top-1/2 cursor-pointer right-3 -translate-y-1/2 text-size-12",
-                    editingField === "email" ? "text-muted-foreground" : "text-[#8B5339]",
-                  )}
-                >
-                  {editingField === "email" ? "Huỷ" : "Đổi"}
-                </button>
-              </div>
-            </div>
+            <EditableField
+              label="Email"
+              value={user.email}
+              onChange={() => undefined}
+              isEditing={false}
+              onToggleEdit={() => setContactDialogField("email")}
+              inputProps={{ id: "profile-email", type: "email" }}
+            />
 
             <div>
               <p className={cn(LABEL_CLASS, "mt-2.25")}>Giới tính</p>
@@ -201,7 +198,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
                           value={val}
                           checked={field.value === val}
                           onChange={() => field.onChange(val)}
-                          className="accent-[#1E1A15] size-3.5 cursor-pointer"
+                          className="accent-brand-10 size-3.5 cursor-pointer"
                         />
                         {GENDER_LABELS[val]}
                       </label>
@@ -211,11 +208,11 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               />
             </div>
 
-            <div className="col-span-full flex flex-wrap items-center gap-3 pt-3 mt-2.25">
+            <div className="col-span-full flex flex-wrap items-center gap-3 pt-3">
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#1E1A15] h-11.5 px-6 text-size-13 font-semibold hover:bg-[#1E1A15]/90 disabled:opacity-60"
+                className="bg-brand-10 h-11.5 px-6 text-size-13 font-semibold hover:bg-brand-10/90 disabled:opacity-60"
               >
                 {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
               </Button>
@@ -224,30 +221,64 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               </Button>
             </div>
 
-            <p className="col-span-full text-size-12 text-[#76706A]">
+            <p className="col-span-full text-size-12 text-neutral-76706A">
               Đổi số điện thoại hoặc email cần xác thực lại bằng mã OTP.
             </p>
           </form>
         </div>
 
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative size-50 overflow-hidden rounded-full bg-muted">
-            {avatarPreview && (
-              <Image src={avatarPreview} alt={user.fullName} fill className="object-cover" />
+        {/* order-first: dưới lg (mobile/tablet, grid-cols-1) đẩy khối avatar lên TRƯỚC form
+            — chỉ đổi thứ tự hiển thị bằng CSS order, không đổi DOM/tab order. Từ lg: trở
+            lên reset order-none để về đúng vị trí cột phải như thiết kế gốc (grid 2 cột
+            lg:grid-cols-[1fr_240px] tự xếp nó sang bên phải bất kể order). */}
+        <div className="order-first flex flex-col items-center gap-3 lg:order-none">
+          {/* 1 container duy nhất, KHÔNG overflow-hidden — vòng tròn lấy từ rounded-full
+              ngay trên <Image> (border-radius tự clip nội dung ảnh của chính nó, không
+              cần div bọc overflow-hidden riêng). Nhờ vậy icon thùng rác (sibling, absolute
+              left-full) không bao giờ bị mask/overflow nào của container cắt mất, đồng
+              thời container vẫn đúng size-50 nên avatar tự căn giữa, không lệch trái. */}
+          <div className="relative size-50 rounded-full bg-muted">
+            {avatarUrl && (
+              <Image src={avatarUrl} alt={user.fullName} fill className="rounded-full object-cover" />
+            )}
+            {uploadingAvatar && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+                <Loader2 className="size-6 animate-spin text-white" />
+              </div>
+            )}
+            {avatarUrl && !uploadingAvatar && (
+              <button
+                type="button"
+                onClick={onRemoveAvatar}
+                aria-label="Xóa ảnh đại diện"
+                className="absolute top-1/2 left-full ml-2 -translate-y-1/2 cursor-pointer text-destructive hover:text-destructive/80"
+              >
+                <Trash2 className="size-5" />
+              </button>
             )}
           </div>
-          <Button type="button" variant="outline" size="sm" className="relative overflow-hidden text-size-12 font-semibold h-9.5 bg-white">
-            Tải ảnh lên
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={uploadingAvatar}
+            className="relative overflow-hidden text-size-12 font-semibold h-9.5 bg-white disabled:opacity-60"
+          >
+            {uploadingAvatar ? "Đang tải..." : "Tải ảnh lên"}
             <input
               type="file"
               accept="image/*"
               onChange={onPickAvatar}
+              disabled={uploadingAvatar}
               className="absolute inset-0 cursor-pointer opacity-0"
               aria-label="Tải ảnh đại diện"
             />
           </Button>
+          <p className="text-size-12 text-center text-muted-foreground">Ảnh đại diện không bắt buộc</p>
         </div>
       </div>
+
+      <ChangeContactDialog field={contactDialogField} onOpenChange={(open) => !open && setContactDialogField(null)} />
     </div>
   );
 }
