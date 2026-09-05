@@ -8,7 +8,6 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthLayout } from "@/components/layout/AuthLayout";
 import { forgotPassword } from "@/lib/auth-api";
 
 const forgotPasswordSchema = z.object({
@@ -32,7 +31,7 @@ export default function ForgotPasswordPage() {
   });
 
   return (
-    <AuthLayout>
+    <>
       <h1 className="font-heading text-2xl font-extrabold uppercase">Quên mật khẩu</h1>
 
       {submitted ? (
@@ -72,6 +71,6 @@ export default function ForgotPasswordPage() {
           Quay lại đăng nhập
         </Link>
       </p>
-    </AuthLayout>
+    </>
   );
 }

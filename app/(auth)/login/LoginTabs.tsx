@@ -14,7 +14,7 @@ const DISABLED_TABS = ["Đăng ký", "OTP", "Quên mật khẩu"];
 export function LoginTabs() {
   return (
     <div className="mx-auto max-w-105 md:max-w-209 my-6 px-4 sm:my-10">
-      <div className="overflow-hidden rounded-2xl flex bg-[#E4EBE6]">
+      <div className="overflow-hidden rounded-2xl flex bg-login-card-bg">
         <div className="relative hidden min-h-113 w-90.25 shrink-0 md:block">
           <Image
             src="/image/login_banner.jpg"
@@ -30,7 +30,7 @@ export function LoginTabs() {
             <button
               type="button"
               aria-current="page"
-              className="border-b-2 border-[#1E1A15] pb-3 text-size-14 font-semibold text-[#1E1A15] transition-colors"
+              className="border-b-2 border-brand-10 pb-3 text-size-14 font-semibold text-brand-10 transition-colors"
             >
               Đăng nhập
             </button>
@@ -41,7 +41,7 @@ export function LoginTabs() {
                 disabled
                 className={cn(
                   "cursor-not-allowed border-b-2 border-transparent pb-3",
-                  "text-size-14 font-semibold text-[#76706A] transition-colors",
+                  "text-size-14 font-semibold text-neutral-76706A transition-colors",
                 )}
               >
                 {label}

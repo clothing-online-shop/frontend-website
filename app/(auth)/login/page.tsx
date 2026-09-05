@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { LoginTabs } from "./LoginTabs";
+import { LoginForm } from "./LoginForm";
 
 export default function LoginPage() {
   return (
     <Suspense>
-      <LoginTabs />
+      <LoginForm />
     </Suspense>
   );
 }

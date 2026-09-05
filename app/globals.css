@@ -60,6 +60,11 @@
   --color-neutral-37322C: var(--neutral-37322C);
   --color-neutral-3F3A34: var(--neutral-3F3A34);
   --color-neutral-7F7973: var(--neutral-7F7973);
+  --color-neutral-76706A: var(--neutral-76706A);
+  --color-neutral-4C4741: var(--neutral-4C4741);
+  --color-neutral-E0DDDA: var(--neutral-E0DDDA);
+  --color-error-soft: var(--error-soft);
+  --color-login-card-bg: var(--login-card-bg);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 6px;
@@ -114,6 +119,11 @@
   --neutral-37322C: #37322C;
   --neutral-3F3A34: #3F3A34;
   --neutral-7F7973: #7F7973;
+  --neutral-76706A: #76706A;
+  --neutral-4C4741: #4C4741;
+  --neutral-E0DDDA: #E0DDDA;
+  --error-soft: #FFF0EE;
+  --login-card-bg: #E4EBE6;
 
   --background: var(--neutral-96);
   --background-header: var(--neutral-FEFDFB);
