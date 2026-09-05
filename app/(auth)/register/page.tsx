@@ -8,7 +8,6 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthLayout } from "@/components/layout/AuthLayout";
 import { register as registerApi } from "@/lib/auth-api";
 import { getErrorMessage } from "@/lib/error";
 
@@ -37,7 +36,7 @@ export default function RegisterPage() {
   });
 
   return (
-    <AuthLayout>
+    <>
       <h1 className="font-heading text-2xl font-extrabold uppercase">Tạo tài khoản</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Đã có tài khoản?{" "}
@@ -95,6 +94,6 @@ export default function RegisterPage() {
           {mutation.isPending ? "Đang tạo tài khoản..." : "Đăng ký"}
         </Button>
       </form>
-    </AuthLayout>
+    </>
   );
 }
