@@ -13,7 +13,7 @@ const DISABLED_TABS = ["Đăng ký", "OTP", "Quên mật khẩu"];
 
 export function LoginTabs() {
   return (
-    <div className="mx-auto max-w-[420px] md:max-w-209 my-6 px-4 sm:my-10">
+    <div className="mx-auto max-w-105 md:max-w-209 my-6 px-4 sm:my-10">
       <div className="overflow-hidden rounded-2xl flex bg-[#E4EBE6]">
         <div className="relative hidden min-h-113 w-90.25 shrink-0 md:block">
           <Image

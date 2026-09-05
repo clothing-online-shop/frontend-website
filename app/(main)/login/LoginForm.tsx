@@ -52,7 +52,7 @@ export function LoginForm() {
 
   const mutation = useMutation({ mutationFn: login });
 
-  function onValid(values: LoginFormValues) {
+  const onValid = (values: LoginFormValues) => {
     mutation.mutate(
       { identifier: values.identifier, password: values.password },
       {
