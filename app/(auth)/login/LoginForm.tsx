@@ -22,7 +22,7 @@ import {
   AUTH_LABEL_CLASS,
   AUTH_LINK_CLASS,
   AUTH_SUBMIT_BUTTON_CLASS,
-} from "./auth-field-styles";
+} from "../auth-field-styles";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Vui lòng nhập email hoặc số điện thoại"),
@@ -122,7 +122,7 @@ export function LoginForm() {
             type="button"
             onClick={() => setShowPassword((visible) => !visible)}
             aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-            className="absolute top-1/2 cursor-pointer right-3 -translate-y-1/2 text-[#76706A] hover:text-[#1E1A15]"
+            className="absolute top-1/2 cursor-pointer right-3 -translate-y-1/2 text-neutral-76706A hover:text-brand-10"
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
@@ -131,7 +131,7 @@ export function LoginForm() {
       </div>
 
       <div className="flex items-center justify-between text-size-14 mb-4">
-        <label className="flex items-center gap-2 text-[#4C4741] text-size-12">
+        <label className="flex items-center gap-2 text-neutral-4C4741 text-size-12">
           <Controller
             name="remember"
             control={control}
