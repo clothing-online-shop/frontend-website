@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { login } from "@/lib/auth-api";
 import { getErrorMessage } from "@/lib/error";
 import { useAuthStore } from "@/store/auth-store";
+import { cn } from "@/lib/utils";
 import {
   AUTH_ERROR_BOX_CLASS,
   AUTH_INPUT_CLASS,
@@ -32,15 +35,19 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { identifier: "", password: "", remember: true },
+    // onChange để isValid cập nhật ngay khi gõ — dùng khoá nút "Đăng nhập" lúc chưa nhập đủ
+    // thông tin, thay vì chỉ biết form invalid sau khi bấm submit lần đầu.
+    mode: "onChange",
   });
 
   const mutation = useMutation({ mutationFn: login });
@@ -61,13 +68,14 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onValid)}>
       <div>
-        <label htmlFor="login-identifier" className={AUTH_LABEL_CLASS}>
+        <p className={AUTH_LABEL_CLASS}>
           Số điện thoại hoặc email
-        </label>
+        </p>
         <Input
           id="login-identifier"
-          className={AUTH_INPUT_CLASS}
-          placeholder="0912 345 678"
+          aria-label="Số điện thoại hoặc email"
+          className={cn(AUTH_INPUT_CLASS, "placeholder:text-size-13")}
+          placeholder="Nhập số điện thoại hoặc email"
           autoComplete="username"
           {...register("identifier")}
         />
@@ -76,18 +84,30 @@ export function LoginForm() {
         )}
       </div>
 
-      <div className="mt-2 my-4">
-        <label htmlFor="login-password" className={AUTH_LABEL_CLASS}>
+
+      <div className="my-4">
+        <p className={AUTH_LABEL_CLASS}>
           Mật khẩu
-        </label>
-        <Input
-          id="login-password"
-          type="password"
-          className={AUTH_INPUT_CLASS}
-          placeholder="••••••"
-          autoComplete="current-password"
-          {...register("password")}
-        />
+        </p>
+        <div className="relative">
+          <Input
+            id="login-password"
+            type={showPassword ? "text" : "password"}
+            aria-label="Mật khẩu"
+            className={cn(AUTH_INPUT_CLASS, "pr-10 placeholder:text-size-13")}
+            placeholder="Nhập mật khẩu"
+            autoComplete="current-password"
+            {...register("password")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            className="absolute top-1/2 cursor-pointer right-3 -translate-y-1/2 text-[#76706A] hover:text-[#1E1A15]"
+          >
+            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        </div>
         {errors.password && <p className="text-size-12 text-destructive mt-1">{errors.password.message}</p>}
       </div>
 
@@ -110,8 +130,8 @@ export function LoginForm() {
       <Button
         type="submit"
         size="lg"
-        className={AUTH_SUBMIT_BUTTON_CLASS}
-        disabled={mutation.isPending}
+        className={cn(AUTH_SUBMIT_BUTTON_CLASS, "disabled:pointer-events-auto disabled:cursor-not-allowed")}
+        disabled={!isValid || mutation.isPending}
       >
         {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
       </Button>

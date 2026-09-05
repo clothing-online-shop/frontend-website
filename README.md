@@ -1,5 +1,6 @@
 # frontend-website
-
+test.demo@example.com
+Test@123
 Website bán hàng dành cho khách hàng của Clothing Shop, xây bằng Next.js (App Router). Gọi API trực tiếp tới **`backend-user`**. Đây là 1 trong 4 repo độc lập của hệ thống (không còn là monorepo/workspace chung):
 
 | Repo | Vai trò | Port local |

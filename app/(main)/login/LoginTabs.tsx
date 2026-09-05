@@ -13,24 +13,24 @@ const DISABLED_TABS = ["Đăng ký", "OTP", "Quên mật khẩu"];
 
 export function LoginTabs() {
   return (
-    <div className="mx-auto max-w-[836px] my-10 bg-[#E4EBE6]">
-      <div className="overflow-hidden rounded-2xl flex">
-        <div className="relative hidden min-h-[452px] w-[361px] shrink-0 md:block">
+    <div className="mx-auto max-w-[420px] md:max-w-209 my-6 px-4 sm:my-10">
+      <div className="overflow-hidden rounded-2xl flex bg-[#E4EBE6]">
+        <div className="relative hidden min-h-113 w-90.25 shrink-0 md:block">
           <Image
             src="/image/login_banner.jpg"
             alt=""
             fill
             sizes="361px"
-            className="object-cover max-h-[416px]"
+            className="object-cover max-h-104"
           />
         </div>
 
-        <div className="flex-1 max-w-[380px] p-8 sm:pl-[34px] sm:py-[36px]">
-          <nav className="mb-[20px] flex flex-wrap gap-4 border-b border-border" aria-label="Xác thực">
+        <div className="flex-1 max-w-95 p-5 sm:p-8 sm:pl-8.5 sm:py-9">
+          <nav className="mb-6.5 flex flex-wrap gap-3 border-b border-border sm:gap-4" aria-label="Xác thực">
             <button
               type="button"
               aria-current="page"
-              className="-mb-px border-b-2 border-[#1E1A15] pb-3 text-size-14 font-semibold text-[#1E1A15] transition-colors"
+              className="border-b-2 border-[#1E1A15] pb-3 text-size-14 font-semibold text-[#1E1A15] transition-colors"
             >
               Đăng nhập
             </button>
@@ -40,7 +40,7 @@ export function LoginTabs() {
                 type="button"
                 disabled
                 className={cn(
-                  "-mb-px cursor-not-allowed border-b-2 border-transparent pb-3",
+                  "cursor-not-allowed border-b-2 border-transparent pb-3",
                   "text-size-14 font-semibold text-[#76706A] transition-colors",
                 )}
               >
