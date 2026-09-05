@@ -10,14 +10,24 @@ export enum ProductStatus {
 
 export type ProductSort = "price_asc" | "price_desc" | "newest" | "best_selling";
 
+export type Gender = "MALE" | "FEMALE" | "OTHER";
+
 export interface AuthUser {
   id: string;
   email: string;
   phone: string | null;
   fullName: string;
+  // toSafeUser() (backend-user) chỉ loại field password, còn lại trả nguyên model User —
+  // trước đây type này thiếu 4 field dưới đây dù backend đã trả về, khiến trang tài khoản
+  // không đọc được ngày sinh/giới tính/avatar thật của user.
+  dateOfBirth: string | null;
+  gender: Gender | null;
+  avatarUrl: string | null;
+  avatarPublicId: string | null;
   role: "CUSTOMER" | "ADMIN";
   status: "ACTIVE" | "INACTIVE" | "BANNED";
   emailVerifiedAt: string | null;
+  phoneVerifiedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
