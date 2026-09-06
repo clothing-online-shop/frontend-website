@@ -29,6 +29,55 @@ const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Thông báo", href: "/account/notifications" },
 ];
 
+// Dùng chung cho cả 2 khối <nav> bên dưới (pill cuộn ngang ở mobile, list dọc ở tablet/
+// desktop) — trước đây mỗi khối tự lặp lại y hệt logic disabled/active/aria-current, sửa 1
+// chỗ (vd thêm quyền truy cập) dễ quên sửa chỗ còn lại. "variant" chỉ đổi phần className
+// hiển thị, không đổi logic.
+function AccountNavLink({
+  item,
+  active,
+  variant,
+}: {
+  item: AccountNavItem;
+  active: boolean;
+  variant: "pill" | "row";
+}) {
+  if (!item.enabled) {
+    return (
+      <span
+        aria-disabled="true"
+        className={
+          variant === "pill"
+            ? "shrink-0 cursor-not-allowed whitespace-nowrap rounded-full bg-muted/60 px-3.5 py-1.5 text-size-13 text-muted-foreground/50"
+            : "block cursor-not-allowed border-l-4 border-transparent px-4 py-3 text-muted-foreground/60"
+        }
+      >
+        {item.label}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        variant === "pill"
+          ? "shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-size-13 transition-colors"
+          : "block border-l-4 px-4 py-3 transition-colors",
+        variant === "pill"
+          ? active
+            ? "bg-primary font-semibold text-primary-foreground"
+            : "bg-muted text-muted-foreground hover:bg-muted/70"
+          : active
+            ? "border-primary bg-neutral-96 font-semibold text-primary"
+            : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}
+    >
+      {item.label}
+    </Link>
+  );
+}
+
 export function AccountSidebar({ user }: { user: AuthUser }) {
   const pathname = usePathname();
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -43,7 +92,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         <div className="flex items-center gap-3">
           <div className="relative size-11 shrink-0 overflow-hidden rounded-full bg-muted">
             {user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt={user.fullName} fill className="object-cover" />
+              <Image src={user.avatarUrl} alt={user.fullName} fill sizes="44px" className="object-cover" />
             ) : (
               <UserRound className="absolute inset-0 m-auto size-6 text-muted-foreground" />
             )}
@@ -71,7 +120,6 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         </Button>
       </div>
 
-
       {/* Mobile: list dọc 7 mục + đăng xuất đẩy form xuống rất xa, phải cuộn mới thấy — thay
           bằng 1 thanh tab cuộn NGANG ngay dưới card user, chỉ cao 1 hàng. Vuốt ngang để xem
           hết mục, không cần thêm thao tác mở dialog/menu nào. Từ tablet (md:) trở lên vẫn
@@ -80,67 +128,25 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         aria-label="Tài khoản"
         className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 md:hidden"
       >
-        {ACCOUNT_NAV.map((item) => {
-          const active = item.enabled && pathname === item.href;
-          if (!item.enabled) {
-            return (
-              <span
-                key={item.href}
-                aria-disabled="true"
-                className="shrink-0 cursor-not-allowed whitespace-nowrap rounded-full bg-muted/60 px-3.5 py-1.5 text-size-13 text-muted-foreground/50"
-              >
-                {item.label}
-              </span>
-            );
-          }
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-size-13 transition-colors",
-                active
-                  ? "bg-primary font-semibold text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/70",
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+        {ACCOUNT_NAV.map((item) => (
+          <AccountNavLink
+            key={item.href}
+            item={item}
+            active={Boolean(item.enabled && pathname === item.href)}
+            variant="pill"
+          />
+        ))}
       </nav>
 
       <nav className="hidden space-y-1 md:block" aria-label="Tài khoản">
-        {ACCOUNT_NAV.map((item) => {
-          const active = item.enabled && pathname === item.href;
-          if (!item.enabled) {
-            return (
-              <span
-                key={item.href}
-                aria-disabled="true"
-                className="block cursor-not-allowed border-l-4 border-transparent px-4 py-3 text-muted-foreground/60"
-              >
-                {item.label}
-              </span>
-            );
-          }
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "block border-l-4 px-4 py-3 transition-colors",
-                active
-                  ? "border-primary bg-neutral-96 font-semibold text-primary"
-                  : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+        {ACCOUNT_NAV.map((item) => (
+          <AccountNavLink
+            key={item.href}
+            item={item}
+            active={Boolean(item.enabled && pathname === item.href)}
+            variant="row"
+          />
+        ))}
         {/* Cùng border-l-4 px-4 py-3 như các mục nav ở trên — để border-transparent "ăn" đúng
             4px như hàng khác thì chữ "Đăng xuất" mới thẳng hàng, không bị lệch trái/khác
             khoảng cách như trước (rounded-lg px-3 py-2 không khớp khung của các item kia). */}

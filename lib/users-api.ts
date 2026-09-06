@@ -38,7 +38,7 @@ export interface ConfirmEmailChangePayload {
 }
 
 export async function requestPhoneChange(payload: RequestPhoneChangePayload): Promise<{ message: string }> {
-  const { data } = await apiClient.post("/users/me/phone/request-change", payload);
+  const { data } = await apiClient.post<{ message: string }>("/users/me/phone/request-change", payload);
   return data;
 }
 
@@ -48,7 +48,7 @@ export async function confirmPhoneChange(payload: ConfirmPhoneChangePayload): Pr
 }
 
 export async function requestEmailChange(payload: RequestEmailChangePayload): Promise<{ message: string }> {
-  const { data } = await apiClient.post("/users/me/email/request-change", payload);
+  const { data } = await apiClient.post<{ message: string }>("/users/me/email/request-change", payload);
   return data;
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useLogout } from "@/hooks/useLogout";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,9 +29,18 @@ export function LogoutConfirmDialog({ open, onOpenChange }: LogoutConfirmDialogP
 
   async function handleConfirm() {
     setLoggingOut(true);
-    // logout() tự điều hướng sang /login khi xong — không cần tự đóng dialog/reset state ở
-    // đây, chuyển trang sẽ unmount toàn bộ cây component chứa dialog này.
-    await logout();
+    try {
+      // logout() tự điều hướng sang /login khi xong — không cần tự đóng dialog/reset state
+      // ở đây, chuyển trang sẽ unmount toàn bộ cây component chứa dialog này.
+      await logout();
+    } catch {
+      // Hiện tại useLogout() tự nuốt lỗi gọi API (logoutApi(...).catch(() => undefined)) nên
+      // nhánh này gần như không bao giờ chạy — nhưng vẫn cần có, không thì nếu sau này đổi
+      // hành vi đó (để lỗi lộ ra thật), nút sẽ kẹt mãi ở "Đang đăng xuất..." không cách nào
+      // thoát ra, không báo gì cho người dùng biết.
+      toast.error("Đăng xuất thất bại, vui lòng thử lại.");
+      setLoggingOut(false);
+    }
   }
 
   return (

@@ -18,10 +18,12 @@ type EditableFieldProps = {
   inputProps?: InputHTMLAttributes<HTMLInputElement>;
 };
 
-// Field dạng label + input khoá mặc định (nền xám) + nút "Đổi"/"Huỷ" ở góc phải để mở/khoá
-// nhập liệu — dùng chung cho các field cần xác thực lại (OTP) mới đổi được, như SĐT/Email
-// trong ProfileForm. Bấm "Huỷ" chỉ đổi trạng thái khoá, việc trả input về giá trị gốc do
-// component cha xử lý (thường qua resetField của react-hook-form).
+// Field dạng label + input + nút "Đổi"/"Huỷ" ở góc phải. Hỗ trợ 2 kiểu dùng tuỳ component
+// cha điều khiển isEditing: (1) unlock nhập liệu tại chỗ (isEditing chuyển true/false, "Huỷ"
+// tự trả input về giá trị gốc qua resetField của react-hook-form) — hiện KHÔNG còn chỗ nào
+// dùng kiểu này; (2) khoá vĩnh viễn (isEditing luôn false, onChange không dùng tới) và
+// onToggleEdit chỉ để mở 1 dialog/flow riêng bên ngoài (vd SĐT/Email trong ProfileForm mở
+// ChangeContactDialog vì đổi 2 field đó bắt buộc qua OTP, không thể gộp vào input tại chỗ).
 export function EditableField({
   label,
   value,

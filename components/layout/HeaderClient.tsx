@@ -51,7 +51,7 @@ function HeaderActionItem({ label, icon: Icon, isAvatar, avatarUrl, href, badge,
         {isAvatar ? (
           <span className="relative flex size-4.5 items-center justify-center overflow-hidden rounded-full border border-header-avatar-border bg-header-avatar-bg">
             {avatarUrl ? (
-              <Image src={avatarUrl} alt="" fill className="object-cover" />
+              <Image src={avatarUrl} alt="" fill sizes="18px" className="object-cover" />
             ) : (
               <Icon className="size-3" />
             )}

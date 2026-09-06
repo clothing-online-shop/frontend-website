@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EditableField } from "@/components/account/EditableField";
 import { ChangeContactDialog } from "@/components/account/ChangeContactDialog";
+import { DatePicker } from "@/components/common/DatePicker";
 import { cn } from "@/lib/utils";
 import { maskPhone } from "@/lib/format";
 import type { AuthUser } from "@/lib/shared-types";
@@ -148,13 +149,20 @@ export function ProfileForm({ user }: { user: AuthUser }) {
 
             <div>
               <p className={LABEL_CLASS}>Ngày sinh</p>
-              <Input
-                id="profile-dob"
-                type="date"
-                aria-label="Ngày sinh"
-                max={new Date().toISOString().slice(0, 10)}
-                className={INPUT_CLASS}
-                {...register("dateOfBirth")}
+              <Controller
+                name="dateOfBirth"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="profile-dob"
+                    aria-label="Ngày sinh"
+                    value={field.value}
+                    onChange={field.onChange}
+                    maxDate={new Date()}
+                    className={INPUT_CLASS}
+                    type="text"
+                  />
+                )}
               />
               {errors.dateOfBirth && (
                 <p className="mt-1 text-size-12 text-destructive">{errors.dateOfBirth.message}</p>
@@ -216,7 +224,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               >
                 {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
               </Button>
-              <Button type="button" variant="outline" className="h-11.5 px-6 text-size-13 bg-white font-semibold">
+              <Button type="button" disabled variant="outline" className="h-11.5 px-6 text-size-13 bg-white font-semibold">
                 Đổi mật khẩu
               </Button>
             </div>
@@ -239,7 +247,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               thời container vẫn đúng size-50 nên avatar tự căn giữa, không lệch trái. */}
           <div className="relative size-50 rounded-full bg-muted">
             {avatarUrl && (
-              <Image src={avatarUrl} alt={user.fullName} fill className="rounded-full object-cover" />
+              <Image src={avatarUrl} alt={user.fullName} fill sizes="200px" className="rounded-full object-cover" />
             )}
             {uploadingAvatar && (
               <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">

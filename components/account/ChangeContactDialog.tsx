@@ -85,6 +85,11 @@ function ChangeContactForm({
       setStep("confirm");
       setCode("");
       setCooldown(RESEND_COOLDOWN_SECONDS);
+      // Mã mới đã gửi — lỗi "sai/hết hạn" của mã CŨ (nếu có, từ lần confirm trước hoặc lần
+      // gửi lại trước) không còn ý nghĩa gì nữa, phải xóa đi chứ không thì nó cứ đứng nguyên
+      // trên màn hình (confirmMutation chỉ tự reset khi gọi lại confirmMutation.mutate(),
+      // không tự biết là requestMutation vừa chạy lại).
+      confirmMutation.reset();
     },
   });
 
