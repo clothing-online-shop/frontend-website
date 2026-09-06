@@ -282,7 +282,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               aria-label="Tải ảnh đại diện"
             />
           </Button>
-          <p className="text-size-12 text-center text-muted-foreground">Ảnh đại diện không bắt buộc</p>
         </div>
       </div>
 
