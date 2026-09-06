@@ -51,7 +51,7 @@ export function LogoutConfirmDialog({ open, onOpenChange }: LogoutConfirmDialogP
           <DialogDescription>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này không?</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button type="button" variant="ghost" disabled={loggingOut} />}>Hủy</DialogClose>
+          <DialogClose render={<Button type="button" className="h-11.5" variant="ghost" disabled={loggingOut} />}>Hủy</DialogClose>
           <Button
             type="button"
             variant="dark"
