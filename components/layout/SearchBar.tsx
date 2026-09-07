@@ -26,6 +26,11 @@ export function SearchBar({
       <Input
         name="q"
         type="search"
+        // Tắt gợi ý autofill mặc định của trình duyệt (nhớ theo name="q" trên toàn site,
+        // không liên quan gì tới search-history thật) — để tránh lẫn với dãy "Từ khóa tìm
+        // gần đây" thật sự (lấy từ API, hiện ở trang kết quả) khiến người dùng tưởng nhầm
+        // là cùng 1 danh sách.
+        autoComplete="off"
         placeholder="Tìm áo, váy, mã SKU..."
         defaultValue={defaultValue}
         className="h-11 rounded-full bg-white pr-10 pl-4"
