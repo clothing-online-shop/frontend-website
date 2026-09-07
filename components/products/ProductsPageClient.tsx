@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,6 +69,20 @@ export function ProductsPageClient({ category }: { category?: string }) {
   const productsQuery = useQuery({
     queryKey: ["products", queryParams],
     queryFn: () => getProducts(queryParams),
+  });
+
+  // Ghi nhận search ở đây (thay vì tại SearchBar) để bắt được MỌI đường vào trang kết quả —
+  // gõ ở ô tìm kiếm, bấm 1 pill "từ khoá gần đây", hay mở thẳng link có sẵn ?search=... —
+  // không phải lo trùng logic ở nhiều nơi. Chỉ chạy lại khi search đổi, không phải mỗi lần
+  // re-render (page đổi, sort đổi... productsQuery refetch không kéo theo ghi nhận lại).
+  useEffect(() => {
+    if (search) recordSearch(search).catch(() => undefined);
+  }, [search]);
+
+  const recentSearchesQuery = useQuery({
+    queryKey: ["search-history"],
+    queryFn: getRecentSearches,
+    enabled: Boolean(search),
   });
 
   const activeCategory = categoriesQuery.data
@@ -148,6 +165,23 @@ export function ProductsPageClient({ category }: { category?: string }) {
               </SelectContent>
             </Select>
           </div>
+
+          {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
+            <div className="mb-6">
+              <p className="mb-2 text-sm text-muted-foreground">Từ khóa tìm gần đây</p>
+              <div className="flex flex-wrap gap-2">
+                {recentSearchesQuery.data.map((keyword) => (
+                  <Link
+                    key={keyword}
+                    href={`/san-pham?search=${encodeURIComponent(keyword)}`}
+                    className="rounded-full border border-border px-3 py-1.5 text-sm transition-colors hover:border-primary hover:text-primary"
+                  >
+                    {keyword}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           {productsQuery.isLoading ? (
             <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">

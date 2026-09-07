@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/auth-store";
+import { getGuestId } from "@/lib/guest-id";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
@@ -11,6 +12,13 @@ apiClient.interceptors.request.use((config) => {
   const accessToken = useAuthStore.getState().accessToken;
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  // Gắn cho MỌI request, kể cả đã đăng nhập — các API cần identity (search-history,
+  // recently-viewed...) tự ưu tiên userId từ JWT khi có, guestId chỉ dùng làm fallback nên
+  // gửi kèm không hại gì, đỡ phải nhớ set riêng ở từng chỗ gọi.
+  const guestId = getGuestId();
+  if (guestId) {
+    config.headers["X-Guest-Id"] = guestId;
   }
   return config;
 });
