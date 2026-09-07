@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
@@ -75,9 +75,17 @@ export function ProductsPageClient({ category }: { category?: string }) {
   // gõ ở ô tìm kiếm, bấm 1 pill "từ khoá gần đây", hay mở thẳng link có sẵn ?search=... —
   // không phải lo trùng logic ở nhiều nơi. Chỉ chạy lại khi search đổi, không phải mỗi lần
   // re-render (page đổi, sort đổi... productsQuery refetch không kéo theo ghi nhận lại).
+  const queryClient = useQueryClient();
   useEffect(() => {
-    if (search) recordSearch(search).catch(() => undefined);
-  }, [search]);
+    if (!search) return;
+    recordSearch(search)
+      // Ghi xong mới invalidate — SearchBar (header) và query bên dưới đều dùng chung
+      // queryKey ["search-history"], nếu không invalidate thì cache cũ (fetch lúc mount,
+      // TRƯỚC khi kịp ghi xong) cứ đứng yên, khiến từ khoá vừa search không hiện lên dù BE
+      // đã lưu đúng — đây chính là lý do "search xong không thấy vào lịch sử".
+      .then(() => queryClient.invalidateQueries({ queryKey: ["search-history"] }))
+      .catch(() => undefined);
+  }, [search, queryClient]);
 
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
