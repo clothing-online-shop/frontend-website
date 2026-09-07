@@ -19,6 +19,14 @@ import { updateProfile } from "@/lib/users-api";
 import { deleteImage, uploadImage } from "@/lib/upload-api";
 import { useAuthStore } from "@/store/auth-store";
 
+const GENDER_OPTIONS = ["MALE", "FEMALE", "OTHER"] as const;
+
+const GENDER_LABELS: Record<(typeof GENDER_OPTIONS)[number], string> = {
+  MALE: "Nam",
+  FEMALE: "Nữ",
+  OTHER: "Khác",
+};
+
 // phone/email KHÔNG còn trong schema này — đổi 2 field đó phải qua OTP (xem
 // ChangeContactDialog), không đi qua submit chung của form nữa (trước đây "Lưu thay đổi"
 // coi như thành công dù gõ số/email mới nhưng thực chất không gửi lên BE, vì
@@ -32,16 +40,10 @@ const profileSchema = z.object({
       (val) => !val || new Date(val) <= new Date(),
       { message: "Ngày sinh không được là ngày trong tương lai" },
     ),
-  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+  gender: z.enum(GENDER_OPTIONS).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
-
-const GENDER_LABELS: Record<string, string> = {
-  MALE: "Nam",
-  FEMALE: "Nữ",
-  OTHER: "Khác",
-};
 
 const LABEL_CLASS = "text-size-12 font-medium text-muted-foreground";
 const INPUT_CLASS = "h-11 mt-1.5 placeholder:text-size-13";
@@ -73,7 +75,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       const updated = await updateProfile({
         fullName: values.fullName,
         dateOfBirth: values.dateOfBirth || undefined,
-        gender: values.gender as "MALE" | "FEMALE" | "OTHER" | undefined,
+        gender: values.gender,
         // Avatar đã tải lên/xóa thật trên Cloudinary ngay lúc bấm (xem onPickAvatar/
         // onRemoveAvatar) — gửi kèm ở đây chỉ để lưu url/publicId hiện tại vào hồ sơ,
         // null nghĩa là user đã gỡ avatar.
@@ -199,7 +201,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
                 control={control}
                 render={({ field }) => (
                   <div className="mt-2.5 flex items-center gap-5">
-                    {(["MALE", "FEMALE", "OTHER"] as const).map((val) => (
+                    {GENDER_OPTIONS.map((val) => (
                       <label key={val} className="flex cursor-pointer items-center gap-1.5 text-size-13">
                         <input
                           type="radio"
