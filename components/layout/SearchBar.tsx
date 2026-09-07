@@ -63,6 +63,13 @@ export function SearchBar({
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       <form onSubmit={handleSubmit} role="search">
+        <button
+          type="submit"
+          aria-label="Tìm kiếm"
+          className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Search className="size-4" />
+        </button>
         <Input
           name="q"
           type="search"
@@ -70,16 +77,9 @@ export function SearchBar({
           placeholder="Tìm áo, váy, mã SKU..."
           defaultValue={defaultValue}
           onFocus={() => setOpen(true)}
-          className="h-11 w-full rounded-full bg-white pr-10 pl-4"
+          className="h-11 w-full bg-white pr-4 pl-10"
           aria-label="Từ khóa tìm kiếm"
         />
-        <button
-          type="submit"
-          aria-label="Tìm kiếm"
-          className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Search className="size-4" />
-        </button>
       </form>
 
       {open && history.length > 0 ? (
