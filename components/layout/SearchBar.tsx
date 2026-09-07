@@ -17,6 +17,10 @@ export function SearchBar({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // Cần biết ô đang có chữ hay không để quyết định hiện dropdown lịch sử — chỉ hợp lý khi
+  // ô TRỐNG (đang gõ dở 1 query mới thì không nên đè lịch sử cũ lên, dễ rối vì không phải
+  // gợi ý theo đúng chữ đang gõ). Vì vậy chuyển input sang controlled thay vì defaultValue.
+  const [text, setText] = useState(defaultValue ?? "");
   const containerRef = useRef<HTMLDivElement>(null);
 
   // enabled: open — chỉ gọi API lúc thực sự mở dropdown (bấm vào ô), không gọi sẵn mỗi lần
@@ -27,6 +31,7 @@ export function SearchBar({
     enabled: open,
   });
   const history = recentSearchesQuery.data ?? [];
+  const showHistory = open && text.trim() === "" && history.length > 0;
 
   // Đóng dựa thẳng vào blur thật của trình duyệt thay vì tự đoán "click ra ngoài" bằng
   // listener mousedown/keydown gắn ở document — cách cũ dễ vỡ khi input type="search" có
@@ -43,13 +48,14 @@ export function SearchBar({
   function goSearch(keyword: string) {
     const trimmed = keyword.trim();
     if (!trimmed) return;
+    setText(keyword);
     setOpen(false);
     router.push(`/san-pham?search=${encodeURIComponent(trimmed)}`);
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    goSearch((new FormData(e.currentTarget).get("q") as string) ?? "");
+    goSearch(text);
   }
 
   return (
@@ -67,7 +73,8 @@ export function SearchBar({
           type="search"
           autoComplete="off"
           placeholder="Tìm áo, váy, mã SKU..."
-          defaultValue={defaultValue}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           onFocus={() => setOpen(true)}
           onKeyDown={(e) => {
             if (e.key === "Escape") setOpen(false);
@@ -77,7 +84,7 @@ export function SearchBar({
         />
       </form>
 
-      {open && history.length > 0 ? (
+      {showHistory ? (
         <div className="absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-lg bg-popover py-1.5 text-popover-foreground shadow-md ring-1 ring-foreground/10">
           <p className="px-3.5 py-1.5 text-size-12 text-muted-foreground">Tìm kiếm gần đây</p>
           {history.map((keyword) => (
