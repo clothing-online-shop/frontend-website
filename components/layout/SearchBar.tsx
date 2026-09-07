@@ -16,22 +16,25 @@ export function SearchBar({
   defaultValue?: string;
 }) {
   const router = useRouter();
+  // open: chỉ bật khi bấm/click vào ô (onFocus) — dropdown lịch sử hiện ngay lúc đó và giữ
+  // nguyên cho tới khi rời khỏi ô, KHÔNG quan tâm đang có chữ hay trống (không tự ẩn lúc gõ,
+  // không tự hiện lại lúc xoá hết chữ — chỉ đúng 1 điều kiện duy nhất: đã click vào chưa).
   const [open, setOpen] = useState(false);
-  // Cần biết ô đang có chữ hay không để quyết định hiện dropdown lịch sử — chỉ hợp lý khi
-  // ô TRỐNG (đang gõ dở 1 query mới thì không nên đè lịch sử cũ lên, dễ rối vì không phải
-  // gợi ý theo đúng chữ đang gõ). Vì vậy chuyển input sang controlled thay vì defaultValue.
   const [text, setText] = useState(defaultValue ?? "");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // enabled: open — chỉ gọi API lúc thực sự mở dropdown (bấm vào ô), không gọi sẵn mỗi lần
-  // header render dù chưa ai đụng tới ô search.
+  // Gọi ngay khi mount (KHÔNG gate qua enabled: open nữa) — trước đó chỉ fetch đúng lúc
+  // bấm vào ô, nhưng việc bật "enabled" đúng thời điểm focus không đáng tin cậy 100% (có
+  // lúc phải đổi tab rồi quay lại — trigger refetchOnWindowFocus mặc định của react-query —
+  // dropdown mới chịu hiện, tức lần fetch lúc focus ban đầu không chạy/không kịp). SearchBar
+  // chỉ mount 1 lần/trang (nằm trong header, sống suốt qua các lần điều hướng nội bộ) nên
+  // gọi sẵn ở đây không tốn thêm request nào so với gọi lúc focus, chỉ là gọi sớm hơn.
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,
-    enabled: open,
   });
   const history = recentSearchesQuery.data ?? [];
-  const showHistory = open && text.trim() === "" && history.length > 0;
+  const showHistory = open && history.length > 0;
 
   // Đóng dựa thẳng vào blur thật của trình duyệt thay vì tự đoán "click ra ngoài" bằng
   // listener mousedown/keydown gắn ở document — cách cũ dễ vỡ khi input type="search" có
@@ -66,7 +69,7 @@ export function SearchBar({
           aria-label="Tìm kiếm"
           className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
         >
-          <Search className="size-4" />
+          <Search className="size-4 text-brand-10!" />
         </button>
         <Input
           name="q"
