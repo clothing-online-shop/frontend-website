@@ -217,6 +217,15 @@ export interface HeroBanner {
   sortOrder: number;
 }
 
+export interface ActivePromoBar {
+  id: string;
+  label: string;
+  highlight: string;
+  linkUrl: string;
+  startDate: string;
+  endDate: string;
+}
+
 export interface ActivePopup {
   id: string;
   eyebrow: string | null;
