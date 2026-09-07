@@ -23,6 +23,7 @@ interface AuthState {
     remember?: boolean,
   ) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setUser: (user: AuthUser) => void;
   logout: () => void;
 }
 
@@ -75,6 +76,7 @@ export const useAuthStore = create<AuthState>()(
         set({ user, accessToken, refreshToken });
       },
       setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+      setUser: (user) => set({ user }),
       logout: () => {
         if (typeof window !== "undefined") {
           window.localStorage.removeItem(REMEMBER_FLAG_KEY);
