@@ -110,6 +110,21 @@ export interface Brand {
   productCount: number;
 }
 
+export interface RecentlyViewedItem {
+  id: string;
+  productId: string;
+  viewedAt: string;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    thumbnail: string | null;
+    basePrice: number;
+    salePrice: number | null;
+    status: ProductStatus;
+  };
+}
+
 export interface WishlistItem {
   id: string;
   productId: string;
@@ -138,10 +153,18 @@ export interface ProductVariant {
 export interface ProductReview {
   id: string;
   productId: string;
-  userId: string;
+  // Tên đã được BE ẩn danh một phần (vd "Mai N.") — không phải fullName thật, xem
+  // backend-user/src/modules/products/products.service.ts (maskReviewerName).
+  reviewerName: string;
   rating: number;
   comment: string | null;
   createdAt: string;
+}
+
+export interface ReviewSummary {
+  average: number;
+  count: number;
+  breakdown: Record<number, number>;
 }
 
 export interface ProductDetail extends ProductListItem {
@@ -157,6 +180,8 @@ export interface ProductDetail extends ProductListItem {
   };
   variants: ProductVariant[];
   reviews: ProductReview[];
+  reviewSummary: ReviewSummary;
+  soldCount: number;
   relatedProducts: ProductListItem[];
 }
 

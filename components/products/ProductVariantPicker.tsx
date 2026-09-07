@@ -6,9 +6,13 @@ import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductDetail } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
 import { getColorSwatch } from "@/lib/color-swatches";
 import { cn } from "@/lib/utils";
+import { QuantityStepper } from "@/components/products/QuantityStepper";
+import { SizeGuideDialog } from "@/components/products/SizeGuideDialog";
+import { WishlistButton } from "@/components/products/WishlistButton";
 
 export function ProductVariantPicker({
   product,
@@ -31,6 +35,7 @@ export function ProductVariantPicker({
     (initialColor && colors.includes(initialColor) ? initialColor : colors[0]) ?? null,
   );
   const [skuCopied, setSkuCopied] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const selectedVariant =
     product.variants.find((v) => v.size === selectedSize && v.color === selectedColor) ??
@@ -56,7 +61,16 @@ export function ProductVariantPicker({
     if (!selectedVariant) return;
     // Sprint 3 sẽ nối API giỏ hàng thật — hiện tại chưa có store giỏ hàng thật (xem
     // store/cart-store.ts), chỉ báo xác nhận luồng chọn variant.
-    toast.success(`Đã chọn ${selectedVariant.color} - ${selectedVariant.size}. Giỏ hàng sẽ sớm ra mắt!`);
+    toast.success(
+      `Đã chọn ${quantity} x ${selectedVariant.color} - ${selectedVariant.size}. Giỏ hàng sẽ sớm ra mắt!`,
+    );
+  }
+
+  function handleBuyNow() {
+    if (!selectedVariant) return;
+    // Cùng lý do handleAddToCart() — chưa có checkout thật để chuyển sang, tạm toast xác
+    // nhận luồng chọn variant.
+    toast.success(`Đã chọn ${quantity} x ${selectedVariant.color} - ${selectedVariant.size}. Sắp ra mắt!`);
   }
 
   async function handleCopySku() {
@@ -75,32 +89,38 @@ export function ProductVariantPicker({
 
   return (
     <div className="space-y-6">
-      {selectedVariant ? (
-        <button
-          type="button"
-          onClick={handleCopySku}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <span>
-            SKU: <span className="font-medium text-foreground">{selectedVariant.sku}</span>
-          </span>
-          {skuCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-        </button>
-      ) : null}
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        {product.brandName ? <span className="uppercase">{product.brandName}</span> : null}
+        {product.brandName && selectedVariant ? <span>·</span> : null}
+        {selectedVariant ? (
+          <button
+            type="button"
+            onClick={handleCopySku}
+            className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+          >
+            <span>
+              SKU: <span className="font-medium text-foreground">{selectedVariant.sku}</span>
+            </span>
+            {skuCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+          </button>
+        ) : null}
+      </div>
 
       <div className="flex items-center gap-3">
+        <p className={cn("text-2xl font-extrabold", hasDiscount ? "text-primary" : "text-foreground")}>
+          {formatPrice(displayPrice)}
+        </p>
         {hasDiscount ? (
           <>
             <p className="text-sm text-muted-foreground line-through">
               {formatPrice(product.basePrice)}
             </p>
-            <span className="text-xs font-bold text-primary">-{discountPercent}%</span>
+            <Badge className="rounded-sm bg-brand-10 font-bold text-primary-foreground">
+              -{discountPercent}%
+            </Badge>
           </>
         ) : null}
       </div>
-      <p className={cn("text-2xl font-extrabold", hasDiscount ? "text-primary" : "text-foreground")}>
-        {formatPrice(displayPrice)}
-      </p>
 
       <div>
         <p className="mb-2 text-sm font-medium">
@@ -132,9 +152,12 @@ export function ProductVariantPicker({
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium">
-          Kích cỡ{selectedSize ? `: ${selectedSize}` : ""}
-        </p>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium">
+            Size{selectedSize ? `: ${selectedSize}` : ""}
+          </p>
+          <SizeGuideDialog />
+        </div>
         <div className="flex flex-wrap gap-2">
           {sizes.map((size) => (
             <button
@@ -160,16 +183,33 @@ export function ProductVariantPicker({
           ? "Vui lòng chọn màu sắc và kích cỡ"
           : outOfStock
             ? "Hết hàng"
-            : `Còn ${selectedVariant.stockQuantity} sản phẩm`}
+            : `Còn ${selectedVariant.stockQuantity} sản phẩm · size ${selectedVariant.size}`}
       </p>
+
+      <div className="flex items-center gap-3">
+        <QuantityStepper value={quantity} onChange={setQuantity} max={selectedVariant?.stockQuantity} />
+        <Button
+          size="lg"
+          className="flex-1 text-base font-bold"
+          disabled={!selectedVariant || outOfStock}
+          onClick={handleAddToCart}
+        >
+          Thêm vào giỏ hàng
+        </Button>
+        <WishlistButton
+          productId={product.id}
+          className="static top-auto right-auto z-auto size-11 rounded-sm border border-border bg-transparent shadow-none"
+        />
+      </div>
 
       <Button
         size="lg"
+        variant="outline"
         className="w-full text-base font-bold"
         disabled={!selectedVariant || outOfStock}
-        onClick={handleAddToCart}
+        onClick={handleBuyNow}
       >
-        Thêm vào giỏ hàng
+        Mua ngay
       </Button>
     </div>
   );

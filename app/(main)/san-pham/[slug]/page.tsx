@@ -1,13 +1,19 @@
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { isAxiosError } from "axios";
-import { Minus, PackageCheck, Plus, Truck, Wallet } from "lucide-react";
 import { getProductBySlug, getProducts } from "@/lib/products-api";
 import { formatPrice } from "@/lib/format";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductGallery } from "@/components/products/ProductGallery";
+import { ProductInfoHeader } from "@/components/products/ProductInfoHeader";
 import { ProductVariantPicker } from "@/components/products/ProductVariantPicker";
+import { ProductPolicyInfo } from "@/components/products/ProductPolicyInfo";
+import { ProductTabs } from "@/components/products/ProductTabs";
+import { ReviewSection } from "@/components/products/reviews/ReviewSection";
+import { RecentlyViewedSection } from "@/components/products/RecentlyViewedSection";
+import { RecordProductView } from "@/components/products/RecordProductView";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,45 +24,6 @@ import {
 } from "@/components/ui/breadcrumb";
 
 export const revalidate = 60;
-
-const POLICIES = [
-  {
-    icon: Wallet,
-    title: "Thanh toán khi nhận hàng (COD)",
-    description: "Giao hàng toàn quốc.",
-  },
-  {
-    icon: Truck,
-    title: "Miễn phí giao hàng",
-    description: "Với đơn hàng từ 499.000 đ.",
-  },
-  {
-    icon: PackageCheck,
-    title: "Đổi trả miễn phí",
-    description: "Trong 30 ngày kể từ ngày mua.",
-  },
-];
-
-function AccordionSection({
-  title,
-  defaultOpen,
-  children,
-}: {
-  title: string;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <details className="group border-b border-border py-4" open={defaultOpen}>
-      <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-bold uppercase [&::-webkit-details-marker]:hidden">
-        {title}
-        <Plus className="size-4 text-muted-foreground group-open:hidden" />
-        <Minus className="hidden size-4 text-muted-foreground group-open:block" />
-      </summary>
-      <div className="mt-3 text-sm text-foreground/90">{children}</div>
-    </details>
-  );
-}
 
 export async function generateStaticParams() {
   try {
@@ -156,12 +123,14 @@ export default async function ProductDetailPage({
             <BreadcrumbLink href="/">Trang chủ</BreadcrumbLink>
           </BreadcrumbItem>
           {(product.category.ancestors ?? []).map((ancestor) => (
-            <BreadcrumbItem key={ancestor.id}>
+            <Fragment key={ancestor.id}>
               <BreadcrumbSeparator />
-              <BreadcrumbLink href={`/danh-muc/${ancestor.slug}`}>
-                {ancestor.name}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
+              <BreadcrumbItem>
+                <BreadcrumbLink href={`/danh-muc/${ancestor.slug}`}>
+                  {ancestor.name}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            </Fragment>
           ))}
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -180,45 +149,13 @@ export default async function ProductDetailPage({
         <ProductGallery images={images} name={product.name} />
 
         <div>
-          <h1 className="font-heading text-2xl font-extrabold">{product.name}</h1>
+          <ProductInfoHeader product={product} />
           <div className="mt-6">
             <ProductVariantPicker product={product} initialColor={initialColor} />
           </div>
 
-          <div className="mt-10 border-t border-border">
-            {product.description ? (
-              <AccordionSection title="Mô tả sản phẩm" defaultOpen>
-                <div
-                  className="rich-content"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
-                />
-              </AccordionSection>
-            ) : null}
-            {product.material ? (
-              <AccordionSection title="Chất liệu">
-                <p>{product.material}</p>
-              </AccordionSection>
-            ) : null}
-            {product.careInstructions ? (
-              <AccordionSection title="Hướng dẫn sử dụng">
-                <p>{product.careInstructions}</p>
-              </AccordionSection>
-            ) : null}
-          </div>
-
-          <div className="mt-8 space-y-4">
-            {POLICIES.map((policy) => (
-              <div key={policy.title} className="flex items-start gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-secondary">
-                  <policy.icon className="size-4.5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold">{policy.title}</p>
-                  <p className="text-xs text-muted-foreground">{policy.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ProductPolicyInfo />
+          <ProductTabs product={product} />
         </div>
       </div>
 
@@ -234,6 +171,10 @@ export default async function ProductDetailPage({
           </div>
         </section>
       ) : null}
+
+      <ReviewSection reviews={product.reviews} summary={product.reviewSummary} />
+      <RecentlyViewedSection excludeProductId={product.id} />
+      <RecordProductView productId={product.id} />
 
       <div className="mt-10">
         <Link href="/san-pham" className="text-sm text-muted-foreground hover:text-foreground">
