@@ -78,6 +78,14 @@ export function ProductsPageClient({ category }: { category?: string }) {
   const queryClient = useQueryClient();
   useEffect(() => {
     if (!search) return;
+
+    // Từ khoá này bấm ra từ chính 1 pill "Từ khóa tìm gần đây" (hoặc gõ trùng y hệt 1 mục
+    // đã có) thì khỏi ghi lại — BE upsert sẽ chỉ bump searchedAt (không tạo dòng mới), tốn
+    // 1 request vô ích và kéo theo invalidateQueries làm cả dãy pill nhảy vị trí ngay lúc
+    // người dùng đang nhìn kết quả, không cần thiết vì từ khoá đã nằm sẵn trong lịch sử rồi.
+    const cachedHistory = queryClient.getQueryData<string[]>(["search-history"]) ?? [];
+    if (cachedHistory.includes(search)) return;
+
     recordSearch(search)
       // Ghi xong mới invalidate — SearchBar (header) và query bên dưới đều dùng chung
       // queryKey ["search-history"], nếu không invalidate thì cache cũ (fetch lúc mount,
