@@ -133,48 +133,53 @@ export function ProductsPageClient({ category }: { category?: string }) {
         <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-7 flex items-center justify-between">
             <div>
-              <h1 className="font-heading text-2xl font-extrabold uppercase">
+              <h1 className="font-heading text-size-34">
                 {search
-                  ? `Kết quả tìm kiếm cho "${search}"`
+                  ? `Kết quả cho "${search}"`
                   : activeCategory
                     ? activeCategory.name
                     : "Tất cả sản phẩm"}
               </h1>
               {productsQuery.data ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {productsQuery.data.meta.total} sản phẩm
+                <p className="mt-1.5 text-size-14 text-[#68625C]">
+                  Tìm thấy {productsQuery.data.meta.total} sản phẩm
                 </p>
               ) : null}
             </div>
-            <Select value={sort} onValueChange={updateSort}>
-              <SelectTrigger className="w-44">
-                <SelectValue placeholder="Sắp xếp">
-                  {(value: ProductSort) =>
-                    SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
-                  }
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Ẩn dropdown sắp xếp khi đang ở trang kết quả search — kết quả search vốn đã
+                xếp theo độ khớp/fuzzy từ BE (products.service.ts), không hợp để cho sắp
+                xếp lại theo giá/mới nhất như duyệt danh mục bình thường. */}
+            {!search && (
+              <Select value={sort} onValueChange={updateSort}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Sắp xếp">
+                    {(value: ProductSort) =>
+                      SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
-            <div className="mb-6">
-              <p className="mb-2 text-sm text-muted-foreground">Từ khóa tìm gần đây</p>
+            <div className="mb-8">
+              <p className="mb-3 text-size-14 text-[#68625C]">Từ khóa tìm gần đây</p>
               <div className="flex flex-wrap gap-2">
                 {recentSearchesQuery.data.map((keyword) => (
                   <Link
                     key={keyword}
                     href={`/san-pham?search=${encodeURIComponent(keyword)}`}
-                    className="rounded-full border border-border px-3 py-1.5 text-sm transition-colors hover:border-primary hover:text-primary"
+                    className="border border-[#E0DDDA] px-3.5 py-1.75 text-size-13 transition-colors bg-white hover:border-primary hover:text-primary"
                   >
                     {keyword}
                   </Link>
