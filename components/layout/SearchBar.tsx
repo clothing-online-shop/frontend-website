@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Search } from "lucide-react";
@@ -28,25 +28,17 @@ export function SearchBar({
   });
   const history = recentSearchesQuery.data ?? [];
 
-  // Click ra ngoài (hoặc Esc) thì đóng — dropdown nằm trong cùng containerRef nên bấm vào 1
-  // mục lịch sử không bị tính là "click ra ngoài".
-  useEffect(() => {
-    if (!open) return;
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+  // Đóng dựa thẳng vào blur thật của trình duyệt thay vì tự đoán "click ra ngoài" bằng
+  // listener mousedown/keydown gắn ở document — cách cũ dễ vỡ khi input type="search" có
+  // nút xoá "×" mặc định của trình duyệt (xoá hết chữ vẫn coi như 1 tương tác trong ô,
+  // nhưng listener toàn trang đôi lúc bắt nhầm thành "ra ngoài" rồi đóng mất dropdown).
+  // onBlur trên div cha bắt được cả khi 1 phần tử con (input) mất focus — chỉ thực sự đóng
+  // nếu nơi nhận focus tiếp theo (relatedTarget) không còn nằm trong khối search này nữa.
+  function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
+    if (!containerRef.current?.contains(e.relatedTarget as Node | null)) {
+      setOpen(false);
     }
-    function handleEscape(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open]);
+  }
 
   function goSearch(keyword: string) {
     const trimmed = keyword.trim();
@@ -61,7 +53,7 @@ export function SearchBar({
   }
 
   return (
-    <div ref={containerRef} className={cn("relative", className)}>
+    <div ref={containerRef} onBlur={handleBlur} className={cn("relative", className)}>
       <form onSubmit={handleSubmit} role="search">
         <button
           type="submit"
@@ -77,6 +69,9 @@ export function SearchBar({
           placeholder="Tìm áo, váy, mã SKU..."
           defaultValue={defaultValue}
           onFocus={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
+          }}
           className="h-11 w-full bg-white pr-4 pl-10"
           aria-label="Từ khóa tìm kiếm"
         />
@@ -89,12 +84,7 @@ export function SearchBar({
             <button
               key={keyword}
               type="button"
-              // mousedown thay vì click — chạy TRƯỚC khi input mất focus (blur), tránh
-              // trường hợp blur đóng dropdown mất trước khi click kịp đăng ký.
-              onMouseDown={(e) => {
-                e.preventDefault();
-                goSearch(keyword);
-              }}
+              onClick={() => goSearch(keyword)}
               className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2 text-left text-size-13 hover:bg-muted"
             >
               <Clock className="size-3.5 shrink-0 text-muted-foreground" />
