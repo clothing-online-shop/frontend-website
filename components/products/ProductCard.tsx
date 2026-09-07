@@ -60,17 +60,26 @@ export function ProductCard({ product }: { product: ProductListItem }) {
           <p className="text-sm font-bold text-foreground">{formatPrice(product.basePrice)}</p>
         )}
 
-        {product.colors && product.colors.length > 0 ? (
-          <div className="flex items-center gap-1">
-            {product.colors.map((color) => (
-              <span
-                key={color}
-                className="size-3.5 rounded-full border border-border"
-                style={{ backgroundColor: getColorSwatch(color) }}
-              />
-            ))}
+        {(product.colors.length > 0 || product.sizes.length > 0) && (
+          <div className="flex items-center justify-between">
+            {product.colors.length > 0 ? (
+              <div className="flex items-center gap-1">
+                {product.colors.map((color) => (
+                  <span
+                    key={color}
+                    className="size-3.5 rounded-full border border-border"
+                    style={{ backgroundColor: getColorSwatch(color) }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <span />
+            )}
+            {product.sizes.length > 0 ? (
+              <p className="text-xs text-muted-foreground">{product.sizes.join(" · ")}</p>
+            ) : null}
           </div>
-        ) : null}
+        )}
       </Link>
     </div>
   );

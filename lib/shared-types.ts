@@ -80,6 +80,9 @@ export interface CategoryNode {
   isActive: boolean;
   sortOrder: number;
   parentId: string | null;
+  // Tổng số sản phẩm ACTIVE của danh mục này cộng dồn cả nhánh con (xem
+  // backend-user/src/modules/categories/categories.service.ts).
+  productCount: number;
   createdAt: string;
   updatedAt: string;
   children: CategoryNode[];
@@ -97,7 +100,14 @@ export interface ProductListItem {
   categoryId: string;
   totalStock: number;
   colors: string[];
+  sizes: string[];
   createdAt: string;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  productCount: number;
 }
 
 export interface WishlistItem {
