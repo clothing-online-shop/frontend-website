@@ -34,7 +34,7 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                <span className="font-heading text-sm font-bold uppercase transition-colors group-hover:text-primary sm:text-base">
+                <span className="text-sm font-bold uppercase transition-colors group-hover:text-primary sm:text-base">
                   {category.name}
                 </span>
               </Link>

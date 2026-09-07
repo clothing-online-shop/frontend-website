@@ -68,7 +68,7 @@ export function OrderSuccessContent() {
         <p className="mt-2 text-sm text-muted-foreground">
           Cảm ơn bạn đã đặt hàng. Mã đơn hàng của bạn là:
         </p>
-        <p className="mt-1 font-heading text-lg font-bold">{order.orderCode}</p>
+        <p className="mt-1 text-lg font-bold">{order.orderCode}</p>
       </div>
 
       <Card className="mt-8">

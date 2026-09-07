@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
-import { Lora } from "next/font/google";
+import { Paytone_One, SN_Pro } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Đổi theo yêu cầu: Lora (serif) dùng cho TOÀN BỘ site, không chỉ heading/logo nữa — bỏ
-// Mulish (trước đây là --font-body, không còn nơi nào dùng riêng nữa sau khi --font-sans
-// ở globals.css trỏ thẳng sang --font-heading, xem comment ở đó).
-const fontHeading = Lora({
+// Paytone One chỉ dùng cho title lớn (class font-heading, xem globals.css) — chỉ có 1
+// weight 400 (font display, không có bản đậm/nghiêng riêng).
+const fontHeading = Paytone_One({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: "400",
   variable: "--font-heading",
+});
+
+// SN Pro dùng cho phần chữ còn lại (body + title nhỏ) — font mặc định của toàn site qua
+// --font-sans (xem globals.css). Variable font nên load "variable" thay vì liệt kê từng
+// weight, vẫn dùng được mọi class font-normal/medium/semibold/bold/extrabold sẵn có.
+const fontBody = SN_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -24,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${fontHeading.variable} h-full antialiased`}>
+    <html lang="vi" className={`${fontHeading.variable} ${fontBody.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>

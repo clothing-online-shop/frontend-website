@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).prisma\\)\")",
+      "Bash(powershell -NoProfile -Command 'Get-CimInstance Win32_Process -Filter \"Name='\\\\''node.exe'\\\\''\" | Where-Object { $_.CommandLine -match '\\\\''backend-cms'\\\\'' } | Select-Object ProcessId,CommandLine | Format-List')",
+      "Bash(powershell -NoProfile -Command 'Stop-Process -Id 16556,7084 -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1; Get-CimInstance Win32_Process -Filter \"Name='\\\\''node.exe'\\\\''\" | Where-Object { $_.CommandLine -match '\\\\''backend-cms'\\\\'' } | Select-Object ProcessId')",
+      "Bash(pnpm prisma:migrate --name add_promo_bar)",
+      "Bash(export PGPASSWORD=postgres)",
+      "Bash(\"C:\\\\Users\\\\diegobrando\\\\scoop\\\\apps\\\\postgresql\\\\current\\\\bin\\\\psql.exe\" -h localhost -U postgres -d clothing_shop -c \"SELECT id, label, highlight, \\\\\"linkUrl\\\\\", \\\\\"startDate\\\\\", \\\\\"endDate\\\\\" FROM promo_bars;\")",
+      "Bash(pnpm dev *)",
+      "Bash(powershell -NoProfile -Command 'Get-CimInstance Win32_Process -Filter \"Name='\\\\''node.exe'\\\\''\" | Where-Object { $_.CommandLine -match '\\\\''backend-user'\\\\'' } | Select-Object ProcessId,CommandLine | Format-List')",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 8524,18636 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(pnpm prisma:generate)",
+      "Bash(curl -s -w \"\\\\ncms:%{http_code}\\\\n\" http://localhost:3002/health)",
+      "Bash(curl -s -w \"\\\\nuser:%{http_code}\\\\n\" http://localhost:3001/health)",
+      "Bash(curl -s -w \"\\\\npromo:%{http_code}\\\\n\" http://localhost:3001/promo-bars/active)"
+    ],
+    "additionalDirectories": [
+      "c:\\Projects\\clothing-online-store\\backend-cms\\prisma",
+      "c:\\Projects\\clothing-online-store\\backend-cms\\src\\common\\constants\\error-codes",
+      "c:\\Projects\\clothing-online-store\\backend-cms\\src\\modules\\promo-bars\\dto",
+      "c:\\Projects\\clothing-online-store\\backend-cms\\src\\modules\\promo-bars",
+      "c:\\Projects\\clothing-online-store\\backend-cms\\src",
+      "c:\\Projects\\clothing-online-store\\backend-user\\src\\modules\\promo-bars",
+      "c:\\Projects\\clothing-online-store\\backend-user\\src",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\types",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\lib\\api",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\hooks",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\lib",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\schemas",
+      "c:\\Projects\\clothing-online-store\\frontend-admin\\src\\pages\\promo-bar"
+    ]
+  }
+}

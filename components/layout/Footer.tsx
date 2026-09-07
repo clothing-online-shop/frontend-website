@@ -64,7 +64,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Mua sắm
             </h3>
             <ul className="space-y-2 text-sm text-background/70">
@@ -79,7 +79,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Chính sách
             </h3>
             <ul className="space-y-2 text-sm text-background/70">
@@ -94,7 +94,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Nhận bản tin
             </h3>
             <p className="mb-3 text-sm text-background/70">

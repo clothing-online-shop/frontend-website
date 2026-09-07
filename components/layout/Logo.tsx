@@ -9,7 +9,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link href="/" className="inline-block">
       <span className={cn("font-heading text-size-30 tracking-tight", className)}>
-         <span className="font-normal italic">Phương Phương</span>
+         <span className="font-normal">Phương Phương</span>
       </span>
     </Link>
   );
