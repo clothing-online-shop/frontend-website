@@ -25,7 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className={`${fontHeading.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+      {/* suppressHydrationWarning: chỉ nuốt cảnh báo mismatch NGAY TRÊN <body> — 1 số
+          extension trình duyệt (vd ColorZilla) tự chèn thuộc tính lạ (cz-shortcut-listen)
+          vào body trước khi React hydrate xong, gây warning giả, không phải bug thật của
+          app. Không ẩn được các mismatch khác (chỉ áp dụng cho phần tử này). */}
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
