@@ -69,11 +69,10 @@ export function SearchBar({
           aria-label="Tìm kiếm"
           className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
         >
-          <Search className="size-4 text-brand-10!" />
+          <Search className="size-4 text-neutral-68625C!" />
         </button>
         <Input
           name="q"
-          type="search"
           autoComplete="off"
           placeholder="Tìm áo, váy, mã SKU..."
           value={text}
