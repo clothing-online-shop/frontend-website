@@ -2,6 +2,11 @@
 // header X-Guest-Id để gộp dữ liệu theo từng trình duyệt khi chưa có user.id. Sinh 1 lần,
 // lưu localStorage để giữ nguyên qua các lần ghé lại — KHÔNG sinh mới mỗi request (sẽ làm
 // BE tưởng đây là khách vãng lai mới, mất hết lịch sử của lần trước).
+//
+// Trả về string | null (không throw) vì apiClient (lib/api-client.ts) gọi hàm này ở
+// interceptor CHUNG cho mọi request, kể cả những request bắn ra từ Server Component (vd
+// getCategoryTree() trong generateMetadata) — lúc đó không có window/localStorage, gọi thẳng
+// sẽ crash cả trang thay vì chỉ đơn giản là "chưa có định danh".
 const GUEST_ID_KEY = "clothing-shop-guest-id";
 
 export function getGuestId(): string | null {

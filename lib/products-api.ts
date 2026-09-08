@@ -12,6 +12,7 @@ export interface ListProductsParams {
   maxPrice?: number;
   size?: string;
   color?: string;
+  brand?: string;
   search?: string;
   sort?: ProductSort;
   page?: number;

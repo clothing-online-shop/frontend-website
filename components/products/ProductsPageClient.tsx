@@ -3,38 +3,18 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
-import { ProductCard } from "@/components/products/ProductCard";
-import { ProductFilters } from "@/components/products/ProductFilters";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { ProductFilters } from "@/components/products/filters/ProductFilters";
+import { ProductsBreadcrumb } from "@/components/products/ProductsBreadcrumb";
+import { CategoryHero } from "@/components/products/CategoryHero";
+import { ProductsToolbar } from "@/components/products/ProductsToolbar";
+import { ProductGrid } from "@/components/products/ProductGrid";
 
-const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
-  { value: "newest", label: "Mới nhất" },
-  { value: "price_asc", label: "Giá tăng dần" },
-  { value: "price_desc", label: "Giá giảm dần" },
-];
-
-const PAGE_LIMIT = 12;
+const PAGE_LIMIT = 9;
 
 export function ProductsPageClient({ category: categoryProp }: { category?: string }) {
   const router = useRouter();
@@ -43,17 +23,18 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
 
   // categoryProp: route /danh-muc/[category] truyền thẳng qua props (không đi qua query
   // param). Fallback query param ?category=... chỉ thật sự cần cho route /san-pham khi kết
-  // hợp lọc danh mục CÙNG LÚC với search (xem ProductFilters — bấm 1 danh mục lúc đang
-  // search phải giữ nguyên cả 2 điều kiện, không nhảy sang /danh-muc/<slug> làm mất search).
+  // hợp lọc danh mục CÙNG LÚC với search (xem filters/CategoryFilter.tsx — bấm 1 danh mục
+  // lúc đang search phải giữ nguyên cả 2 điều kiện, không nhảy sang /danh-muc/<slug> làm
+  // mất search).
   const category = categoryProp ?? searchParams.get("category") ?? undefined;
 
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
   const color = searchParams.get("color") ?? undefined;
+  const brand = searchParams.get("brand") ?? undefined;
   const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
-  const page = Number(searchParams.get("page") ?? "1");
 
   const queryParams = {
     category,
@@ -61,10 +42,9 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
     color,
+    brand,
     search,
     sort,
-    page,
-    limit: PAGE_LIMIT,
   };
 
   const categoriesQuery = useQuery({
@@ -72,15 +52,24 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     queryFn: getCategoryTree,
   });
 
-  const productsQuery = useQuery({
+  // Đổi bất kỳ filter/sort nào ở trên đều đổi queryKey -> React Query tự coi là query mới,
+  // bắt đầu lại từ trang 1 (không cần tự reset thủ công) — khớp UX "Xem thêm" (load more),
+  // không dùng URL param `page` như bản Trước/Sau cũ.
+  const productsQuery = useInfiniteQuery({
     queryKey: ["products", queryParams],
-    queryFn: () => getProducts(queryParams),
+    queryFn: ({ pageParam }) => getProducts({ ...queryParams, page: pageParam, limit: PAGE_LIMIT }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
   });
+
+  const products = productsQuery.data?.pages.flatMap((page) => page.data) ?? [];
+  const total = productsQuery.data?.pages[0]?.meta.total ?? 0;
 
   // Ghi nhận search ở đây (thay vì tại SearchBar) để bắt được MỌI đường vào trang kết quả —
   // gõ ở ô tìm kiếm, bấm 1 pill "từ khoá gần đây", hay mở thẳng link có sẵn ?search=... —
   // không phải lo trùng logic ở nhiều nơi. Chỉ chạy lại khi search đổi, không phải mỗi lần
-  // re-render (page đổi, sort đổi... productsQuery refetch không kéo theo ghi nhận lại).
+  // re-render (đổi sort/filter khác, load thêm trang... không kéo theo ghi nhận lại).
   const queryClient = useQueryClient();
   useEffect(() => {
     if (!search) return;
@@ -115,93 +104,38 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     if (!value) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
-    params.delete("page");
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  function goToPage(nextPage: number) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", String(nextPage));
-    router.push(`${pathname}?${params.toString()}`);
-  }
+  const heroTitle = search
+    ? `Kết quả tìm kiếm cho "${search}"`
+    : activeCategory
+      ? activeCategory.name
+      : "Tất cả sản phẩm";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Trang chủ</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          {activeCategory ? (
-            <>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/san-pham">Sản phẩm</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{activeCategory.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </>
-          ) : (
-            <BreadcrumbItem>
-              <BreadcrumbPage>Sản phẩm</BreadcrumbPage>
-            </BreadcrumbItem>
-          )}
-        </BreadcrumbList>
-      </Breadcrumb>
+      <ProductsBreadcrumb
+        categories={categoriesQuery.data ?? []}
+        activeCategory={activeCategory}
+        search={search}
+      />
+
+      <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
         <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
-          <div className="mb-7 flex items-center justify-between">
-            <div>
-              <h1 className="font-heading text-size-34">
-                {search
-                  ? `Kết quả cho "${search}"`
-                  : activeCategory
-                    ? activeCategory.name
-                    : "Tất cả sản phẩm"}
-              </h1>
-              {productsQuery.data ? (
-                <p className="mt-1.5 text-size-14 text-[#68625C]">
-                  Tìm thấy {productsQuery.data.meta.total} sản phẩm
-                </p>
-              ) : null}
-            </div>
-            {/* Ẩn dropdown sắp xếp khi đang ở trang kết quả search — kết quả search vốn đã
-                xếp theo độ khớp/fuzzy từ BE (products.service.ts), không hợp để cho sắp
-                xếp lại theo giá/mới nhất như duyệt danh mục bình thường. */}
-            {!search && (
-              <Select value={sort} onValueChange={updateSort}>
-                <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Sắp xếp">
-                    {(value: ProductSort) =>
-                      SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
-                    }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {SORT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-
           {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
             <div className="mb-8">
-              <p className="mb-3 text-size-14 text-[#68625C]">Từ khóa tìm gần đây</p>
+              <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
               <div className="flex flex-wrap gap-2">
                 {recentSearchesQuery.data.map((keyword) => (
                   <Link
                     key={keyword}
                     href={`/san-pham?search=${encodeURIComponent(keyword)}`}
-                    className="border border-[#E0DDDA] px-3.5 py-1.75 text-size-13 transition-colors bg-white hover:border-primary hover:text-primary"
+                    className="border border-neutral-E0DDDA px-3.5 py-1.75 text-size-13 transition-colors bg-white hover:border-primary hover:text-primary"
                   >
                     {keyword}
                   </Link>
@@ -210,55 +144,29 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
             </div>
           ) : null}
 
-          {productsQuery.isLoading ? (
-            <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="aspect-3/4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/3" />
-                </div>
-              ))}
-            </div>
-          ) : productsQuery.data && productsQuery.data.data.length > 0 ? (
-            <>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-                {productsQuery.data.data.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-
-              {productsQuery.data.meta.totalPages > 1 ? (
-                <div className="mt-10 flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => goToPage(page - 1)}
-                  >
-                    Trước
-                  </Button>
-                  <span className="px-3 text-sm text-muted-foreground">
-                    Trang {page} / {productsQuery.data.meta.totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= productsQuery.data.meta.totalPages}
-                    onClick={() => goToPage(page + 1)}
-                  >
-                    Sau
-                  </Button>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center border border-dashed border-border py-24 text-center">
-              <p className="text-muted-foreground">
-                Không tìm thấy sản phẩm phù hợp với bộ lọc hiện tại.
-              </p>
-            </div>
+          {/* Ẩn toolbar (đếm số lượng + sắp xếp) khi đang ở trang kết quả search — kết quả
+              search vốn đã xếp theo độ khớp/fuzzy từ BE (products.service.ts), không hợp để
+              sắp xếp lại theo giá/mới nhất như duyệt danh mục bình thường; số lượng cũng đã
+              hiện sẵn trong CategoryHero phía trên, không cần lặp lại. */}
+          {!search && (
+            <ProductsToolbar
+              shownCount={products.length}
+              total={total}
+              isLoading={productsQuery.isLoading}
+              sort={sort}
+              onSortChange={updateSort}
+            />
           )}
+
+          <ProductGrid
+            products={products}
+            isLoading={productsQuery.isLoading}
+            total={total}
+            limit={PAGE_LIMIT}
+            hasMore={productsQuery.hasNextPage}
+            isLoadingMore={productsQuery.isFetchingNextPage}
+            onLoadMore={() => productsQuery.fetchNextPage()}
+          />
         </div>
       </div>
     </div>

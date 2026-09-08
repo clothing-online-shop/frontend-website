@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ProductGallery({ images, name }: { images: string[]; name: string }) {
@@ -47,6 +47,10 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             className="object-cover"
             priority
           />
+          <span className="absolute top-3 right-3 flex items-center gap-1 rounded-sm bg-background/90 px-2 py-1 text-xs font-medium text-foreground">
+            <ZoomIn className="size-3.5" />
+            Phóng to
+          </span>
         </div>
 
         {gallery.length > 1 ? (

@@ -35,7 +35,7 @@ export function Footer() {
     <footer className="bg-foreground text-background">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-3">
+          <div className="space-y-3 -mt-[9px]">
             <Logo className="text-background text-size-26" />
             <ul className="space-y-2 text-sm text-background/70">
               <li className="flex items-start gap-2">
@@ -64,7 +64,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Mua sắm
             </h3>
             <ul className="space-y-2 text-sm text-background/70">
@@ -79,7 +79,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Chính sách
             </h3>
             <ul className="space-y-2 text-sm text-background/70">
@@ -94,7 +94,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-heading text-sm font-bold text-background uppercase">
+            <h3 className="mb-3 text-sm font-bold text-background uppercase">
               Nhận bản tin
             </h3>
             <p className="mb-3 text-sm text-background/70">

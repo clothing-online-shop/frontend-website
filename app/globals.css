@@ -8,10 +8,11 @@
   --color-background: var(--background);
   --color-background-header: var(--background-header);
   --color-foreground: var(--foreground);
-  /* Lora dùng cho toàn site (không chỉ heading) — trỏ thẳng --font-sans sang --font-heading
-     thay vì --font-body (Mulish, đã bỏ ở layout.tsx) để mọi chỗ dùng font-sans mặc định
-     (html { @apply font-sans } bên dưới) cũng ra Lora, không cần sửa từng component. */
-  --font-sans: var(--font-heading);
+  /* 2 font tách biệt: --font-heading (Paytone One, layout.tsx) chỉ dùng cho title lớn qua
+     class font-heading; --font-sans trỏ sang --font-body (SN Pro) cho phần chữ còn lại —
+     mặc định của toàn site (html { @apply font-sans } bên dưới), không cần sửa từng
+     component nào không dùng class font-heading. */
+  --font-sans: var(--font-body);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);

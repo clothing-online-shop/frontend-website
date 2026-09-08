@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils";
 
 const WISHLIST_KEY = ["wishlist"];
 
-export function WishlistButton({ productId }: { productId: string }) {
+export function WishlistButton({
+  productId,
+  className,
+}: {
+  productId: string;
+  className?: string;
+}) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
@@ -55,7 +61,10 @@ export function WishlistButton({ productId }: { productId: string }) {
       disabled={toggleMutation.isPending}
       aria-label={isWishlisted ? "Bỏ khỏi yêu thích" : "Thêm vào yêu thích"}
       aria-pressed={isWishlisted}
-      className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm transition-colors hover:text-primary disabled:opacity-60"
+      className={cn(
+        "absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm transition-colors hover:text-primary disabled:opacity-60",
+        className,
+      )}
     >
       <Heart className={cn("size-4", isWishlisted && "fill-primary text-primary")} />
     </button>

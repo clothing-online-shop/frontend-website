@@ -80,6 +80,9 @@ export interface CategoryNode {
   isActive: boolean;
   sortOrder: number;
   parentId: string | null;
+  // Tổng số sản phẩm ACTIVE của danh mục này cộng dồn cả nhánh con (xem
+  // backend-user/src/modules/categories/categories.service.ts).
+  productCount: number;
   createdAt: string;
   updatedAt: string;
   children: CategoryNode[];
@@ -97,7 +100,29 @@ export interface ProductListItem {
   categoryId: string;
   totalStock: number;
   colors: string[];
+  sizes: string[];
   createdAt: string;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  productCount: number;
+}
+
+export interface RecentlyViewedItem {
+  id: string;
+  productId: string;
+  viewedAt: string;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    thumbnail: string | null;
+    basePrice: number;
+    salePrice: number | null;
+    status: ProductStatus;
+  };
 }
 
 export interface WishlistItem {
@@ -128,10 +153,18 @@ export interface ProductVariant {
 export interface ProductReview {
   id: string;
   productId: string;
-  userId: string;
+  // Tên đã được BE ẩn danh một phần (vd "Mai N.") — không phải fullName thật, xem
+  // backend-user/src/modules/products/products.service.ts (maskReviewerName).
+  reviewerName: string;
   rating: number;
   comment: string | null;
   createdAt: string;
+}
+
+export interface ReviewSummary {
+  average: number;
+  count: number;
+  breakdown: Record<number, number>;
 }
 
 export interface ProductDetail extends ProductListItem {
@@ -147,6 +180,8 @@ export interface ProductDetail extends ProductListItem {
   };
   variants: ProductVariant[];
   reviews: ProductReview[];
+  reviewSummary: ReviewSummary;
+  soldCount: number;
   relatedProducts: ProductListItem[];
 }
 
@@ -215,6 +250,15 @@ export interface HeroBanner {
   ctaLabel: string | null;
   ctaLinkUrl: string | null;
   sortOrder: number;
+}
+
+export interface ActivePromoBar {
+  id: string;
+  label: string;
+  highlight: string;
+  linkUrl: string;
+  startDate: string;
+  endDate: string;
 }
 
 export interface ActivePopup {

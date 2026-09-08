@@ -12,6 +12,12 @@ apiClient.interceptors.request.use((config) => {
   const accessToken = useAuthStore.getState().accessToken;
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  } else if (typeof window !== "undefined") {
+    // Chỉ gắn ở client — localStorage không tồn tại khi apiClient được gọi từ Server
+    // Component (getGuestId() dùng localStorage). Chỉ cần khi CHƯA đăng nhập (xem
+    // lib/guest-id.ts) — request nào đã có Bearer token thì backend định danh theo user,
+    // không cần header này.
+    config.headers["X-Guest-Id"] = getGuestId();
   }
   // Gắn cho MỌI request, kể cả đã đăng nhập — các API cần identity (search-history,
   // recently-viewed...) tự ưu tiên userId từ JWT khi có, guestId chỉ dùng làm fallback nên
