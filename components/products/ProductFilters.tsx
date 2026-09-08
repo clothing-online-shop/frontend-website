@@ -33,6 +33,26 @@ function FilterSection({
   );
 }
 
+// Đang có search (?search=...) thì lọc danh mục phải CỘNG DỒN vào cùng URL /san-pham hiện
+// tại (giữ nguyên search + mọi filter khác), không được nhảy sang route /danh-muc/<slug>
+// riêng — route đó không mang theo search, bấm vào sẽ mất luôn từ khoá đang tìm. Không có
+// search thì giữ đúng hành vi cũ: dùng route /danh-muc/<slug> (URL đẹp, tốt cho SEO danh mục).
+function categoryHref(
+  searchParams: URLSearchParams,
+  activeCategorySlug: string | undefined,
+  targetSlug: string,
+): string {
+  const isActive = activeCategorySlug === targetSlug;
+  if (searchParams.get("search")) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (isActive) params.delete("category");
+    else params.set("category", targetSlug);
+    params.delete("page");
+    return `/san-pham?${params.toString()}`;
+  }
+  return isActive ? "/san-pham" : `/danh-muc/${targetSlug}`;
+}
+
 function CategoryLinks({
   categories,
   activeCategorySlug,
@@ -40,14 +60,14 @@ function CategoryLinks({
   categories: CategoryNode[];
   activeCategorySlug?: string;
 }) {
+  const searchParams = useSearchParams();
+
   return (
     <ul className="space-y-1">
       {categories.map((category) => (
         <li key={category.id}>
           <Link
-            href={
-              activeCategorySlug === category.slug ? "/san-pham" : `/danh-muc/${category.slug}`
-            }
+            href={categoryHref(searchParams, activeCategorySlug, category.slug)}
             className={cn(
               "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
               activeCategorySlug === category.slug
@@ -62,9 +82,7 @@ function CategoryLinks({
               {category.children.map((child) => (
                 <li key={child.id}>
                   <Link
-                    href={
-                      activeCategorySlug === child.slug ? "/san-pham" : `/danh-muc/${child.slug}`
-                    }
+                    href={categoryHref(searchParams, activeCategorySlug, child.slug)}
                     className={cn(
                       "block rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
                       activeCategorySlug === child.slug

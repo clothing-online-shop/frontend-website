@@ -36,10 +36,16 @@ const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
 
 const PAGE_LIMIT = 12;
 
-export function ProductsPageClient({ category }: { category?: string }) {
+export function ProductsPageClient({ category: categoryProp }: { category?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // categoryProp: route /danh-muc/[category] truyền thẳng qua props (không đi qua query
+  // param). Fallback query param ?category=... chỉ thật sự cần cho route /san-pham khi kết
+  // hợp lọc danh mục CÙNG LÚC với search (xem ProductFilters — bấm 1 danh mục lúc đang
+  // search phải giữ nguyên cả 2 điều kiện, không nhảy sang /danh-muc/<slug> làm mất search).
+  const category = categoryProp ?? searchParams.get("category") ?? undefined;
 
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
