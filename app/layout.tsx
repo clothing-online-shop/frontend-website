@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className={`${fontHeading.variable} ${fontBody.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>
     </html>
