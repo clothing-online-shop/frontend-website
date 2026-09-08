@@ -20,14 +20,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  // categoryProp: route /danh-muc/[category] truyền thẳng qua props (không đi qua query
-  // param). Fallback query param ?category=... chỉ thật sự cần cho route /san-pham khi kết
-  // hợp lọc danh mục CÙNG LÚC với search (xem filters/CategoryFilter.tsx — bấm 1 danh mục
-  // lúc đang search phải giữ nguyên cả 2 điều kiện, không nhảy sang /danh-muc/<slug> làm
-  // mất search).
   const category = categoryProp ?? searchParams.get("category") ?? undefined;
-
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
@@ -66,26 +59,13 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const products = productsQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = productsQuery.data?.pages[0]?.meta.total ?? 0;
 
-  // Ghi nhận search ở đây (thay vì tại SearchBar) để bắt được MỌI đường vào trang kết quả —
-  // gõ ở ô tìm kiếm, bấm 1 pill "từ khoá gần đây", hay mở thẳng link có sẵn ?search=... —
-  // không phải lo trùng logic ở nhiều nơi. Chỉ chạy lại khi search đổi, không phải mỗi lần
-  // re-render (đổi sort/filter khác, load thêm trang... không kéo theo ghi nhận lại).
   const queryClient = useQueryClient();
   useEffect(() => {
     if (!search) return;
-
-    // Từ khoá này bấm ra từ chính 1 pill "Từ khóa tìm gần đây" (hoặc gõ trùng y hệt 1 mục
-    // đã có) thì khỏi ghi lại — BE upsert sẽ chỉ bump searchedAt (không tạo dòng mới), tốn
-    // 1 request vô ích và kéo theo invalidateQueries làm cả dãy pill nhảy vị trí ngay lúc
-    // người dùng đang nhìn kết quả, không cần thiết vì từ khoá đã nằm sẵn trong lịch sử rồi.
     const cachedHistory = queryClient.getQueryData<string[]>(["search-history"]) ?? [];
     if (cachedHistory.includes(search)) return;
 
     recordSearch(search)
-      // Ghi xong mới invalidate — SearchBar (header) và query bên dưới đều dùng chung
-      // queryKey ["search-history"], nếu không invalidate thì cache cũ (fetch lúc mount,
-      // TRƯỚC khi kịp ghi xong) cứ đứng yên, khiến từ khoá vừa search không hiện lên dù BE
-      // đã lưu đúng — đây chính là lý do "search xong không thấy vào lịch sử".
       .then(() => queryClient.invalidateQueries({ queryKey: ["search-history"] }))
       .catch(() => undefined);
   }, [search, queryClient]);
@@ -116,11 +96,6 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
         activeCategory={activeCategory}
         search={search}
       />
-
-      {/* Trang kết quả search không dùng banner CategoryHero (thiết kế gốc cho search là
-          tiêu đề + phụ đề dạng chữ thường, nằm NGAY TRONG cột nội dung bên cạnh bộ lọc — xem
-          mockup gốc — không phải 1 khối banner nền màu chạy full-width phía trên như khi duyệt
-          danh mục). CategoryHero chỉ áp dụng cho duyệt danh mục/tất cả sản phẩm. */}
       {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
@@ -155,10 +130,6 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
             </div>
           ) : null}
 
-          {/* Ẩn toolbar (đếm số lượng + sắp xếp) khi đang ở trang kết quả search — kết quả
-              search vốn đã xếp theo độ khớp/fuzzy từ BE (products.service.ts), không hợp để
-              sắp xếp lại theo giá/mới nhất như duyệt danh mục bình thường; số lượng cũng đã
-              hiện sẵn ở phụ đề "Tìm thấy N sản phẩm" phía trên, không cần lặp lại. */}
           {!search && (
             <ProductsToolbar
               shownCount={products.length}

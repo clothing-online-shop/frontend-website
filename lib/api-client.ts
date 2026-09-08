@@ -19,9 +19,7 @@ apiClient.interceptors.request.use((config) => {
     // không cần header này.
     config.headers["X-Guest-Id"] = getGuestId();
   }
-  // Gắn cho MỌI request, kể cả đã đăng nhập — các API cần identity (search-history,
-  // recently-viewed...) tự ưu tiên userId từ JWT khi có, guestId chỉ dùng làm fallback nên
-  // gửi kèm không hại gì, đỡ phải nhớ set riêng ở từng chỗ gọi.
+  
   const guestId = getGuestId();
   if (guestId) {
     config.headers["X-Guest-Id"] = guestId;
