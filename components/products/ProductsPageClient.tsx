@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { getColors } from "@/lib/colors-api";
 import { ProductFilters } from "@/components/products/filters/ProductFilters";
 import { ProductsBreadcrumb } from "@/components/products/ProductsBreadcrumb";
 import { CategoryHero } from "@/components/products/CategoryHero";
@@ -56,6 +58,16 @@ export function ProductsPageClient({ category }: { category?: string }) {
   const products = productsQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = productsQuery.data?.pages[0]?.meta.total ?? 0;
 
+  // Cùng query ["colors"] với ColorFilter (React Query dedupe theo queryKey, không gọi
+  // API 2 lần) — dùng để hiện đúng hex thật ở chấm màu trên từng ProductCard, khớp màu
+  // đang hiện trong bộ lọc thay vì đoán qua bảng tĩnh.
+  const colorsQuery = useQuery({ queryKey: ["colors"], queryFn: getColors });
+  const colorHexMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const c of colorsQuery.data ?? []) map[c.name] = c.hexCode;
+    return map;
+  }, [colorsQuery.data]);
+
   const activeCategory = categoriesQuery.data
     ?.flatMap((c) => [c, ...c.children])
     .find((c) => c.slug === category);
@@ -83,7 +95,7 @@ export function ProductsPageClient({ category }: { category?: string }) {
 
       <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />
 
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-[270px_1fr]">
         <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
@@ -103,6 +115,7 @@ export function ProductsPageClient({ category }: { category?: string }) {
             hasMore={productsQuery.hasNextPage}
             isLoadingMore={productsQuery.isFetchingNextPage}
             onLoadMore={() => productsQuery.fetchNextPage()}
+            colorHexMap={colorHexMap}
           />
         </div>
       </div>

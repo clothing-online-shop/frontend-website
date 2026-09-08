@@ -27,7 +27,7 @@ export function ProductsToolbar({
   onSortChange: (value: string | null) => void;
 }) {
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className="bg-white p-4 mb-6 flex items-center justify-between">
       {isLoading ? (
         <span />
       ) : (

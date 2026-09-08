@@ -1,11 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { useCountdown } from "@/hooks/useCountdown";
 import type { ActiveFlashSale } from "@/lib/shared-types";
 import { formatPrice } from "@/lib/format";
-import { getColorSwatch } from "@/lib/color-swatches";
+import { getColors } from "@/lib/colors-api";
+import { resolveColorHex } from "@/lib/color-swatches";
 import { Badge } from "@/components/ui/badge";
 
 function pad(value: number): string {
@@ -15,6 +18,13 @@ function pad(value: number): string {
 export function FlashSaleSection({ flashSale }: { flashSale: ActiveFlashSale | null }) {
   const endsAt = flashSale ? new Date(flashSale.endDate).getTime() : 0;
   const { hours, minutes, seconds, isOver } = useCountdown(endsAt);
+
+  const { data: colorsData } = useQuery({ queryKey: ["colors"], queryFn: getColors });
+  const colorHexMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const c of colorsData ?? []) map[c.name] = c.hexCode;
+    return map;
+  }, [colorsData]);
 
   if (!flashSale || isOver || flashSale.products.length === 0) return null;
 
@@ -63,7 +73,7 @@ export function FlashSaleSection({ flashSale }: { flashSale: ActiveFlashSale | n
                       <span
                         key={color}
                         className="size-3.5 rounded-full border border-border"
-                        style={{ backgroundColor: getColorSwatch(color) }}
+                        style={{ backgroundColor: resolveColorHex(color, colorHexMap) }}
                       />
                     ))}
                   </div>

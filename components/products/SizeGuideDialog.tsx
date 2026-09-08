@@ -23,7 +23,7 @@ export function SizeGuideDialog() {
         render={
           <button
             type="button"
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+            className="cursor-pointer font-medium text-size-14 text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
           />
         }
       >

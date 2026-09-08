@@ -28,7 +28,7 @@ export function ProductTabs({ product }: { product: ProductDetail }) {
     <Tabs value={active} onValueChange={(value) => setActive(value as string)} className="mt-10">
       <TabsList variant="line" className="w-full justify-start border-b border-border">
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value} className="text-sm font-bold uppercase">
+          <TabsTrigger key={tab.value} value={tab.value} className="text-sm font-bold">
             {tab.label}
           </TabsTrigger>
         ))}
