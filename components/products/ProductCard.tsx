@@ -3,10 +3,19 @@ import Link from "next/link";
 import type { ProductListItem } from "@/lib/shared-types";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
-import { getColorSwatch } from "@/lib/color-swatches";
+import { resolveColorHex } from "@/lib/color-swatches";
 import { WishlistButton } from "@/components/products/WishlistButton";
 
-export function ProductCard({ product }: { product: ProductListItem }) {
+export function ProductCard({
+  product,
+  colorHexMap,
+}: {
+  product: ProductListItem;
+  // Map tên màu -> hex thật, do trang cha (đã fetch GET /colors) truyền xuống — ProductCard
+  // vẫn là Server Component (không tự fetch được), thiếu prop này thì rơi về bảng tĩnh
+  // getColorSwatch() qua resolveColorHex(). Xem ProductsPageClient.tsx (nơi fetch + truyền).
+  colorHexMap?: Record<string, string>;
+}) {
   const outOfStock = product.totalStock <= 0;
   const hasDiscount = product.salePrice != null && product.salePrice < product.basePrice;
   const discountPercent = hasDiscount
@@ -68,7 +77,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
                   <span
                     key={color}
                     className="size-3.5 rounded-full border border-border"
-                    style={{ backgroundColor: getColorSwatch(color) }}
+                    style={{ backgroundColor: resolveColorHex(color, colorHexMap) }}
                   />
                 ))}
               </div>

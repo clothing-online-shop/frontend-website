@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductDetail } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
-import { getColorSwatch } from "@/lib/color-swatches";
+import { getColors } from "@/lib/colors-api";
+import { resolveColorHex } from "@/lib/color-swatches";
 import { cn } from "@/lib/utils";
 import { QuantityStepper } from "@/components/products/QuantityStepper";
 import { SizeGuideDialog } from "@/components/products/SizeGuideDialog";
@@ -29,6 +31,13 @@ export function ProductVariantPicker({
     () => Array.from(new Set(product.variants.map((v) => v.color))),
     [product],
   );
+
+  const { data: colorsData } = useQuery({ queryKey: ["colors"], queryFn: getColors });
+  const colorHexMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const c of colorsData ?? []) map[c.name] = c.hexCode;
+    return map;
+  }, [colorsData]);
 
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(
@@ -140,7 +149,7 @@ export function ProductVariantPicker({
                   "relative size-12 overflow-hidden rounded-sm border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
                   selectedColor === color ? "border-primary" : "border-border",
                 )}
-                style={swatchImage ? undefined : { backgroundColor: getColorSwatch(color) }}
+                style={swatchImage ? undefined : { backgroundColor: resolveColorHex(color, colorHexMap) }}
               >
                 {swatchImage ? (
                   <Image src={swatchImage} alt={color} fill sizes="48px" className="object-cover" />

@@ -110,6 +110,12 @@ export interface Brand {
   productCount: number;
 }
 
+export interface Color {
+  id: string;
+  name: string;
+  hexCode: string;
+}
+
 export interface RecentlyViewedItem {
   id: string;
   productId: string;

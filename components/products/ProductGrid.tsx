@@ -11,6 +11,7 @@ export function ProductGrid({
   hasMore,
   isLoadingMore,
   onLoadMore,
+  colorHexMap,
 }: {
   products: ProductListItem[];
   isLoading: boolean;
@@ -19,6 +20,7 @@ export function ProductGrid({
   hasMore: boolean;
   isLoadingMore: boolean;
   onLoadMore: () => void;
+  colorHexMap?: Record<string, string>;
 }) {
   if (isLoading) {
     return (
@@ -48,7 +50,7 @@ export function ProductGrid({
     <>
       <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} colorHexMap={colorHexMap} />
         ))}
       </div>
 
