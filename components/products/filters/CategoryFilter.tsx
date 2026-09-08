@@ -4,10 +4,6 @@ import type { CategoryNode } from "@/lib/shared-types";
 import { cn } from "@/lib/utils";
 import { FilterSection } from "@/components/products/filters/FilterSection";
 
-// Đang có search (?search=...) thì lọc danh mục phải CỘNG DỒN vào cùng URL /san-pham hiện
-// tại (giữ nguyên search + mọi filter khác), không được nhảy sang route /danh-muc/<slug>
-// riêng — route đó không mang theo search, bấm vào sẽ mất luôn từ khoá đang tìm. Không có
-// search thì giữ đúng hành vi cũ: dùng route /danh-muc/<slug> (URL đẹp, tốt cho SEO danh mục).
 function categoryHref(
   searchParams: URLSearchParams,
   isActive: boolean,
