@@ -56,7 +56,7 @@ export function ProductGrid({
 
       {hasMore ? (
         <div className="mt-10 flex justify-center">
-          <Button variant="outline" onClick={onLoadMore} disabled={isLoadingMore}>
+          <Button className="bg-white p-6 text-size-14 font-semibold w-[225px] border border-[1.5px] border-brand-10 text-brand-10" variant="outline" onClick={onLoadMore} disabled={isLoadingMore}>
             {isLoadingMore ? "Đang tải..." : `Xem thêm ${remaining} sản phẩm`}
           </Button>
         </div>

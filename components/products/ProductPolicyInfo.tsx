@@ -6,7 +6,7 @@ const POLICY_LINES = [
 
 export function ProductPolicyInfo() {
   return (
-    <div className="mt-6 space-y-1.5 border border-border bg-secondary/40 p-4 text-sm text-foreground/90">
+    <div className="mt-6 space-y-1.5 border border-border bg-white p-4 text-sm text-foreground/90">
       {POLICY_LINES.map((line) => (
         <p key={line}>{line}</p>
       ))}

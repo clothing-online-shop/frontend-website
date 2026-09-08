@@ -186,7 +186,17 @@ export interface ProductDetail extends ProductListItem {
   };
   variants: ProductVariant[];
   reviews: ProductReview[];
+  // Đánh giá thật 100% — dùng cho ReviewSection/ReviewSummaryCard (breakdown theo sao +
+  // danh sách review thật phải khớp nhau). Không dùng field này cho dòng "★ 4.8 · N đánh
+  // giá" cạnh tên sản phẩm — dùng displayRating bên dưới.
   reviewSummary: ReviewSummary;
+  // Điểm/lượt đánh giá ĐÃ CỘNG DỒN với "đánh giá ảo" admin tự nhập ở CMS (Product.
+  // fakeReviewCount/fakeRatingAverage) — chỉ dùng cho dòng nhanh cạnh tên sản phẩm
+  // (ProductRatingRow), KHÔNG dùng cho ReviewSection (sẽ lệch với breakdown/danh sách review
+  // thật, vốn không có nội dung cho phần "ảo").
+  displayRating: { average: number; count: number };
+  // Cũng đã cộng dồn với Product.fakeSoldCount ở BE — không có UI nào khác phụ thuộc
+  // soldCount phải "thật 100%" như reviewSummary nên không cần tách riêng.
   soldCount: number;
   relatedProducts: ProductListItem[];
 }

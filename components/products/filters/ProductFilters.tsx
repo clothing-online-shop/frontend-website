@@ -91,7 +91,7 @@ export function ProductFilters({
   }
 
   return (
-    <aside className="bg-white p-6">
+    <aside className="bg-white p-6 max-h-[900px]">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase">Bộ lọc</h2>
         {hasActiveFilters && (
