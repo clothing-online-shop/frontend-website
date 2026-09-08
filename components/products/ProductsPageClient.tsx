@@ -107,11 +107,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const heroTitle = search
-    ? `Kết quả tìm kiếm cho "${search}"`
-    : activeCategory
-      ? activeCategory.name
-      : "Tất cả sản phẩm";
+  const heroTitle = activeCategory ? activeCategory.name : "Tất cả sản phẩm";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -121,12 +117,27 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
         search={search}
       />
 
-      <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />
+      {/* Trang kết quả search không dùng banner CategoryHero (thiết kế gốc cho search là
+          tiêu đề + phụ đề dạng chữ thường, nằm NGAY TRONG cột nội dung bên cạnh bộ lọc — xem
+          mockup gốc — không phải 1 khối banner nền màu chạy full-width phía trên như khi duyệt
+          danh mục). CategoryHero chỉ áp dụng cho duyệt danh mục/tất cả sản phẩm. */}
+      {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[220px_1fr]">
         <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
+          {search ? (
+            <div className="mb-8">
+              <h1 className="font-heading text-size-28 font-normal text-brand-10 sm:text-size-32">
+                {`Kết quả cho "${search}"`}
+              </h1>
+              {productsQuery.data ? (
+                <p className="mt-2 text-size-14 text-neutral-68625C">Tìm thấy {total} sản phẩm</p>
+              ) : null}
+            </div>
+          ) : null}
+
           {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
             <div className="mb-8">
               <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
@@ -147,7 +158,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
           {/* Ẩn toolbar (đếm số lượng + sắp xếp) khi đang ở trang kết quả search — kết quả
               search vốn đã xếp theo độ khớp/fuzzy từ BE (products.service.ts), không hợp để
               sắp xếp lại theo giá/mới nhất như duyệt danh mục bình thường; số lượng cũng đã
-              hiện sẵn trong CategoryHero phía trên, không cần lặp lại. */}
+              hiện sẵn ở phụ đề "Tìm thấy N sản phẩm" phía trên, không cần lặp lại. */}
           {!search && (
             <ProductsToolbar
               shownCount={products.length}
