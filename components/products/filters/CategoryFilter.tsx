@@ -1,7 +1,26 @@
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
 import { cn } from "@/lib/utils";
 import { FilterSection } from "@/components/products/filters/FilterSection";
+
+// Đang có search (?search=...) thì lọc danh mục phải CỘNG DỒN vào cùng URL /san-pham hiện
+// tại (giữ nguyên search + mọi filter khác), không được nhảy sang route /danh-muc/<slug>
+// riêng — route đó không mang theo search, bấm vào sẽ mất luôn từ khoá đang tìm. Không có
+// search thì giữ đúng hành vi cũ: dùng route /danh-muc/<slug> (URL đẹp, tốt cho SEO danh mục).
+function categoryHref(
+  searchParams: URLSearchParams,
+  isActive: boolean,
+  targetSlug: string,
+): string {
+  if (searchParams.get("search")) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (isActive) params.delete("category");
+    else params.set("category", targetSlug);
+    return `/san-pham?${params.toString()}`;
+  }
+  return isActive ? "/san-pham" : `/danh-muc/${targetSlug}`;
+}
 
 function CategoryRow({
   category,
@@ -10,10 +29,11 @@ function CategoryRow({
   category: CategoryNode;
   activeCategorySlug?: string;
 }) {
+  const searchParams = useSearchParams();
   const isActive = activeCategorySlug === category.slug;
   return (
     <Link
-      href={isActive ? "/san-pham" : `/danh-muc/${category.slug}`}
+      href={categoryHref(searchParams, isActive, category.slug)}
       className={cn(
         "flex items-center justify-between rounded-sm px-2 py-1 text-sm transition-colors hover:bg-secondary",
         isActive ? "bg-secondary font-bold text-primary" : "text-muted-foreground",
