@@ -16,19 +16,10 @@ export function SearchBar({
   defaultValue?: string;
 }) {
   const router = useRouter();
-  // open: chỉ bật khi bấm/click vào ô (onFocus) — dropdown lịch sử hiện ngay lúc đó và giữ
-  // nguyên cho tới khi rời khỏi ô, KHÔNG quan tâm đang có chữ hay trống (không tự ẩn lúc gõ,
-  // không tự hiện lại lúc xoá hết chữ — chỉ đúng 1 điều kiện duy nhất: đã click vào chưa).
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(defaultValue ?? "");
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Gọi ngay khi mount (KHÔNG gate qua enabled: open nữa) — trước đó chỉ fetch đúng lúc
-  // bấm vào ô, nhưng việc bật "enabled" đúng thời điểm focus không đáng tin cậy 100% (có
-  // lúc phải đổi tab rồi quay lại — trigger refetchOnWindowFocus mặc định của react-query —
-  // dropdown mới chịu hiện, tức lần fetch lúc focus ban đầu không chạy/không kịp). SearchBar
-  // chỉ mount 1 lần/trang (nằm trong header, sống suốt qua các lần điều hướng nội bộ) nên
-  // gọi sẵn ở đây không tốn thêm request nào so với gọi lúc focus, chỉ là gọi sớm hơn.
+  
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,
@@ -36,12 +27,6 @@ export function SearchBar({
   const history = recentSearchesQuery.data ?? [];
   const showHistory = open && history.length > 0;
 
-  // Đóng dựa thẳng vào blur thật của trình duyệt thay vì tự đoán "click ra ngoài" bằng
-  // listener mousedown/keydown gắn ở document — cách cũ dễ vỡ khi input type="search" có
-  // nút xoá "×" mặc định của trình duyệt (xoá hết chữ vẫn coi như 1 tương tác trong ô,
-  // nhưng listener toàn trang đôi lúc bắt nhầm thành "ra ngoài" rồi đóng mất dropdown).
-  // onBlur trên div cha bắt được cả khi 1 phần tử con (input) mất focus — chỉ thực sự đóng
-  // nếu nơi nhận focus tiếp theo (relatedTarget) không còn nằm trong khối search này nữa.
   function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
     if (!containerRef.current?.contains(e.relatedTarget as Node | null)) {
       setOpen(false);
