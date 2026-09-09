@@ -132,18 +132,16 @@ export function CartView() {
     <div className="mx-auto max-w-6xl px-4 py-16">
       <h1 className="text-2xl font-bold">Giỏ hàng</h1>
 
-      <div className="mt-4">
-        <FreeShippingBar subtotal={selectedSubtotal} />
-      </div>
-
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          <label className="flex items-center gap-2 border-t border-border py-4 text-sm">
+          <FreeShippingBar subtotal={selectedSubtotal} />
+
+          <label className="flex items-center gap-2 py-4 text-sm">
             <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} />
             Chọn tất cả ({cart.items.length})
           </label>
 
-          <div>
+          <div className="border-t border-border">
             {cart.items.map((item) => (
               <CartLineItem
                 key={item.id}
