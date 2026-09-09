@@ -235,6 +235,7 @@ export interface CreateOrderPayload {
   addressId: string;
   cartItemIds: string[];
   paymentMethod: CheckoutPaymentMethod;
+  voucherCode?: string;
 }
 
 export interface InitiateVnpayResponse {
@@ -312,6 +313,73 @@ export interface BlogPostSummary {
   slug: string;
   coverImage: string | null;
   createdAt: string;
+}
+
+export interface CartItemProductSummary {
+  id: string;
+  name: string;
+  slug: string;
+  thumbnail: string | null;
+}
+
+export interface CartItem {
+  id: string;
+  productVariantId: string;
+  quantity: number;
+  price: number;
+  lineTotal: number;
+  stockQuantity: number;
+  size: string;
+  color: string;
+  product: CartItemProductSummary;
+}
+
+export interface CartResponse {
+  id: string | null;
+  items: CartItem[];
+  subtotal: number;
+}
+
+export type CartAdjustmentReason = "unavailable" | "out_of_stock" | "capped";
+
+export interface CartAdjustment {
+  productVariantId: string;
+  requestedQuantity: number;
+  finalQuantity: number;
+  reason: CartAdjustmentReason;
+}
+
+export interface AddCartItemPayload {
+  productVariantId: string;
+  quantity?: number;
+}
+
+export interface UpdateCartItemPayload {
+  quantity: number;
+}
+
+export interface MergeCartPayload {
+  items: { productVariantId: string; quantity: number }[];
+}
+
+export interface MergeCartResult {
+  cart: CartResponse;
+  adjustments: CartAdjustment[];
+}
+
+export type DiscountType = "PERCENTAGE" | "FIXED_AMOUNT";
+
+export interface ValidateVoucherPayload {
+  code: string;
+  cartItemIds: string[];
+}
+
+export interface VoucherValidationResult {
+  code: string;
+  discountType: DiscountType;
+  subtotal: number;
+  discountAmount: number;
+  total: number;
 }
 
 export interface PaginatedResult<T> {
