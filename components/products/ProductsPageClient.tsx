@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
 import { ProductFilters } from "@/components/products/filters/ProductFilters";
 import { ProductsBreadcrumb } from "@/components/products/ProductsBreadcrumb";
@@ -15,11 +17,11 @@ import { ProductGrid } from "@/components/products/ProductGrid";
 
 const PAGE_LIMIT = 9;
 
-export function ProductsPageClient({ category }: { category?: string }) {
+export function ProductsPageClient({ category: categoryProp }: { category?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
+  const category = categoryProp ?? searchParams.get("category") ?? undefined;
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
@@ -58,6 +60,23 @@ export function ProductsPageClient({ category }: { category?: string }) {
   const products = productsQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = productsQuery.data?.pages[0]?.meta.total ?? 0;
 
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!search) return;
+    const cachedHistory = queryClient.getQueryData<string[]>(["search-history"]) ?? [];
+    if (cachedHistory.includes(search)) return;
+
+    recordSearch(search)
+      .then(() => queryClient.invalidateQueries({ queryKey: ["search-history"] }))
+      .catch(() => undefined);
+  }, [search, queryClient]);
+
+  const recentSearchesQuery = useQuery({
+    queryKey: ["search-history"],
+    queryFn: getRecentSearches,
+    enabled: Boolean(search),
+  });
+
   // Cùng query ["colors"] với ColorFilter (React Query dedupe theo queryKey, không gọi
   // API 2 lần) — dùng để hiện đúng hex thật ở chấm màu trên từng ProductCard, khớp màu
   // đang hiện trong bộ lọc thay vì đoán qua bảng tĩnh.
@@ -79,11 +98,7 @@ export function ProductsPageClient({ category }: { category?: string }) {
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const heroTitle = search
-    ? `Kết quả tìm kiếm cho "${search}"`
-    : activeCategory
-      ? activeCategory.name
-      : "Tất cả sản phẩm";
+  const heroTitle = activeCategory ? activeCategory.name : "Tất cả sản phẩm";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -92,20 +107,49 @@ export function ProductsPageClient({ category }: { category?: string }) {
         activeCategory={activeCategory}
         search={search}
       />
-
-      <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />
+      {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[270px_1fr]">
         <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
 
         <div>
-          <ProductsToolbar
-            shownCount={products.length}
-            total={total}
-            isLoading={productsQuery.isLoading}
-            sort={sort}
-            onSortChange={updateSort}
-          />
+          {search ? (
+            <div className="mb-8">
+              <h1 className="font-heading text-size-28 font-normal text-brand-10 sm:text-size-32">
+                {`Kết quả cho "${search}"`}
+              </h1>
+              {productsQuery.data ? (
+                <p className="mt-2 text-size-14 text-neutral-68625C">Tìm thấy {total} sản phẩm</p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
+            <div className="mb-8">
+              <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
+              <div className="flex flex-wrap gap-2">
+                {recentSearchesQuery.data.map((keyword) => (
+                  <Link
+                    key={keyword}
+                    href={`/san-pham?search=${encodeURIComponent(keyword)}`}
+                    className="border border-neutral-E0DDDA px-3.5 py-1.75 text-size-13 transition-colors bg-white hover:border-primary hover:text-primary"
+                  >
+                    {keyword}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {!search && (
+            <ProductsToolbar
+              shownCount={products.length}
+              total={total}
+              isLoading={productsQuery.isLoading}
+              sort={sort}
+              onSortChange={updateSort}
+            />
+          )}
 
           <ProductGrid
             products={products}

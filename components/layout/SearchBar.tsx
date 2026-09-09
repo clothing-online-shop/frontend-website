@@ -1,9 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Clock, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { getRecentSearches } from "@/lib/search-history-api";
 
 export function SearchBar({
   className,
@@ -13,31 +16,77 @@ export function SearchBar({
   defaultValue?: string;
 }) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState(defaultValue ?? "");
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const recentSearchesQuery = useQuery({
+    queryKey: ["search-history"],
+    queryFn: getRecentSearches,
+  });
+  const history = recentSearchesQuery.data ?? [];
+  const showHistory = open && history.length > 0;
+
+  function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
+    if (!containerRef.current?.contains(e.relatedTarget as Node | null)) {
+      setOpen(false);
+    }
+  }
+
+  function goSearch(keyword: string) {
+    const trimmed = keyword.trim();
+    if (!trimmed) return;
+    setText(keyword);
+    setOpen(false);
+    router.push(`/san-pham?search=${encodeURIComponent(trimmed)}`);
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const keyword = (new FormData(e.currentTarget).get("q") as string)?.trim();
-    if (!keyword) return;
-    router.push(`/san-pham?search=${encodeURIComponent(keyword)}`);
+    goSearch(text);
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn("relative", className)} role="search">
-      <Input
-        name="q"
-        type="search"
-        placeholder="Tìm áo, váy, mã SKU..."
-        defaultValue={defaultValue}
-        className="h-11 rounded-full bg-white pr-10 pl-4"
-        aria-label="Từ khóa tìm kiếm"
-      />
-      <button
-        type="submit"
-        aria-label="Tìm kiếm"
-        className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <Search className="size-4" />
-      </button>
-    </form>
+    <div ref={containerRef} onBlur={handleBlur} className={cn("relative", className)}>
+      <form onSubmit={handleSubmit} role="search">
+        <button
+          type="submit"
+          aria-label="Tìm kiếm"
+          className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Search className="size-4 text-neutral-68625C!" />
+        </button>
+        <Input
+          name="q"
+          autoComplete="off"
+          placeholder="Tìm áo, váy, mã SKU..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
+          }}
+          className="h-11 w-full bg-white pr-4 pl-10"
+          aria-label="Từ khóa tìm kiếm"
+        />
+      </form>
+
+      {showHistory ? (
+        <div className="absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-lg bg-popover py-1.5 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+          <p className="px-3.5 py-1.5 text-size-12 text-muted-foreground">Tìm kiếm gần đây</p>
+          {history.map((keyword) => (
+            <button
+              key={keyword}
+              type="button"
+              onClick={() => goSearch(keyword)}
+              className="flex w-full cursor-pointer items-center gap-2 px-3.5 py-2 text-left text-size-13 hover:bg-muted"
+            >
+              <Clock className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="truncate">{keyword}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }

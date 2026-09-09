@@ -19,6 +19,11 @@ apiClient.interceptors.request.use((config) => {
     // không cần header này.
     config.headers["X-Guest-Id"] = getGuestId();
   }
+  
+  const guestId = getGuestId();
+  if (guestId) {
+    config.headers["X-Guest-Id"] = guestId;
+  }
   return config;
 });
 
