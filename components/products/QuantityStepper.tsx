@@ -17,17 +17,17 @@ export function QuantityStepper({
   }
 
   return (
-    <div className="flex h-11 items-center border border-border">
+    <div className="flex h-13 items-center border border-border">
       <button
         type="button"
         aria-label="Giảm số lượng"
         disabled={value <= min}
         onClick={() => onChange(clamp(value - 1))}
-        className="flex h-full w-10 items-center justify-center text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-full w-13 items-center justify-center text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Minus className="size-3.5" />
       </button>
-      <span className="flex h-full w-10 items-center justify-center border-x border-border text-sm font-medium">
+      <span className="flex h-full w-13 items-center justify-center border-x border-border text-sm font-medium">
         {value}
       </span>
       <button
@@ -35,7 +35,7 @@ export function QuantityStepper({
         aria-label="Tăng số lượng"
         disabled={max !== undefined && value >= max}
         onClick={() => onChange(clamp(value + 1))}
-        className="flex h-full w-10 items-center justify-center text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-full w-13 items-center justify-center text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Plus className="size-3.5" />
       </button>

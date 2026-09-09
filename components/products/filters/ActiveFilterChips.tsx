@@ -17,7 +17,7 @@ export function ActiveFilterChips({ chips }: { chips: Chip[] }) {
           key={chip.key}
           type="button"
           onClick={chip.onRemove}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-xs text-foreground transition-colors hover:border-primary"
+          className="flex items-center gap-1.5 border border-brand-38 bg-neutral-F6F2E7 px-3 py-1 text-xs text-foreground transition-colors hover:border-primary"
         >
           {chip.label}
           <X className="size-3" />

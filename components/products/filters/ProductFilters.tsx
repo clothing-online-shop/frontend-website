@@ -91,14 +91,14 @@ export function ProductFilters({
   }
 
   return (
-    <aside>
+    <aside className="bg-white p-6 max-h-[900px]">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase">Bộ lọc</h2>
         {hasActiveFilters && (
           <button
             type="button"
             onClick={clearAll}
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+            className="cursor-pointer text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
           >
             Xóa tất cả
           </button>

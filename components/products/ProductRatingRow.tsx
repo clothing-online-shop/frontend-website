@@ -1,19 +1,21 @@
 import { Star } from "lucide-react";
-import type { ReviewSummary } from "@/lib/shared-types";
 import { cn } from "@/lib/utils";
 
+// rating = displayRating (product) — đã cộng dồn "đánh giá ảo" admin nhập ở CMS với đánh
+// giá thật, xem lib/shared-types.ts. Không nhận nguyên ReviewSummary (có breakdown) vì dòng
+// này không hiện breakdown, tránh hiểu nhầm đây là số liệu breakdown-consistent.
 export function ProductRatingRow({
-  summary,
+  rating,
   soldCount,
 }: {
-  summary: ReviewSummary;
+  rating: { average: number; count: number };
   soldCount: number;
 }) {
-  if (summary.count === 0 && soldCount === 0) return null;
+  if (rating.count === 0 && soldCount === 0) return null;
 
   return (
     <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
-      {summary.count > 0 ? (
+      {rating.count > 0 ? (
         <span className="flex items-center gap-1">
           <span className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -21,18 +23,18 @@ export function ProductRatingRow({
                 key={i}
                 className={cn(
                   "size-3.5",
-                  i < Math.round(summary.average)
+                  i < Math.round(rating.average)
                     ? "fill-primary text-primary"
                     : "fill-none text-border",
                 )}
               />
             ))}
           </span>
-          <span className="font-medium text-foreground">{summary.average}</span>
-          <span>· {summary.count} đánh giá</span>
+          <span className="font-medium text-foreground">{rating.average}</span>
+          <span>· {rating.count} đánh giá</span>
         </span>
       ) : null}
-      {summary.count > 0 && soldCount > 0 ? <span className="text-border">|</span> : null}
+      {rating.count > 0 && soldCount > 0 ? <span className="text-border">|</span> : null}
       {soldCount > 0 ? <span>Đã bán {soldCount.toLocaleString("vi-VN")}</span> : null}
     </div>
   );

@@ -12,7 +12,7 @@ export function SizeFilter({
 }) {
   return (
     <FilterSection title="Size">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {SIZES.map((size) => (
           <button
             key={size}
@@ -20,10 +20,10 @@ export function SizeFilter({
             onClick={() => onToggle(size)}
             aria-pressed={selectedSizes.includes(size)}
             className={cn(
-              "flex h-9 min-w-9 items-center justify-center rounded-sm border px-2.5 text-sm font-medium transition-colors",
+              "flex h-9 min-w-9 items-center justify-center rounded-none border px-2.5 text-sm font-medium transition-colors",
               selectedSizes.includes(size)
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border hover:border-primary",
+                ? "border-brand-10 bg-brand-10 text-white"
+                : "border-border hover:border-brand-10",
             )}
           >
             {size}
