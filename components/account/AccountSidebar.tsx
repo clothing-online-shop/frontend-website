@@ -19,14 +19,27 @@ interface AccountNavItem {
   enabled?: boolean;
 }
 
+// Khớp cả route con (vd /thong-tin-ca-nhan/don-hang-cua-toi/DH2026...) — không chỉ đúng y
+// hệt href, để mục "Đơn hàng của tôi" vẫn sáng khi đang ở trang chi tiết 1 đơn cụ thể. Riêng
+// "/thong-tin-ca-nhan" (Hồ sơ cá nhân) CHỈ khớp chính xác — nó là tiền tố của mọi route con
+// khác (don-hang-cua-toi, dia-chi...), match theo startsWith sẽ khiến 2 mục cùng sáng active
+// 1 lúc.
+function isNavActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href === "/thong-tin-ca-nhan") return false;
+  return pathname.startsWith(`${href}/`);
+}
+
+// Route con đặt tiếng Việt khớp đúng nhãn hiển thị (đổi từ /account sang /thong-tin-ca-nhan
+// theo tên thư mục mới) — không dùng /account/<slug-anh> nữa.
 const ACCOUNT_NAV: AccountNavItem[] = [
-  { label: "Hồ sơ cá nhân", href: "/account", enabled: true },
-  { label: "Địa chỉ", href: "/account/addresses" },
-  { label: "Đơn hàng của tôi", href: "/account/orders" },
-  { label: "Đổi trả & hoàn tiền", href: "/account/returns" },
-  { label: "Sản phẩm yêu thích", href: "/account/wishlist" },
-  { label: "Điểm & hạng thành viên", href: "/account/loyalty" },
-  { label: "Thông báo", href: "/account/notifications" },
+  { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan", enabled: true },
+  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi" },
+  { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", enabled: true },
+  { label: "Đổi trả & hoàn tiền", href: "/thong-tin-ca-nhan/doi-tra-hoan-tien" },
+  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich" },
+  { label: "Điểm & hạng thành viên", href: "/thong-tin-ca-nhan/diem-hang-thanh-vien" },
+  { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];
 
 // Dùng chung cho cả 2 khối <nav> bên dưới (pill cuộn ngang ở mobile, list dọc ở tablet/
@@ -132,7 +145,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && pathname === item.href)}
+            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
             variant="pill"
           />
         ))}
@@ -143,7 +156,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && pathname === item.href)}
+            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
             variant="row"
           />
         ))}

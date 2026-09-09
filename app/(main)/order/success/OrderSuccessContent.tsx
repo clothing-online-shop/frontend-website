@@ -6,13 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { StatusPage } from "@/components/errors/StatusPage";
+import { OrderSummaryCard } from "@/components/account/OrderSummaryCard";
 import { getOrder } from "@/lib/orders-api";
-import { formatPrice } from "@/lib/format";
 import { getErrorMessage } from "@/lib/error";
-import { ORDER_STATUS_LABEL, PAYMENT_METHOD_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/orderStatus";
 import { useAuthStore } from "@/store/auth-store";
 
 export function OrderSuccessContent() {
@@ -71,41 +68,15 @@ export function OrderSuccessContent() {
         <p className="mt-1 text-lg font-bold">{order.orderCode}</p>
       </div>
 
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Chi tiết đơn hàng
-            <Badge variant="secondary">{ORDER_STATUS_LABEL[order.status]}</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between gap-4">
-            <span className="shrink-0 text-muted-foreground">Địa chỉ giao hàng</span>
-            <span className="text-right">{order.shippingAddress}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Phương thức thanh toán</span>
-            <span>
-              {PAYMENT_METHOD_LABEL[order.paymentMethod as keyof typeof PAYMENT_METHOD_LABEL] ??
-                order.paymentMethod}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Trạng thái thanh toán</span>
-            <span>{PAYMENT_STATUS_LABEL[order.paymentStatus]}</span>
-          </div>
-          <div className="flex justify-between border-t border-border pt-2 font-bold">
-            <span>Tổng tiền</span>
-            <span>{formatPrice(order.totalAmount)}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mt-8">
+        <OrderSummaryCard order={order} />
+      </div>
 
       <div className="mt-8 flex justify-center gap-4">
         <Button nativeButton={false} variant="outline" render={<Link href="/san-pham" />}>
           Tiếp tục mua sắm
         </Button>
-        <Button nativeButton={false} render={<Link href="/account" />}>
+        <Button nativeButton={false} render={<Link href="/thong-tin-ca-nhan/don-hang-cua-toi" />}>
           Xem đơn hàng của tôi
         </Button>
       </div>
