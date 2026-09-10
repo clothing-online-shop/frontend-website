@@ -10,10 +10,6 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   CANCELLED: "Đã hủy",
 };
 
-// Cấu hình tab cho trang "Đơn hàng của tôi" — mỗi tab gộp nhiều OrderStatus thật thành 1
-// nhóm hiển thị (BE có 7 trạng thái chi tiết, UI chỉ cần 4 nhóm + "Tất cả"). `statuses`
-// undefined = không lọc (tab "Tất cả"). Dùng chung cho cả tab bar và query param gửi lên
-// GET /orders?status=...
 export interface OrderListTab {
   key: string;
   label: string;
@@ -23,25 +19,20 @@ export interface OrderListTab {
 export const ORDER_LIST_TABS: OrderListTab[] = [
   { key: "all", label: "Tất cả" },
   { key: "pending", label: "Chờ xác nhận", statuses: ["PENDING"] },
-  {
-    key: "shipping",
-    label: "Đang giao",
-    statuses: ["CONFIRMED", "PACKING", "HANDED_OVER", "SHIPPING"],
-  },
+  { key: "preparing", label: "Chờ lấy hàng", statuses: ["CONFIRMED", "PACKING"] },
+  { key: "shipping", label: "Đang giao", statuses: ["HANDED_OVER", "SHIPPING"] },
   { key: "completed", label: "Hoàn thành", statuses: ["COMPLETED"] },
   { key: "cancelled", label: "Đã hủy", statuses: ["CANCELLED"] },
 ];
 
-// Màu badge trạng thái ở trang "Đơn hàng của tôi" — theo nhóm (không phải theo từng
-// OrderStatus riêng lẻ) để khớp đúng 4 nhóm hiển thị của ORDER_LIST_TABS phía trên.
 export const ORDER_STATUS_BADGE_CLASS: Record<OrderStatus, string> = {
   PENDING: "bg-[#EFE8E1] text-[#784900]",
   CONFIRMED: "bg-[#EFE8E1] text-[#784900]",
   PACKING: "bg-[#EFE8E1] text-[#784900]",
   HANDED_OVER: "bg-[#EFE8E1] text-[#784900]",
   SHIPPING: "bg-[#EFE8E1] text-[#784900]",
-  COMPLETED: "bg-[#EFE8E1] text-[#784900]",
-  CANCELLED: "bg-[#EFE8E1] text-[#784900]",
+  COMPLETED: "bg-[#E4EBE6] text-[#23643F]",
+  CANCELLED: "bg-[#F6E7E6] text-[#A03F3C]",
 };
 
 export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {

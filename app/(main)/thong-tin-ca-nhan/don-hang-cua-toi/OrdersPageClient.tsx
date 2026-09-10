@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import type { Order } from "@/lib/shared-types";
 import { listMyOrders } from "@/lib/orders-api";
 import { ORDER_LIST_TABS } from "@/lib/orderStatus";
@@ -22,6 +22,10 @@ export function OrdersPageClient() {
   // queryKey chỉ phụ thuộc tab.key (không phải cả object tab.statuses) — đổi tab luôn kéo
   // theo đổi key ("my-orders" là prefix chung, xem CancelOrderDialog invalidate theo prefix
   // này để mọi tab tự refetch sau khi hủy 1 đơn, không chỉ tab đang mở).
+  //
+  // keepPreviousData: đổi sang tab CHƯA có cache thì giữ nguyên danh sách tab cũ (isPlaceholderData
+  // = true) trong lúc fetch, thay vì sụp toàn bộ vùng list xuống 3 ô skeleton rồi bung lại —
+  // đó là lý do "lần đầu bấm tab bị giật mạnh, lần 2 (đã cache) hết giật".
   const ordersQuery = useInfiniteQuery({
     queryKey: ["my-orders", tab.key],
     queryFn: ({ pageParam }) =>
@@ -29,11 +33,14 @@ export function OrdersPageClient() {
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
+    placeholderData: keepPreviousData,
   });
 
   const orders = ordersQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = ordersQuery.data?.pages[0]?.meta.total ?? 0;
   const remaining = Math.min(PAGE_LIMIT, total - orders.length);
+  // Đang hiện data của tab trước trong lúc tab mới load — làm mờ + chặn click để báo "đang tải".
+  const isSwitchingTab = ordersQuery.isPlaceholderData;
 
   return (
     <div>
@@ -41,7 +48,7 @@ export function OrdersPageClient() {
         Đơn hàng của tôi
       </h1>
 
-      <div className="mt-5 flex gap-1 border-b border-[#EDEBE8] ml-3">
+      <div className="mt-5 flex gap-1 border-b border-[#EDEBE8]">
         {ORDER_LIST_TABS.map((t) => (
           <p
             key={t.key}
@@ -58,9 +65,16 @@ export function OrdersPageClient() {
         ))}
       </div>
 
-      <div>
+      <div
+        className={cn(
+          "min-h-60 transition-opacity duration-150",
+          isSwitchingTab && "pointer-events-none opacity-50",
+        )}
+      >
         {ordersQuery.isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full" />)
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full" />)}
+          </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center border border-dashed border-neutral-E0DDDA py-24 text-center">
             <p className="text-neutral-68625C">Chưa có đơn hàng nào ở mục này.</p>
@@ -70,7 +84,7 @@ export function OrdersPageClient() {
         )}
       </div>
 
-      {ordersQuery.hasNextPage ? (
+      {ordersQuery.hasNextPage && !isSwitchingTab ? (
         <div className="mt-6 flex justify-center">
           <Button
             variant="outline"

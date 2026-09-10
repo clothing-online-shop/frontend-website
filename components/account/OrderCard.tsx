@@ -45,7 +45,7 @@ export function OrderCard({
 
 
   return (
-    <div className="border-b border-b-[#F1EEEB] bg-white p-4 sm:px-6 sm:py-5.5">
+    <div className="border-b border-b-[#F1EEEB] bg-white sm:py-5.5">
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex gap-3.5 items-center justify-center">
           <span className="font-semibold text-size-14 text-[#1E1A15]">{order.orderCode}</span>
