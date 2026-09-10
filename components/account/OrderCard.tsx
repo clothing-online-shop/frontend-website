@@ -50,7 +50,7 @@ export function OrderCard({
 
   return (
     <div className="border-b border-b-neutral-F1EEEB bg-white py-4 sm:py-5.5">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-semibold text-size-14 text-brand-10">{order.orderCode}</span>
           <span className="text-size-13 text-neutral-76706A">{formatDate(order.createdAt)}</span>

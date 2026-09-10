@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import type { Order } from "@/lib/shared-types";
 import { listMyOrders } from "@/lib/orders-api";
@@ -12,12 +13,25 @@ import { CancelOrderDialog } from "@/components/account/CancelOrderDialog";
 import { cn } from "@/lib/utils";
 
 const PAGE_LIMIT = 5;
+const DEFAULT_TAB = ORDER_LIST_TABS[0];
 
 export function OrdersPageClient() {
-  const [activeTab, setActiveTab] = useState<string>(ORDER_LIST_TABS[0].key);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
 
-  const tab = ORDER_LIST_TABS.find((t) => t.key === activeTab) ?? ORDER_LIST_TABS[0];
+  // Tab lưu trong URL (?tab=) — refresh / back / share link đều giữ đúng vị trí, đồng bộ với
+  // cách trang /san-pham quản lý filter. Giá trị lạ → về tab mặc định.
+  const tab = ORDER_LIST_TABS.find((t) => t.key === searchParams.get("tab")) ?? DEFAULT_TAB;
+
+  function selectTab(key: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (key === DEFAULT_TAB.key) params.delete("tab");
+    else params.set("tab", key);
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname);
+  }
 
   // queryKey prefix "my-orders" dùng chung để CancelOrderDialog invalidate mọi tab 1 lần.
   // keepPreviousData: đổi sang tab chưa có cache thì giữ danh sách cũ (mờ đi) thay vì sụp về
@@ -48,10 +62,10 @@ export function OrdersPageClient() {
         {ORDER_LIST_TABS.map((t) => (
           <p
             key={t.key}
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => selectTab(t.key)}
             className={cn(
               "shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-3 py-2.5 text-size-13 font-semibold sm:px-4",
-              t.key === activeTab
+              t.key === tab.key
                 ? "border-brand-38 text-brand-10"
                 : "border-transparent text-neutral-76706A",
             )}
