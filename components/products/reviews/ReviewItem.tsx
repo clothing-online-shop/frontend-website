@@ -18,7 +18,7 @@ function MockReviewImages() {
 export function ReviewItem({ review }: { review: ProductReview }) {
   return (
     <div className="border-b border-border py-5 bg-white p-6">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-foreground">
             {review.reviewerName[0]?.toUpperCase()}
@@ -38,7 +38,7 @@ export function ReviewItem({ review }: { review: ProductReview }) {
             </div>
           </div>
         </div>
-        <span className="shrink-0 text-xs text-muted-foreground">
+        <span className="w-full shrink-0 text-xs text-muted-foreground sm:w-auto">
           {review.variantLabel ? `${review.variantLabel} · ` : ""}
           {formatDate(review.createdAt)}
         </span>

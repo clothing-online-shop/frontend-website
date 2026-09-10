@@ -10,15 +10,20 @@ import { SizeFilter } from "@/components/products/filters/SizeFilter";
 import { ColorFilter } from "@/components/products/filters/ColorFilter";
 import { BrandFilter } from "@/components/products/filters/BrandFilter";
 import { ActiveFilterChips, buildPriceChipLabel } from "@/components/products/filters/ActiveFilterChips";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const PRICE_MAX = 2_000_000;
 
 export function ProductFilters({
   categories,
   activeCategorySlug,
+  open,
+  onOpenChange,
 }: {
   categories: CategoryNode[];
   activeCategorySlug?: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -90,23 +95,10 @@ export function ProductFilters({
     updateParams({ size: null, color: null, brand: null, minPrice: null, maxPrice: null });
   }
 
-  return (
-    <aside className="bg-white p-6 max-h-[900px]">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold uppercase">Bộ lọc</h2>
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={clearAll}
-            className="cursor-pointer text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
-          >
-            Xóa tất cả
-          </button>
-        )}
-      </div>
-
-      <ActiveFilterChips chips={chips} />
-
+  // Định nghĩa 1 lần, render 2 chỗ (aside desktop + Sheet mobile) — không phải 2 bộ filter
+  // độc lập, chỉ là cùng 1 JSX dùng lại, cả 2 đều đọc/ghi chung state (URL params) ở trên.
+  const filterSections = (
+    <>
       <CategoryFilter categories={categories} activeCategorySlug={activeCategorySlug} />
       <PriceRangeFilter
         minPrice={minPrice}
@@ -130,6 +122,51 @@ export function ProductFilters({
         selectedBrandIds={selectedBrandIds}
         onToggle={(brandId) => toggleMultiValue("brand", brandId, selectedBrandIds)}
       />
-    </aside>
+    </>
+  );
+
+  return (
+    <div>
+      {/* Luôn thấy được filter đang áp dụng mà không cần mở Sheet trên mobile. */}
+      <ActiveFilterChips chips={chips} />
+
+      <aside className="hidden bg-white p-6 max-h-[900px] md:block">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase">Bộ lọc</h2>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="cursor-pointer text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+            >
+              Xóa tất cả
+            </button>
+          )}
+        </div>
+        {filterSections}
+      </aside>
+
+      {/* Trigger nằm ở ProductsToolbar (component anh em) — Sheet này chỉ nhận open/onOpenChange
+          điều khiển từ ngoài, không tự có SheetTrigger. */}
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className="w-80 overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Bộ lọc</SheetTitle>
+          </SheetHeader>
+          <div className="px-4 pb-6">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="mb-3 cursor-pointer text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+              >
+                Xóa tất cả
+              </button>
+            )}
+            {filterSections}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 }

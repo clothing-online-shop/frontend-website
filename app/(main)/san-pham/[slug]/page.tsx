@@ -145,7 +145,7 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
         <ProductGallery images={images} name={product.name} />
 
         <div>
@@ -158,7 +158,8 @@ export default async function ProductDetailPage({
           <ProductTabs product={product} />
         </div>
       </div>
-
+      <ReviewSection productId={product.id} reviews={product.reviews} summary={product.reviewSummary} />
+      
       {product.relatedProducts.length > 0 ? (
         <section className="mt-16 border-t border-border pt-12">
           <h2 className="mb-6 font-heading text-2xl font-extrabold uppercase">
@@ -172,7 +173,6 @@ export default async function ProductDetailPage({
         </section>
       ) : null}
 
-      <ReviewSection productId={product.id} reviews={product.reviews} summary={product.reviewSummary} />
       <RecentlyViewedSection excludeProductId={product.id} />
       <RecordProductView productId={product.id} />
     </div>

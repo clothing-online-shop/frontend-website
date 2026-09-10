@@ -198,12 +198,18 @@ export function ProductVariantPicker({
             : `Còn ${selectedVariant.stockQuantity} sản phẩm · size ${selectedVariant.size}`}
       </p>
 
-      <div className="flex items-center gap-3">
-        <QuantityStepper value={quantity} onChange={setQuantity} max={selectedVariant?.stockQuantity} />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-3">
+          <QuantityStepper value={quantity} onChange={setQuantity} max={selectedVariant?.stockQuantity} />
+          <WishlistButton
+            productId={product.id}
+            className="cursor-pointer static top-auto right-auto z-auto size-13 shrink-0 rounded-none border border-border bg-white shadow-none sm:hidden"
+          />
+        </div>
         <Button
           variant="dark"
           size="lg"
-          className="h-13 flex-1 text-base font-bold"
+          className="h-13 w-full text-base font-bold sm:flex-1"
           disabled={!selectedVariant || outOfStock || cart.isAdding}
           onClick={handleAddToCart}
         >
@@ -211,7 +217,7 @@ export function ProductVariantPicker({
         </Button>
         <WishlistButton
           productId={product.id}
-          className="cursor-pointer static top-auto right-auto z-auto size-13 rounded-none border border-border bg-white shadow-none"
+          className="hidden cursor-pointer static top-auto right-auto z-auto size-13 shrink-0 rounded-none border border-border bg-white shadow-none sm:flex"
         />
       </div>
 

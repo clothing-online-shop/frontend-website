@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function EmptyCartState() {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center py-24 text-center">
+    <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center sm:py-24">
       <ShoppingBag className="size-12 text-muted-foreground" />
       <h2 className="mt-4 text-lg font-bold">Giỏ hàng của bạn đang trống</h2>
       <p className="mt-1 text-sm text-muted-foreground">
