@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Copy } from "lucide-react";
-import { toast } from "sonner";
 import type { ProductDetail } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { formatPrice } from "@/lib/format";
 import { getColors } from "@/lib/colors-api";
 import { resolveColorHex } from "@/lib/color-swatches";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/useCart";
 import { QuantityStepper } from "@/components/products/QuantityStepper";
 import { SizeGuideDialog } from "@/components/products/SizeGuideDialog";
 import { WishlistButton } from "@/components/products/WishlistButton";
@@ -22,6 +23,9 @@ export function ProductVariantPicker({
   product: ProductDetail;
   initialColor?: string;
 }) {
+  const router = useRouter();
+  const cart = useCart();
+
   const sizes = useMemo(
     () => Array.from(new Set(product.variants.map((v) => v.size))),
     [product],
@@ -63,18 +67,28 @@ export function ProductVariantPicker({
 
   function handleAddToCart() {
     if (!selectedVariant) return;
-    // Sprint 3 sẽ nối API giỏ hàng thật — hiện tại chưa có store giỏ hàng thật (xem
-    // store/cart-store.ts), chỉ báo xác nhận luồng chọn variant.
-    toast.success(
-      `Đã chọn ${quantity} x ${selectedVariant.color} - ${selectedVariant.size}. Giỏ hàng sẽ sớm ra mắt!`,
-    );
+    cart.addItem({
+      productVariantId: selectedVariant.id,
+      quantity,
+      snapshot: {
+        productId: product.id,
+        productSlug: product.slug,
+        productName: product.name,
+        thumbnail: product.thumbnail,
+        size: selectedVariant.size,
+        color: selectedVariant.color,
+        price: selectedVariant.price,
+        stockQuantity: selectedVariant.stockQuantity,
+      },
+    });
   }
 
   function handleBuyNow() {
     if (!selectedVariant) return;
-    // Cùng lý do handleAddToCart() — chưa có checkout thật để chuyển sang, tạm toast xác
-    // nhận luồng chọn variant.
-    toast.success(`Đã chọn ${quantity} x ${selectedVariant.color} - ${selectedVariant.size}. Sắp ra mắt!`);
+    // TODO(checkout): khi có trang /checkout thật, chuyển thẳng sang đó với đúng item vừa
+    // thêm thay vì qua /cart — hiện /checkout vẫn là stub nên tạm điều hướng vào giỏ hàng.
+    handleAddToCart();
+    router.push("/cart");
   }
 
   async function handleCopySku() {
@@ -190,7 +204,7 @@ export function ProductVariantPicker({
           variant="dark"
           size="lg"
           className="h-13 flex-1 text-base font-bold"
-          disabled={!selectedVariant || outOfStock}
+          disabled={!selectedVariant || outOfStock || cart.isAdding}
           onClick={handleAddToCart}
         >
           Thêm vào giỏ hàng
@@ -205,7 +219,7 @@ export function ProductVariantPicker({
         size="lg"
         variant="outline"
         className="h-13 w-full text-base font-bold border-1 border-brand-10"
-        disabled={!selectedVariant || outOfStock}
+        disabled={!selectedVariant || outOfStock || cart.isAdding}
         onClick={handleBuyNow}
       >
         Mua ngay

@@ -10,6 +10,7 @@ import { MegaMenu } from "@/components/layout/MegaMenu";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchBar } from "@/components/layout/SearchBar";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/useCart";
 import { useAuthStore } from "@/store/auth-store";
 import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 
@@ -84,6 +85,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  const cart = useCart();
 
   useEffect(() => {
     function onScroll() {
@@ -122,11 +124,18 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
       ]
     : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
 
-  // Chưa có API thông báo/giỏ hàng thật (Sprint 3, xem store/cart-store.ts) nên badge tạm để 0.
+  // Chưa có API thông báo thật nên badge tạm để 0 — giỏ hàng đã nối thật (xem hooks/useCart.ts).
   const actionItems: HeaderActionItemData[] = [
     { key: "notification", label: "Thông báo", icon: Bell, badge: 0, onAction: handleNotificationAction },
     ...accountItems,
-    { key: "cart", label: "Giỏ hàng", icon: ShoppingBag, href: "/cart", badge: 0, onAction: handleCartAction },
+    {
+      key: "cart",
+      label: "Giỏ hàng",
+      icon: ShoppingBag,
+      href: "/cart",
+      badge: cart.itemCount,
+      onAction: handleCartAction,
+    },
   ];
 
   return (
