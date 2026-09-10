@@ -131,7 +131,7 @@ export function ProductVariantPicker({
             <p className="text-sm text-muted-foreground line-through">
               {formatPrice(product.basePrice)}
             </p>
-            <Badge className="rounded-sm bg-brand-10 font-bold text-primary-foreground">
+            <Badge className="rounded-none h-6 bg-primary font-bold text-primary-foreground">
               -{discountPercent}%
             </Badge>
           </>
@@ -211,7 +211,7 @@ export function ProductVariantPicker({
         </Button>
         <WishlistButton
           productId={product.id}
-          className="cursor-pointer static top-auto right-auto z-auto size-13 rounded-none border border-border bg-transparent shadow-none"
+          className="cursor-pointer static top-auto right-auto z-auto size-13 rounded-none border border-border bg-white shadow-none"
         />
       </div>
 

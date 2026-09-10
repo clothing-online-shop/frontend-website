@@ -24,7 +24,7 @@ export function ProductRatingRow({
                 className={cn(
                   "size-3.5",
                   i < Math.round(rating.average)
-                    ? "fill-primary text-primary"
+                    ? "fill-neutral-B46E00 text-neutral-B46E00"
                     : "fill-none text-border",
                 )}
               />

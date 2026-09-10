@@ -17,7 +17,7 @@ function MockReviewImages() {
 
 export function ReviewItem({ review }: { review: ProductReview }) {
   return (
-    <div className="border-b border-border py-5 last:border-0">
+    <div className="border-b border-border py-5 bg-white p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-foreground">
@@ -31,14 +31,17 @@ export function ReviewItem({ review }: { review: ProductReview }) {
                   key={i}
                   className={cn(
                     "size-3",
-                    i < review.rating ? "fill-primary text-primary" : "fill-none text-border",
+                    i < review.rating ? "fill-neutral-B46E00 text-neutral-B46E00" : "fill-none text-border",
                   )}
                 />
               ))}
             </div>
           </div>
         </div>
-        <span className="shrink-0 text-xs text-muted-foreground">{formatDate(review.createdAt)}</span>
+        <span className="shrink-0 text-xs text-muted-foreground">
+          {review.variantLabel ? `${review.variantLabel} · ` : ""}
+          {formatDate(review.createdAt)}
+        </span>
       </div>
 
       {review.comment ? <p className="mt-3 text-sm text-foreground/90">{review.comment}</p> : null}

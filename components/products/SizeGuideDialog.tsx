@@ -29,7 +29,7 @@ export function SizeGuideDialog() {
       >
         Hướng dẫn chọn size
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Hướng dẫn chọn size</DialogTitle>
         </DialogHeader>

@@ -39,9 +39,15 @@ export function CartLineItem({
         aria-label={`Chọn ${item.productName}`}
       />
 
-      <div className="relative size-24 shrink-0 overflow-hidden bg-secondary">
+      <div className="relative w-[107px] h-[142px] shrink-0 overflow-hidden bg-secondary">
         {item.thumbnail ? (
-          <Image src={item.thumbnail} alt={item.productName} fill sizes="96px" className="object-cover" />
+          <Image
+            src={item.thumbnail}
+            alt={item.productName}
+            fill
+            sizes="107px"
+            className="object-cover"
+          />
         ) : null}
       </div>
 

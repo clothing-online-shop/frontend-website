@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export function ReviewSummaryCard({ summary }: { summary: ReviewSummary }) {
   return (
-    <div className="border border-border p-6">
+    <div className="border border-border p-6 bg-white h-[300px]">
       <p className="font-heading text-4xl font-extrabold">{summary.average}</p>
       <div className="mt-2 flex items-center gap-0.5">
         {Array.from({ length: 5 }).map((_, i) => (

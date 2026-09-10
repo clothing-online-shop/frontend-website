@@ -172,15 +172,9 @@ export default async function ProductDetailPage({
         </section>
       ) : null}
 
-      <ReviewSection reviews={product.reviews} summary={product.reviewSummary} />
+      <ReviewSection productId={product.id} reviews={product.reviews} summary={product.reviewSummary} />
       <RecentlyViewedSection excludeProductId={product.id} />
       <RecordProductView productId={product.id} />
-
-      <div className="mt-10">
-        <Link href="/san-pham" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Quay lại danh sách sản phẩm
-        </Link>
-      </div>
     </div>
   );
 }

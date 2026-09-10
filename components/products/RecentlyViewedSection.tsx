@@ -20,9 +20,9 @@ export function RecentlyViewedSection({ excludeProductId }: { excludeProductId: 
           <Link
             key={item.id}
             href={`/san-pham/${item.product.slug}`}
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 bg-white p-4"
           >
-            <div className="relative size-15 shrink-0 overflow-hidden bg-secondary">
+            <div className="relative w-[60px] h-[78px] shrink-0 overflow-hidden bg-secondary">
               {item.product.thumbnail ? (
                 <Image
                   src={item.product.thumbnail}

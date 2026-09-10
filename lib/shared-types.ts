@@ -165,6 +165,10 @@ export interface ProductReview {
   rating: number;
   comment: string | null;
   createdAt: string;
+  // Chỉ có ở review MOCK (xem components/products/reviews/mock-reviews.ts) — review thật từ
+  // BE chưa gắn được với biến thể đã mua (model Review hiện không lưu variant), nên field này
+  // luôn undefined với review thật, ReviewItem chỉ hiện khi có giá trị.
+  variantLabel?: string;
 }
 
 export interface ReviewSummary {
