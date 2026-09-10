@@ -1,8 +1,7 @@
 import type { CheckoutPaymentMethod, OrderStatus, PaymentStatus } from "@/lib/shared-types";
 
-// Nhãn CHI TIẾT từng trạng thái — dùng ở trang chi tiết đơn (account/orders/[orderCode]),
-// trang "Đặt hàng thành công", lịch sử trạng thái... những nơi khách xem sâu, cần granular.
-// KHÔNG dùng cho badge ở danh sách đơn (xem ORDER_STATUS_GROUP_LABEL bên dưới).
+// Nhãn chi tiết từng trạng thái — dùng ở trang chi tiết đơn / trang đặt hàng thành công.
+// Badge ở danh sách dùng ORDER_STATUS_GROUP_LABEL (gộp theo nhóm tab).
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   PENDING: "Chờ xác nhận",
   CONFIRMED: "Đã xác nhận",
@@ -28,10 +27,8 @@ export const ORDER_LIST_TABS: OrderListTab[] = [
   { key: "cancelled", label: "Đã hủy", statuses: ["CANCELLED"] },
 ];
 
-// Nhãn NHÓM — badge ở danh sách đơn hiện đúng nhãn của tab chứa nó ("Chờ lấy hàng", "Đang
-// giao"...) thay vì nhãn chi tiết ("Đã xác nhận", "Đang đóng gói"), để tab và badge luôn
-// khớp nhau, khách không thấy lệch. Derive thẳng từ ORDER_LIST_TABS (1 nguồn sự thật: đổi
-// cách gộp tab thì nhãn badge tự đổi theo). Mọi OrderStatus đều thuộc đúng 1 tab.
+// Nhãn nhóm cho badge ở danh sách — khớp đúng nhãn tab chứa status đó, derive từ
+// ORDER_LIST_TABS để chỉ có 1 nguồn sự thật.
 export const ORDER_STATUS_GROUP_LABEL: Record<OrderStatus, string> = (() => {
   const map = {} as Record<OrderStatus, string>;
   for (const tab of ORDER_LIST_TABS) {
@@ -40,8 +37,12 @@ export const ORDER_STATUS_GROUP_LABEL: Record<OrderStatus, string> = (() => {
   return map;
 })();
 
-// Màu token định nghĩa ở app/globals.css (--order-progress-*/--order-done-*/--order-cancel-*).
-// 5 trạng thái "đang chạy" (PENDING→SHIPPING) dùng chung 1 tông nâu nhạt.
+// Khách chỉ được tự hủy đơn khi còn PENDING — khớp ràng buộc bên backend (cancelOrder).
+export function isOrderCancellable(status: OrderStatus): boolean {
+  return status === "PENDING";
+}
+
+// Màu token ở app/globals.css. 5 trạng thái "đang chạy" (PENDING→SHIPPING) chung 1 tông.
 const PROGRESS_BADGE = "bg-order-progress-bg text-order-progress-fg";
 
 export const ORDER_STATUS_BADGE_CLASS: Record<OrderStatus, string> = {

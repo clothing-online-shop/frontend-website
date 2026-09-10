@@ -4,23 +4,23 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { OrderSummaryCard } from "@/components/account/OrderSummaryCard";
+import { StatusPage } from "@/components/errors/StatusPage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrder } from "@/lib/orders-api";
 import { getErrorMessage } from "@/lib/error";
 
-// Tách riêng khỏi page.tsx (thay vì gọi useQuery ngay trong render-prop của AccountLayout) —
-// children của AccountLayout chỉ nên render component thật, không tự gọi hook, giữ đúng quy
-// tắc Rules of Hooks (xem cách ProfileForm.tsx được dùng làm mẫu).
+// Tách khỏi page.tsx để không gọi hook trong render-prop của AccountLayout (Rules of Hooks).
 export function OrderDetailContent({ orderCode }: { orderCode: string }) {
-  const {
-    data: order,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data: order, isLoading, isError, error } = useQuery({
     queryKey: ["order", orderCode],
     queryFn: () => getOrder(orderCode),
   });
+
+  if (isError || (!isLoading && !order)) {
+    return (
+      <StatusPage title="Không tìm thấy đơn hàng" description={getErrorMessage(error)} />
+    );
+  }
 
   return (
     <div>
@@ -37,10 +37,8 @@ export function OrderDetailContent({ orderCode }: { orderCode: string }) {
       </h1>
 
       <div className="mt-5">
-        {isLoading ? (
+        {isLoading || !order ? (
           <Skeleton className="h-56 w-full" />
-        ) : isError || !order ? (
-          <p className="text-sm text-destructive">{getErrorMessage(error)}</p>
         ) : (
           <OrderSummaryCard order={order} />
         )}

@@ -21,9 +21,7 @@ interface CancelOrderDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Dialog xác nhận hủy đơn — cùng pattern với LogoutConfirmDialog (Dialog + 2 nút Hủy/Xác
-// nhận). `order` null = đóng, khác đăng xuất (chỉ có 1 trigger duy nhất) ở đây danh sách có
-// nhiều đơn nên cần biết ĐANG hủy đơn nào — OrdersPageClient tự quản lý state này.
+// `order` null = đóng. Danh sách có nhiều đơn nên cần biết đang hủy đơn nào — parent quản lý state.
 export function CancelOrderDialog({ order, onOpenChange }: CancelOrderDialogProps) {
   const queryClient = useQueryClient();
 
@@ -31,8 +29,7 @@ export function CancelOrderDialog({ order, onOpenChange }: CancelOrderDialogProp
     mutationFn: (orderCode: string) => cancelOrder(orderCode),
     onSuccess: () => {
       toast.success("Đã hủy đơn hàng.");
-      // Chỉ có "my-orders" queryKey nằm ở đây — invalidate theo prefix để mọi tab (mọi
-      // status filter khác nhau) đều tự refetch, không chỉ tab đang mở.
+      // Invalidate theo prefix để mọi tab tự refetch, không chỉ tab đang mở.
       queryClient.invalidateQueries({ queryKey: ["my-orders"] });
       onOpenChange(false);
     },

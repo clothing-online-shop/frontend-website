@@ -6,17 +6,14 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Order } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { formatDate, formatPrice } from "@/lib/format";
 import { getErrorMessage } from "@/lib/error";
 import { addCartItem } from "@/lib/cart-api";
-import { ORDER_STATUS_BADGE_CLASS, ORDER_STATUS_GROUP_LABEL } from "@/lib/orderStatus";
+import { isOrderCancellable } from "@/lib/orderStatus";
+import { OrderStatusBadge } from "@/components/account/OrderStatusBadge";
 
-// Số ảnh sản phẩm hiện tối đa trên 1 dòng — phần dư gộp vào ô "+N" để card không bị vỡ layout
-// khi đơn có nhiều sản phẩm (nhất là ở mobile, khung hẹp).
 const MAX_THUMBNAILS = 3;
 
-// Nút phụ (Hủy đơn / Mua lại): full-width ở mobile để dễ bấm, về chiều rộng tự nhiên từ sm.
 const SECONDARY_BTN =
   "h-9.5 w-full border-neutral-D0CDCA bg-white text-size-13 font-semibold text-brand-10 sm:w-auto";
 
@@ -27,9 +24,8 @@ export function OrderCard({
   order: Order;
   onCancelClick: (order: Order) => void;
 }) {
-  // Thêm lại từng dòng của đơn cũ vào giỏ hàng — bỏ qua (không chặn cả loạt) những dòng lỗi
-  // (sản phẩm/biến thể đã ngừng bán hoặc hết hàng), báo tổng kết cho người dùng biết rõ đã
-  // thêm được bao nhiêu trên tổng số, thay vì im lặng thành công/thất bại toàn bộ.
+  // "Mua lại": thêm lại từng dòng vào giỏ, bỏ qua dòng lỗi (hết hàng / ngừng bán) và báo
+  // tổng kết thay vì fail/succeed toàn bộ.
   const reorderMutation = useMutation({
     mutationFn: async () => {
       const results = await Promise.allSettled(
@@ -54,21 +50,12 @@ export function OrderCard({
 
   return (
     <div className="border-b border-b-neutral-F1EEEB bg-white py-4 sm:py-5.5">
-      {/* Header: mã đơn + ngày bên trái (tự xuống dòng khi khung hẹp), badge trạng thái ghim
-          góc phải, không bị đẩy xuống dòng riêng. */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-semibold text-size-14 text-brand-10">{order.orderCode}</span>
           <span className="text-size-13 text-neutral-76706A">{formatDate(order.createdAt)}</span>
         </div>
-        <span
-          className={cn(
-            "shrink-0 px-2.5 py-1.25 text-size-12 font-semibold",
-            ORDER_STATUS_BADGE_CLASS[order.status],
-          )}
-        >
-          {ORDER_STATUS_GROUP_LABEL[order.status]}
-        </span>
+        <OrderStatusBadge status={order.status} />
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
@@ -103,9 +90,8 @@ export function OrderCard({
         </span>
       </div>
 
-      {/* Nút: stack dọc full-width ở mobile, về hàng ngang căn phải từ sm. */}
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-        {order.status === "PENDING" ? (
+        {isOrderCancellable(order.status) ? (
           <Button variant="outline" className={SECONDARY_BTN} onClick={() => onCancelClick(order)}>
             Hủy đơn
           </Button>

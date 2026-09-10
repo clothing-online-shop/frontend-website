@@ -19,13 +19,9 @@ export function OrdersPageClient() {
 
   const tab = ORDER_LIST_TABS.find((t) => t.key === activeTab) ?? ORDER_LIST_TABS[0];
 
-  // queryKey chỉ phụ thuộc tab.key (không phải cả object tab.statuses) — đổi tab luôn kéo
-  // theo đổi key ("my-orders" là prefix chung, xem CancelOrderDialog invalidate theo prefix
-  // này để mọi tab tự refetch sau khi hủy 1 đơn, không chỉ tab đang mở).
-  //
-  // keepPreviousData: đổi sang tab CHƯA có cache thì giữ nguyên danh sách tab cũ (isPlaceholderData
-  // = true) trong lúc fetch, thay vì sụp toàn bộ vùng list xuống 3 ô skeleton rồi bung lại —
-  // đó là lý do "lần đầu bấm tab bị giật mạnh, lần 2 (đã cache) hết giật".
+  // queryKey prefix "my-orders" dùng chung để CancelOrderDialog invalidate mọi tab 1 lần.
+  // keepPreviousData: đổi sang tab chưa có cache thì giữ danh sách cũ (mờ đi) thay vì sụp về
+  // skeleton — tránh giật layout.
   const ordersQuery = useInfiniteQuery({
     queryKey: ["my-orders", tab.key],
     queryFn: ({ pageParam }) =>
@@ -39,7 +35,6 @@ export function OrdersPageClient() {
   const orders = ordersQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = ordersQuery.data?.pages[0]?.meta.total ?? 0;
   const remaining = Math.min(PAGE_LIMIT, total - orders.length);
-  // Đang hiện data của tab trước trong lúc tab mới load — làm mờ + chặn click để báo "đang tải".
   const isSwitchingTab = ordersQuery.isPlaceholderData;
 
   return (
@@ -48,8 +43,7 @@ export function OrdersPageClient() {
         Đơn hàng của tôi
       </h1>
 
-      {/* Mobile/tablet: 6 tab không đủ chỗ trên 1 hàng — cho cuộn ngang (overflow-x-auto +
-          shrink-0 + whitespace-nowrap), không wrap xuống nhiều dòng làm vỡ đường gạch chân. */}
+      {/* 6 tab cuộn ngang trên màn hẹp, không wrap để giữ đường gạch chân liền mạch. */}
       <div className="mt-5 flex gap-1 overflow-x-auto border-b border-neutral-EDEBE8">
         {ORDER_LIST_TABS.map((t) => (
           <p

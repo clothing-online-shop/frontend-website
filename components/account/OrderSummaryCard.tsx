@@ -1,20 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { Order } from "@/lib/shared-types";
 import { formatPrice } from "@/lib/format";
-import { ORDER_STATUS_LABEL, PAYMENT_METHOD_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/orderStatus";
+import { PAYMENT_METHOD_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/orderStatus";
+import { OrderStatusBadge } from "@/components/account/OrderStatusBadge";
 
-// Card tóm tắt 1 đơn hàng — dùng chung ở trang "Đặt hàng thành công" (order/success) và
-// trang chi tiết đơn trong "Đơn hàng của tôi" (account/orders/[orderCode]). Chỉ tóm tắt
-// (địa chỉ/thanh toán/tổng tiền), KHÔNG liệt kê từng sản phẩm trong đơn — quyết định tạm thời
-// (v1), danh sách sản phẩm trong đơn để làm sau khi cần trang chi tiết đầy đủ hơn.
+// Card tóm tắt 1 đơn — dùng chung ở trang "Đặt hàng thành công" và trang chi tiết đơn.
+// Chưa liệt kê từng sản phẩm (v1).
 export function OrderSummaryCard({ order }: { order: Order }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Chi tiết đơn hàng
-          <Badge variant="secondary">{ORDER_STATUS_LABEL[order.status]}</Badge>
+          <OrderStatusBadge status={order.status} detailed />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">

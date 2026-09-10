@@ -22,7 +22,7 @@ export async function listMyOrders(
 ): Promise<PaginatedResult<Order>> {
   const { data } = await apiClient.get<PaginatedResult<Order>>("/orders", {
     params: {
-      status: params.statuses?.join(","),
+      status: params.statuses?.length ? params.statuses.join(",") : undefined,
       page: params.page,
       limit: params.limit,
     },

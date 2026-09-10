@@ -13,25 +13,18 @@ import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 interface AccountNavItem {
   label: string;
   href: string;
-  // Chỉ "Hồ sơ cá nhân" có UI thật ở đợt này — các mục còn lại theo đúng bố cục mockup
-  // nhưng chưa có trang đích, khoá click (giống cách xử lý 3 tab chưa làm ở màn đăng nhập)
-  // thay vì trỏ tới route sẽ 404.
+  // false/undefined = chưa có trang đích, render dạng disabled thay vì link 404.
   enabled?: boolean;
 }
 
-// Khớp cả route con (vd /thong-tin-ca-nhan/don-hang-cua-toi/DH2026...) — không chỉ đúng y
-// hệt href, để mục "Đơn hàng của tôi" vẫn sáng khi đang ở trang chi tiết 1 đơn cụ thể. Riêng
-// "/thong-tin-ca-nhan" (Hồ sơ cá nhân) CHỈ khớp chính xác — nó là tiền tố của mọi route con
-// khác (don-hang-cua-toi, dia-chi...), match theo startsWith sẽ khiến 2 mục cùng sáng active
-// 1 lúc.
+// Khớp cả route con (trang chi tiết đơn) — trừ "/thong-tin-ca-nhan" là tiền tố của mọi route
+// con nên chỉ khớp chính xác, không thì 2 mục cùng active.
 function isNavActive(pathname: string, href: string): boolean {
   if (pathname === href) return true;
   if (href === "/thong-tin-ca-nhan") return false;
   return pathname.startsWith(`${href}/`);
 }
 
-// Route con đặt tiếng Việt khớp đúng nhãn hiển thị (đổi từ /account sang /thong-tin-ca-nhan
-// theo tên thư mục mới) — không dùng /account/<slug-anh> nữa.
 const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan", enabled: true },
   { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi" },
@@ -42,10 +35,8 @@ const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];
 
-// Dùng chung cho cả 2 khối <nav> bên dưới (pill cuộn ngang ở mobile, list dọc ở tablet/
-// desktop) — trước đây mỗi khối tự lặp lại y hệt logic disabled/active/aria-current, sửa 1
-// chỗ (vd thêm quyền truy cập) dễ quên sửa chỗ còn lại. "variant" chỉ đổi phần className
-// hiển thị, không đổi logic.
+// Dùng chung cho cả 2 khối <nav> (pill ngang + list dọc) — logic disabled/active giống nhau,
+// chỉ khác className qua `variant`.
 function AccountNavLink({
   item,
   active,
@@ -96,9 +87,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
-    // Mobile + tablet: full width, xếp chồng lên trên content (xem AccountLayout). Chỉ desktop
-    // (lg:) mới dùng min-w-65 (260px) nằm cạnh content — dưới lg màn không đủ rộng, sidebar
-    // 260px bóp content còn ~440px trông rất chật nên chuyển sang thanh nav ngang ở trên.
+    // < lg: full-width, nav ngang; từ lg: sidebar 260px cạnh content.
     <aside className="text-size-14 bg-white w-full lg:w-auto lg:min-w-65">
       <div className="flex items-center h-22.5 sm:border-b border-neutral-EDEBE8 justify-between gap-3 pl-4 pt-4 pb-5 pr-4 lg:pl-6 lg:pt-6 lg:pb-9.25 lg:pr-0 mb-4">
         <div className="flex items-center gap-3">
@@ -111,15 +100,11 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           </div>
           <div>
             <p className="font-semibold text-size-14 text-brand-10">{user.fullName}</p>
-            {/* Hạng/điểm thành viên: chưa có API loyalty, hiện tạm placeholder tĩnh theo đúng
-                mockup thay vì bịa số liệu theo user thật. */}
+            {/* Placeholder — chưa có API loyalty. */}
             <p className="text-size-12 text-brand-38">Hạng Bạc · 1.240 điểm</p>
           </div>
         </div>
-        {/* Đăng xuất tách khỏi list điều hướng ở mobile/tablet — icon gọn ở góc card user,
-            không chiếm thêm 1 hàng trong thanh tab cuộn ngang bên dưới (khác ý nghĩa hành động
-            so với các mục điều hướng nên không hợp để xen vào giữa dãy tab). Từ desktop (lg:)
-            nằm cuối <nav> dọc như thiết kế gốc (ẩn icon này). */}
+        {/* < lg: nút đăng xuất là icon ở góc card user (không xen vào thanh tab ngang). */}
         <Button
           type="button"
           variant="ghost"
@@ -132,9 +117,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         </Button>
       </div>
 
-      {/* Mobile + tablet: list dọc 7 mục + đăng xuất đẩy content xuống rất xa, phải cuộn mới
-          thấy — thay bằng 1 thanh tab cuộn NGANG ngay dưới card user, chỉ cao 1 hàng. Vuốt
-          ngang để xem hết mục. Từ desktop (lg:) hiện nguyên <nav> dọc (ẩn thanh ngang này). */}
+      {/* < lg: nav dạng thanh tab cuộn ngang. */}
       <nav
         aria-label="Tài khoản"
         className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 lg:hidden"
@@ -158,9 +141,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
             variant="row"
           />
         ))}
-        {/* Cùng border-l-4 px-4 py-3 như các mục nav ở trên — để border-transparent "ăn" đúng
-            4px như hàng khác thì chữ "Đăng xuất" mới thẳng hàng, không bị lệch trái/khác
-            khoảng cách như trước (rounded-lg px-3 py-2 không khớp khung của các item kia). */}
+        {/* Cùng border-l-4 px-4 py-3 như các mục nav để chữ thẳng hàng. */}
         <button
           type="button"
           onClick={() => setLogoutOpen(true)}
