@@ -31,7 +31,7 @@ export function ProductCard({
               src={product.thumbnail}
               alt={product.name}
               fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              sizes="(min-width: 1280px) 260px, (min-width: 768px) 20vw, (min-width: 640px) 33vw, 50vw"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : null}

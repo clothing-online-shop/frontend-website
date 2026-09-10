@@ -30,7 +30,7 @@ export function CartSummary({
   const [code, setCode] = useState("");
 
   return (
-    <div className="h-fit border border-border bg-card p-6">
+    <div className="h-fit bg-card p-6">
       <h2 className="text-lg font-bold uppercase">Tạm tính</h2>
 
       <div className="mt-4 flex gap-2">

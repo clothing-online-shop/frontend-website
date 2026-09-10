@@ -23,7 +23,7 @@ export function BlogSection({ posts }: { posts: BlogPostSummary[] }) {
             </div>
             <div className="p-4 bg-white min-h-[130px]">
               <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
-              <h3 className="mt-1 line-clamp-2 text-size-22 font-medium text-foreground">{post.title}</h3>
+              <h3 className="font-heading mt-1 line-clamp-2 text-size-22 font-medium text-foreground">{post.title}</h3>
             </div>
           </article>
         ))}

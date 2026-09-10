@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { SlidersHorizontal } from "lucide-react";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
+import { Button } from "@/components/ui/button";
 import { ProductFilters } from "@/components/products/filters/ProductFilters";
 import { ProductsBreadcrumb } from "@/components/products/ProductsBreadcrumb";
 import { CategoryHero } from "@/components/products/CategoryHero";
@@ -29,6 +31,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const brand = searchParams.get("brand") ?? undefined;
   const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const queryParams = {
     category,
@@ -110,14 +113,30 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
       {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-[270px_1fr]">
-        <ProductFilters categories={categoriesQuery.data ?? []} activeCategorySlug={category} />
+        <ProductFilters
+          categories={categoriesQuery.data ?? []}
+          activeCategorySlug={category}
+          open={filtersOpen}
+          onOpenChange={setFiltersOpen}
+        />
 
         <div>
           {search ? (
             <div className="mb-8">
-              <h1 className="font-heading text-size-28 font-normal text-brand-10 sm:text-size-32">
-                {`Kết quả cho "${search}"`}
-              </h1>
+              <div className="flex items-start justify-between gap-3">
+                <h1 className="font-heading text-size-28 font-normal text-brand-10 sm:text-size-32">
+                  {`Kết quả cho "${search}"`}
+                </h1>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0 md:hidden"
+                  onClick={() => setFiltersOpen(true)}
+                >
+                  <SlidersHorizontal className="size-4" />
+                  Bộ lọc
+                </Button>
+              </div>
               {productsQuery.data ? (
                 <p className="mt-2 text-size-14 text-neutral-68625C">Tìm thấy {total} sản phẩm</p>
               ) : null}
@@ -148,6 +167,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
               isLoading={productsQuery.isLoading}
               sort={sort}
               onSortChange={updateSort}
+              onOpenFilters={() => setFiltersOpen(true)}
             />
           )}
 

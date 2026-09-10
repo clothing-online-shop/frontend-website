@@ -35,16 +35,16 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col-reverse gap-3 sm:flex-row">
       {gallery.length > 1 ? (
-        <div className="hidden max-h-[600px] w-16 shrink-0 flex-col gap-2 overflow-y-auto sm:flex">
+        <div className="flex w-full shrink-0 gap-2 overflow-x-auto sm:w-16 sm:max-h-[600px] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto">
           {gallery.map((src, index) => (
             <button
               key={`${src}-${index}`}
               type="button"
               onClick={() => goTo(index)}
               className={cn(
-                "relative aspect-3/4 shrink-0 overflow-hidden border transition-colors",
+                "relative size-14 shrink-0 overflow-hidden border transition-colors sm:aspect-3/4 sm:size-auto sm:w-full",
                 index === active ? "border-primary" : "border-border",
               )}
             >

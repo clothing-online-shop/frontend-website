@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
+import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { cn } from "@/lib/utils";
 
 // Style dùng chung cho mọi tab trong thanh mega menu (kể cả tab "Bộ sưu tập").
@@ -18,37 +20,49 @@ function navItemClass(isActive: boolean) {
   );
 }
 
-// Tab cha coi là active khi đang ở đúng trang của nó hoặc trang của 1 category con (mega
-// menu chỉ hiện 2 cấp: tab cha + children trong dropdown), khớp breadcrumb dạng Trang chủ/Nữ/...
-function isCategoryActive(category: CategoryNode, pathname: string) {
-  const slugs = [category.slug, ...category.children.map((child) => child.slug)];
-  return slugs.some((slug) => pathname === `/danh-muc/${slug}`);
+function collectSlugs(category: CategoryNode): string[] {
+  return [category.slug, ...category.children.flatMap(collectSlugs)];
 }
 
-function MegaMenuColumn({ category }: { category: CategoryNode }) {
+// Tab cha coi là active khi đang ở đúng trang của nó hoặc trang của 1 category con/cháu (cây
+// danh mục tối đa 3 cấp — xem backend-cms), khớp breadcrumb dạng Trang chủ/Nam/Áo nam/...
+function isCategoryActive(category: CategoryNode, pathname: string) {
+  return collectSlugs(category).some((slug) => pathname === `/danh-muc/${slug}`);
+}
+
+function MegaMenuChildLink({ child }: { child: CategoryNode }) {
   return (
-    <div className="min-w-40">
-      <Link
-        href={`/danh-muc/${category.slug}`}
-        className="mb-2 block text-sm font-semibold text-foreground hover:text-primary"
-      >
-        {category.name}
+    <>
+      <Link href={`/danh-muc/${child.slug}`} className="group flex items-center gap-3 py-1.5">
+        <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-secondary">
+          <Image
+            src={child.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(child.slug)}
+            alt=""
+            fill
+            sizes="44px"
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
+          />
+        </span>
+        <span className="text-sm font-medium text-foreground group-hover:text-primary">{child.name}</span>
+        <span className="ml-auto text-xs text-muted-foreground">{child.productCount}</span>
       </Link>
-      {category.children.length > 0 ? (
-        <ul className="space-y-1.5">
-          {category.children.map((child) => (
-            <li key={child.id}>
+      {/* Cấp 3 (nếu có) — thụt lề dưới tên danh mục cấp 2, khớp mép trái điểm bắt đầu chữ
+          (size-11 + gap-3 = 56px, không phải dưới thumbnail). */}
+      {child.children.length > 0 ? (
+        <ul className="mb-1.5 ml-14 space-y-1">
+          {child.children.map((grandchild) => (
+            <li key={grandchild.id}>
               <Link
-                href={`/danh-muc/${child.slug}`}
+                href={`/danh-muc/${grandchild.slug}`}
                 className="text-sm text-muted-foreground hover:text-primary"
               >
-                {child.name}
+                {grandchild.name}
               </Link>
             </li>
           ))}
         </ul>
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -61,11 +75,43 @@ function MegaMenuItem({ category, isActive }: { category: CategoryNode; isActive
         {category.name}
       </Link>
       {hasChildren ? (
-        <div className="invisible absolute top-full left-1/2 z-40 w-max max-w-[90vw] -translate-x-1/2 pt-1 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
-          <div className="flex gap-8 rounded-md border border-border bg-popover p-6 shadow-lg">
-            {category.children.map((child) => (
-              <MegaMenuColumn key={child.id} category={child} />
-            ))}
+        // left-0 (không căn giữa) — panel giờ đủ rộng để tràn khỏi viewport bên trái nếu căn
+        // giữa dưới tab đầu tiên ("Nam" nằm sát mép trái thanh nav).
+        <div className="invisible absolute top-full left-0 z-40 max-w-[90vw] pt-1 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+          <div className="flex gap-8 border border-border bg-popover p-6 shadow-lg">
+            <div className="min-w-[200px]">
+              <p className="mb-3 text-xs font-bold tracking-wide text-muted-foreground uppercase">
+                {category.name}
+              </p>
+              <ul>
+                {category.children.map((child) => (
+                  <li key={child.id}>
+                    <MegaMenuChildLink child={child} />
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={`/danh-muc/${category.slug}`}
+                className="mt-4 inline-block text-sm font-semibold text-primary hover:underline"
+              >
+                Xem tất cả {category.name} →
+              </Link>
+            </div>
+
+            <Link href={`/danh-muc/${category.slug}`} className="group/img block w-40 shrink-0">
+              <div className="relative aspect-3/4 overflow-hidden bg-secondary">
+                <Image
+                  src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
+                  alt={category.name}
+                  fill
+                  sizes="160px"
+                  className="object-cover transition-transform duration-300 group-hover/img:scale-105"
+                />
+              </div>
+              <p className="mt-2 text-sm font-bold text-foreground uppercase group-hover/img:text-primary">
+                {category.name}
+              </p>
+            </Link>
           </div>
         </div>
       ) : null}

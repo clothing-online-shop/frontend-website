@@ -100,8 +100,8 @@ export function CartView() {
 
   if (cart.isLoading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <h1 className="mb-8 text-2xl font-bold">Giỏ hàng</h1>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-16">
+        <h1 className="font-heading mb-8 text-size-28 sm:text-size-38">Giỏ hàng</h1>
         <CartSkeleton />
       </div>
     );
@@ -109,8 +109,8 @@ export function CartView() {
 
   if (cart.isError) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center">
-        <h1 className="mb-4 text-2xl font-bold">Giỏ hàng</h1>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-16 text-center">
+        <h1 className="mb-4 text-size-28 font-heading sm:text-size-38">Giỏ hàng</h1>
         <p className="text-muted-foreground">Không thể tải giỏ hàng, vui lòng thử lại.</p>
         <Button variant="outline" className="mt-4" onClick={() => cart.refetch()}>
           Thử lại
@@ -121,19 +121,19 @@ export function CartView() {
 
   if (cart.items.length === 0) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <h1 className="text-2xl font-bold">Giỏ hàng</h1>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-16">
+        <h1 className="font-heading text-size-28 sm:text-size-38">Giỏ hàng</h1>
         <EmptyCartState />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="text-2xl font-bold">Giỏ hàng</h1>
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-16">
+      <h1 className="font-heading text-size-28 sm:text-size-38">Giỏ hàng</h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div>
+        <div className="bg-white p-6">
           <FreeShippingBar subtotal={selectedSubtotal} />
 
           <label className="flex items-center gap-2 py-4 text-sm">
@@ -155,7 +155,7 @@ export function CartView() {
             ))}
           </div>
 
-          <Link href="/san-pham" className="mt-6 inline-block text-sm underline underline-offset-2">
+          <Link href="/san-pham" className="mt-6 inline-block text-sm underline underline-offset-2 text-primary font-semibold">
             ← Tiếp tục mua sắm
           </Link>
         </div>

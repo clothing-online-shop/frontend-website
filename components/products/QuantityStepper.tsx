@@ -17,7 +17,7 @@ export function QuantityStepper({
   }
 
   return (
-    <div className="flex h-13 items-center border border-border">
+    <div className="bg-white flex h-13 items-center border border-border">
       <button
         type="button"
         aria-label="Giảm số lượng"

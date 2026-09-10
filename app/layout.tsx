@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import { Paytone_One, SN_Pro } from "next/font/google";
+import { Lora, SN_Pro } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Paytone One chỉ dùng cho title lớn (class font-heading, xem globals.css) — chỉ có 1
-// weight 400 (font display, không có bản đậm/nghiêng riêng).
-const fontHeading = Paytone_One({
+// Lora chỉ dùng cho title lớn (class font-heading, xem globals.css) — variable font nên
+// load "variable" thay vì 1 weight cố định, để các class font-normal/semibold/extrabold
+// đang dùng sẵn trên font-heading (ví dụ ReviewSummaryCard, StatusPage) render đúng đậm nhạt
+// thay vì browser fake-bold.
+const fontHeading = Lora({
   subsets: ["latin", "vietnamese"],
-  weight: "400",
+  weight: "variable",
+  style: ["normal", "italic"],
   variable: "--font-heading",
 });
 

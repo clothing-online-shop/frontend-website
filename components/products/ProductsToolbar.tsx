@@ -1,4 +1,6 @@
+import { SlidersHorizontal } from "lucide-react";
 import type { ProductSort } from "@/lib/shared-types";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -19,15 +21,17 @@ export function ProductsToolbar({
   isLoading,
   sort,
   onSortChange,
+  onOpenFilters,
 }: {
   shownCount: number;
   total: number;
   isLoading: boolean;
   sort: ProductSort;
   onSortChange: (value: string | null) => void;
+  onOpenFilters: () => void;
 }) {
   return (
-    <div className="bg-white p-4 mb-6 flex items-center justify-between">
+    <div className="bg-white p-4 mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {isLoading ? (
         <span />
       ) : (
@@ -35,22 +39,28 @@ export function ProductsToolbar({
           Hiển thị 1–{shownCount} trên {total} sản phẩm
         </p>
       )}
-      <Select value={sort} onValueChange={onSortChange}>
-        <SelectTrigger className="w-44">
-          <SelectValue placeholder="Sắp xếp">
-            {(value: ProductSort) =>
-              SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
-            }
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {SORT_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <Button type="button" variant="outline" className="md:hidden" onClick={onOpenFilters}>
+          <SlidersHorizontal className="size-4" />
+          Bộ lọc
+        </Button>
+        <Select value={sort} onValueChange={onSortChange}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Sắp xếp">
+              {(value: ProductSort) =>
+                SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
