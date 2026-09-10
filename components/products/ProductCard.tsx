@@ -21,6 +21,11 @@ export function ProductCard({
   const discountPercent = hasDiscount
     ? Math.round(((product.basePrice - product.salePrice!) / product.basePrice) * 100)
     : 0;
+  // API UAT hiện có thể còn phiên bản cũ hơn frontend (chưa redeploy), trả về thiếu hẳn field
+  // colors/sizes thay vì mảng rỗng — fallback [] để không crash lúc prerender ("Cannot read
+  // properties of undefined (reading 'length')"), không dựa hoàn toàn vào type khai báo.
+  const colors = product.colors ?? [];
+  const sizes = product.sizes ?? [];
 
   return (
     <div className="group bg-white">
@@ -69,11 +74,11 @@ export function ProductCard({
           <p className="text-sm font-bold text-foreground">{formatPrice(product.basePrice)}</p>
         )}
 
-        {(product.colors.length > 0 || product.sizes.length > 0) && (
+        {(colors.length > 0 || sizes.length > 0) && (
           <div className="flex items-center justify-between">
-            {product.colors.length > 0 ? (
+            {colors.length > 0 ? (
               <div className="flex items-center gap-1">
-                {product.colors.map((color) => (
+                {colors.map((color) => (
                   <span
                     key={color}
                     className="size-3.5 rounded-full border border-border"
@@ -84,8 +89,8 @@ export function ProductCard({
             ) : (
               <span />
             )}
-            {product.sizes.length > 0 ? (
-              <p className="text-xs text-muted-foreground">{product.sizes.join(" · ")}</p>
+            {sizes.length > 0 ? (
+              <p className="text-xs text-muted-foreground">{sizes.join(" · ")}</p>
             ) : null}
           </div>
         )}
