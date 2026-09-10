@@ -13,26 +13,30 @@ import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 interface AccountNavItem {
   label: string;
   href: string;
-  // Chỉ "Hồ sơ cá nhân" có UI thật ở đợt này — các mục còn lại theo đúng bố cục mockup
-  // nhưng chưa có trang đích, khoá click (giống cách xử lý 3 tab chưa làm ở màn đăng nhập)
-  // thay vì trỏ tới route sẽ 404.
+  // false/undefined = chưa có trang đích, render dạng disabled thay vì link 404.
   enabled?: boolean;
 }
 
+// Khớp cả route con (trang chi tiết đơn) — trừ "/thong-tin-ca-nhan" là tiền tố của mọi route
+// con nên chỉ khớp chính xác, không thì 2 mục cùng active.
+function isNavActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href === "/thong-tin-ca-nhan") return false;
+  return pathname.startsWith(`${href}/`);
+}
+
 const ACCOUNT_NAV: AccountNavItem[] = [
-  { label: "Hồ sơ cá nhân", href: "/account", enabled: true },
-  { label: "Địa chỉ", href: "/account/addresses" },
-  { label: "Đơn hàng của tôi", href: "/account/orders" },
-  { label: "Đổi trả & hoàn tiền", href: "/account/returns" },
-  { label: "Sản phẩm yêu thích", href: "/account/wishlist" },
-  { label: "Điểm & hạng thành viên", href: "/account/loyalty" },
-  { label: "Thông báo", href: "/account/notifications" },
+  { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan", enabled: true },
+  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi" },
+  { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", enabled: true },
+  { label: "Đổi trả & hoàn tiền", href: "/thong-tin-ca-nhan/doi-tra-hoan-tien" },
+  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich" },
+  { label: "Điểm & hạng thành viên", href: "/thong-tin-ca-nhan/diem-hang-thanh-vien" },
+  { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];
 
-// Dùng chung cho cả 2 khối <nav> bên dưới (pill cuộn ngang ở mobile, list dọc ở tablet/
-// desktop) — trước đây mỗi khối tự lặp lại y hệt logic disabled/active/aria-current, sửa 1
-// chỗ (vd thêm quyền truy cập) dễ quên sửa chỗ còn lại. "variant" chỉ đổi phần className
-// hiển thị, không đổi logic.
+// Dùng chung cho cả 2 khối <nav> (pill ngang + list dọc) — logic disabled/active giống nhau,
+// chỉ khác className qua `variant`.
 function AccountNavLink({
   item,
   active,
@@ -83,12 +87,9 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
-    // Mobile: full width (đang xếp chồng lên trên content, xem AccountLayout). Từ tablet
-    // (md:) trở lên dùng đúng min-w-65 (260px) như desktop — thử co hẹp còn ~224px trước
-    // đó khiến tên user/nhãn mục dài ("Điểm & hạng thành viên"...) bị wrap 2 dòng, trông
-    // rối; ở 768px (iPad Mini) vẫn dư ~440px cho content nên không cần ép hẹp sidebar.
-    <aside className="text-size-14 bg-white w-full md:w-auto md:min-w-65">
-      <div className="flex items-center h-22.5 sm:border-b border-neutral-EDEBE8 justify-between gap-3 pl-4 pt-4 pb-5 pr-4 md:pl-5 md:pt-5 md:pb-7 md:pr-0 lg:pl-6 lg:pt-6 lg:pb-9.25 mb-4">
+    // < lg: full-width, nav ngang; từ lg: sidebar 260px cạnh content.
+    <aside className="text-size-14 bg-white w-full lg:w-auto lg:min-w-65">
+      <div className="flex items-center h-22.5 sm:border-b border-neutral-EDEBE8 justify-between gap-3 pl-4 pt-4 pb-5 pr-4 lg:pl-6 lg:pt-6 lg:pb-9.25 lg:pr-0 mb-4">
         <div className="flex items-center gap-3">
           <div className="relative size-11 shrink-0 overflow-hidden rounded-full bg-muted">
             {user.avatarUrl ? (
@@ -99,57 +100,48 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           </div>
           <div>
             <p className="font-semibold text-size-14 text-brand-10">{user.fullName}</p>
-            {/* Hạng/điểm thành viên: chưa có API loyalty, hiện tạm placeholder tĩnh theo đúng
-                mockup thay vì bịa số liệu theo user thật. */}
+            {/* Placeholder — chưa có API loyalty. */}
             <p className="text-size-12 text-brand-38">Hạng Bạc · 1.240 điểm</p>
           </div>
         </div>
-        {/* Đăng xuất tách khỏi list điều hướng trên mobile — icon gọn ở góc card user, không
-            chiếm thêm 1 hàng trong thanh tab cuộn ngang bên dưới (khác ý nghĩa hành động so
-            với các mục điều hướng nên không hợp để xen vào giữa dãy tab). Từ tablet (md:)
-            vẫn nằm cuối <nav> như thiết kế gốc (ẩn icon này). */}
+        {/* < lg: nút đăng xuất là icon ở góc card user (không xen vào thanh tab ngang). */}
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
           onClick={() => setLogoutOpen(true)}
           aria-label="Đăng xuất"
-          className="shrink-0 text-muted-foreground md:hidden"
+          className="shrink-0 text-muted-foreground lg:hidden"
         >
           <LogOut className="size-4.5" />
         </Button>
       </div>
 
-      {/* Mobile: list dọc 7 mục + đăng xuất đẩy form xuống rất xa, phải cuộn mới thấy — thay
-          bằng 1 thanh tab cuộn NGANG ngay dưới card user, chỉ cao 1 hàng. Vuốt ngang để xem
-          hết mục, không cần thêm thao tác mở dialog/menu nào. Từ tablet (md:) trở lên vẫn
-          hiện nguyên <nav> dọc như cũ (ẩn thanh tab ngang này). */}
+      {/* < lg: nav dạng thanh tab cuộn ngang. */}
       <nav
         aria-label="Tài khoản"
-        className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 md:hidden"
+        className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 lg:hidden"
       >
         {ACCOUNT_NAV.map((item) => (
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && pathname === item.href)}
+            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
             variant="pill"
           />
         ))}
       </nav>
 
-      <nav className="hidden space-y-1 md:block" aria-label="Tài khoản">
+      <nav className="hidden space-y-1 lg:block" aria-label="Tài khoản">
         {ACCOUNT_NAV.map((item) => (
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && pathname === item.href)}
+            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
             variant="row"
           />
         ))}
-        {/* Cùng border-l-4 px-4 py-3 như các mục nav ở trên — để border-transparent "ăn" đúng
-            4px như hàng khác thì chữ "Đăng xuất" mới thẳng hàng, không bị lệch trái/khác
-            khoảng cách như trước (rounded-lg px-3 py-2 không khớp khung của các item kia). */}
+        {/* Cùng border-l-4 px-4 py-3 như các mục nav để chữ thẳng hàng. */}
         <button
           type="button"
           onClick={() => setLogoutOpen(true)}

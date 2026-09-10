@@ -111,7 +111,7 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
             Giỏ hàng
           </Link>
           <Link
-            href="/account"
+            href="/thong-tin-ca-nhan"
             onClick={close}
             className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-secondary"
           >

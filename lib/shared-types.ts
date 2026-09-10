@@ -205,7 +205,16 @@ export interface ProductDetail extends ProductListItem {
   relatedProducts: ProductListItem[];
 }
 
-export type OrderStatus = "PENDING" | "CONFIRMED" | "SHIPPING" | "COMPLETED" | "CANCELLED";
+// Khớp đúng 7 giá trị enum OrderStatus thật ở backend (trước đây thiếu PACKING/HANDED_OVER,
+// khiến FE không đại diện được toàn bộ luồng trạng thái đơn hàng thật).
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "PACKING"
+  | "HANDED_OVER"
+  | "SHIPPING"
+  | "COMPLETED"
+  | "CANCELLED";
 export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED" | "FAILED";
 export type CheckoutPaymentMethod = "COD" | "VNPAY" | "MOMO" | "STRIPE" | "BANK_TRANSFER";
 
@@ -227,6 +236,7 @@ export interface Order {
   orderCode: string;
   status: OrderStatus;
   totalAmount: number;
+  discountAmount: number;
   shippingAddress: string;
   paymentMethod: string;
   paymentStatus: PaymentStatus;

@@ -118,7 +118,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
           icon: User,
           isAvatar: true,
           avatarUrl: user.avatarUrl,
-          href: "/account",
+          href: "/thong-tin-ca-nhan",
         },
         { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => setLogoutOpen(true) },
       ]
