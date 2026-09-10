@@ -96,12 +96,11 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
-    // Mobile: full width (đang xếp chồng lên trên content, xem AccountLayout). Từ tablet
-    // (md:) trở lên dùng đúng min-w-65 (260px) như desktop — thử co hẹp còn ~224px trước
-    // đó khiến tên user/nhãn mục dài ("Điểm & hạng thành viên"...) bị wrap 2 dòng, trông
-    // rối; ở 768px (iPad Mini) vẫn dư ~440px cho content nên không cần ép hẹp sidebar.
-    <aside className="text-size-14 bg-white w-full md:w-auto md:min-w-65">
-      <div className="flex items-center h-22.5 sm:border-b border-neutral-EDEBE8 justify-between gap-3 pl-4 pt-4 pb-5 pr-4 md:pl-5 md:pt-5 md:pb-7 md:pr-0 lg:pl-6 lg:pt-6 lg:pb-9.25 mb-4">
+    // Mobile + tablet: full width, xếp chồng lên trên content (xem AccountLayout). Chỉ desktop
+    // (lg:) mới dùng min-w-65 (260px) nằm cạnh content — dưới lg màn không đủ rộng, sidebar
+    // 260px bóp content còn ~440px trông rất chật nên chuyển sang thanh nav ngang ở trên.
+    <aside className="text-size-14 bg-white w-full lg:w-auto lg:min-w-65">
+      <div className="flex items-center h-22.5 sm:border-b border-neutral-EDEBE8 justify-between gap-3 pl-4 pt-4 pb-5 pr-4 lg:pl-6 lg:pt-6 lg:pb-9.25 lg:pr-0 mb-4">
         <div className="flex items-center gap-3">
           <div className="relative size-11 shrink-0 overflow-hidden rounded-full bg-muted">
             {user.avatarUrl ? (
@@ -117,29 +116,28 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
             <p className="text-size-12 text-brand-38">Hạng Bạc · 1.240 điểm</p>
           </div>
         </div>
-        {/* Đăng xuất tách khỏi list điều hướng trên mobile — icon gọn ở góc card user, không
-            chiếm thêm 1 hàng trong thanh tab cuộn ngang bên dưới (khác ý nghĩa hành động so
-            với các mục điều hướng nên không hợp để xen vào giữa dãy tab). Từ tablet (md:)
-            vẫn nằm cuối <nav> như thiết kế gốc (ẩn icon này). */}
+        {/* Đăng xuất tách khỏi list điều hướng ở mobile/tablet — icon gọn ở góc card user,
+            không chiếm thêm 1 hàng trong thanh tab cuộn ngang bên dưới (khác ý nghĩa hành động
+            so với các mục điều hướng nên không hợp để xen vào giữa dãy tab). Từ desktop (lg:)
+            nằm cuối <nav> dọc như thiết kế gốc (ẩn icon này). */}
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
           onClick={() => setLogoutOpen(true)}
           aria-label="Đăng xuất"
-          className="shrink-0 text-muted-foreground md:hidden"
+          className="shrink-0 text-muted-foreground lg:hidden"
         >
           <LogOut className="size-4.5" />
         </Button>
       </div>
 
-      {/* Mobile: list dọc 7 mục + đăng xuất đẩy form xuống rất xa, phải cuộn mới thấy — thay
-          bằng 1 thanh tab cuộn NGANG ngay dưới card user, chỉ cao 1 hàng. Vuốt ngang để xem
-          hết mục, không cần thêm thao tác mở dialog/menu nào. Từ tablet (md:) trở lên vẫn
-          hiện nguyên <nav> dọc như cũ (ẩn thanh tab ngang này). */}
+      {/* Mobile + tablet: list dọc 7 mục + đăng xuất đẩy content xuống rất xa, phải cuộn mới
+          thấy — thay bằng 1 thanh tab cuộn NGANG ngay dưới card user, chỉ cao 1 hàng. Vuốt
+          ngang để xem hết mục. Từ desktop (lg:) hiện nguyên <nav> dọc (ẩn thanh ngang này). */}
       <nav
         aria-label="Tài khoản"
-        className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 md:hidden"
+        className="flex gap-2 overflow-x-auto border-y border-border px-4 py-3 lg:hidden"
       >
         {ACCOUNT_NAV.map((item) => (
           <AccountNavLink
@@ -151,7 +149,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         ))}
       </nav>
 
-      <nav className="hidden space-y-1 md:block" aria-label="Tài khoản">
+      <nav className="hidden space-y-1 lg:block" aria-label="Tài khoản">
         {ACCOUNT_NAV.map((item) => (
           <AccountNavLink
             key={item.href}

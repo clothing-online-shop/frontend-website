@@ -63,9 +63,17 @@
   --color-neutral-7F7973: var(--neutral-7F7973);
   --color-neutral-76706A: var(--neutral-76706A);
   --color-neutral-4C4741: var(--neutral-4C4741);
+  --color-neutral-D0CDCA: var(--neutral-D0CDCA);
   --color-neutral-E0DDDA: var(--neutral-E0DDDA);
   --color-neutral-EDEBE8: var(--neutral-EDEBE8);
+  --color-neutral-F1EEEB: var(--neutral-F1EEEB);
   --color-neutral-F6F2E7: var(--neutral-F6F2E7);
+  --color-order-progress-bg: var(--order-progress-bg);
+  --color-order-progress-fg: var(--order-progress-fg);
+  --color-order-done-bg: var(--order-done-bg);
+  --color-order-done-fg: var(--order-done-fg);
+  --color-order-cancel-bg: var(--order-cancel-bg);
+  --color-order-cancel-fg: var(--order-cancel-fg);
   --color-error-soft: var(--error-soft);
   --color-login-card-bg: var(--login-card-bg);
   --color-header-avatar-bg: var(--header-avatar-bg);
@@ -126,11 +134,22 @@
   --neutral-7F7973: #7F7973;
   --neutral-76706A: #76706A;
   --neutral-4C4741: #4C4741;
+  --neutral-D0CDCA: #D0CDCA;
   --neutral-E0DDDA: #E0DDDA;
   --neutral-EDEBE8: #EDEBE8;
+  --neutral-F1EEEB: #F1EEEB;
   --neutral-F6F2E7: #F6F2E7;
   --error-soft: #FFF0EE;
   --login-card-bg: #E4EBE6;
+  /* Badge trạng thái đơn hàng ở trang "Đơn hàng của tôi" — gộp 7 OrderStatus thành 3 nhóm
+     màu: đang xử lý (nâu nhạt, PENDING→SHIPPING), hoàn thành (xanh), đã hủy (đỏ). Xem
+     ORDER_STATUS_BADGE_CLASS trong lib/orderStatus.ts. */
+  --order-progress-bg: #EFE8E1;
+  --order-progress-fg: #784900;
+  --order-done-bg: #E4EBE6;
+  --order-done-fg: #23643F;
+  --order-cancel-bg: #F6E7E6;
+  --order-cancel-fg: #A03F3C;
   /* Khung avatar "Tài khoản" ở Header (Figma: 18x18, bo tròn, nền + viền riêng, không thuộc
      palette brand/neutral chung — chỉ dùng cho đúng chỗ này). */
   --header-avatar-bg: #DAE2FD;

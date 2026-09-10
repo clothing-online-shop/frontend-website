@@ -48,16 +48,18 @@ export function OrdersPageClient() {
         Đơn hàng của tôi
       </h1>
 
-      <div className="mt-5 flex gap-1 border-b border-[#EDEBE8]">
+      {/* Mobile/tablet: 6 tab không đủ chỗ trên 1 hàng — cho cuộn ngang (overflow-x-auto +
+          shrink-0 + whitespace-nowrap), không wrap xuống nhiều dòng làm vỡ đường gạch chân. */}
+      <div className="mt-5 flex gap-1 overflow-x-auto border-b border-neutral-EDEBE8">
         {ORDER_LIST_TABS.map((t) => (
           <p
             key={t.key}
             onClick={() => setActiveTab(t.key)}
             className={cn(
-              "cursor-pointer py-2.5 px-4 text-size-13 font-semibold border-b-2",
+              "shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-3 py-2.5 text-size-13 font-semibold sm:px-4",
               t.key === activeTab
-                ? "text-[#1E1A15] border-[#8B5339]"
-                : "text-[#76706A] border-transparent",
+                ? "border-brand-38 text-brand-10"
+                : "border-transparent text-neutral-76706A",
             )}
           >
             {t.label}
@@ -76,7 +78,7 @@ export function OrdersPageClient() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full" />)}
           </div>
         ) : orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center border border-dashed border-neutral-E0DDDA py-24 text-center">
+          <div className="flex flex-col items-center justify-center border border-dashed border-neutral-E0DDDA py-16 text-center sm:py-24">
             <p className="text-neutral-68625C">Chưa có đơn hàng nào ở mục này.</p>
           </div>
         ) : (
@@ -88,7 +90,7 @@ export function OrdersPageClient() {
         <div className="mt-6 flex justify-center">
           <Button
             variant="outline"
-            className="w-[225px] border-[1.5px] border-brand-10 bg-white p-6 text-size-14 font-semibold text-brand-10"
+            className="w-full border-[1.5px] border-brand-10 bg-white p-6 text-size-14 font-semibold text-brand-10 sm:w-56.25"
             onClick={() => ordersQuery.fetchNextPage()}
             disabled={ordersQuery.isFetchingNextPage}
           >

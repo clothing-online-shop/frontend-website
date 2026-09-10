@@ -16,17 +16,22 @@ export function AccountLayout({ children }: { children: (user: AuthUser) => Reac
   if (!ready || !user) return null;
 
   return (
-    // Mobile: p-4, cột sidebar+content xếp chồng dọc (flex-col). Tablet (md:) đã đủ rộng
-    // để 2 cột nằm cạnh nhau như desktop, chỉ nới lỏng padding/gap ít hơn. Desktop (lg:)
-    // giữ đúng p-8/gap-9 như thiết kế gốc, không đổi.
+    // Mobile + tablet: cột nav + content xếp chồng dọc, content full-width. Chỉ desktop (lg:
+    // >= 1024px) mới đủ rộng để sidebar 260px nằm cạnh content mà không bóp content quá hẹp
+    // — dưới lg, sidebar biến thành thanh nav ngang ở trên (xem AccountSidebar).
     <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
-      {/* items-start (từ md:) — mặc định flex kéo dài các cột theo cột cao nhất (align-items:
+      {/* lg:items-start — mặc định flex kéo dài các cột theo cột cao nhất (align-items:
           stretch), khiến khung sidebar dài lê thê theo content bên phải mỗi khi nội dung
           nhiều (vd danh sách đơn hàng). items-start giữ sidebar đúng chiều cao nội dung thật
           của nó, không bị kéo giãn theo cột kia. */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-5 lg:gap-9">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-9">
         <AccountSidebar user={user} />
-        <div className="bg-white w-full py-5 px-4 md:py-6 md:px-6 lg:py-8 lg:px-9">{children(user)}</div>
+        {/* min-w-0: BẮT BUỘC cho flex child — mặc định flex item có min-width:auto, không co
+            được nhỏ hơn nội dung "cứng" bên trong (tab whitespace-nowrap, badge/giá shrink-0
+            ở trang đơn hàng). Thiếu nó thì content không chịu co theo cột, tràn ra ngoài. */}
+        <div className="min-w-0 w-full bg-white py-5 px-4 md:py-6 md:px-6 lg:py-8 lg:px-9">
+          {children(user)}
+        </div>
       </div>
     </div>
   );
