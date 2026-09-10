@@ -10,7 +10,7 @@ export function EmptyCartState() {
       <p className="mt-1 text-sm text-muted-foreground">
         Hãy khám phá thêm sản phẩm và thêm vào giỏ hàng nhé.
       </p>
-      <Button variant="dark" className="mt-6" nativeButton={false} render={<Link href="/san-pham" />}>
+      <Button variant="dark" className="p-6 bg-primary mt-6" nativeButton={false} render={<Link href="/san-pham" />}>
         Tiếp tục mua sắm
       </Button>
     </div>
