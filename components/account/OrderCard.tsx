@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Order } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatPrice } from "@/lib/format";
 import { getErrorMessage } from "@/lib/error";
 import { addCartItem } from "@/lib/cart-api";
+import { CART_QUERY_KEY } from "@/hooks/useCart";
 import { isOrderCancellable } from "@/lib/orderStatus";
 import { OrderStatusBadge } from "@/components/account/OrderStatusBadge";
 
@@ -24,17 +25,22 @@ export function OrderCard({
   order: Order;
   onCancelClick: (order: Order) => void;
 }) {
+  const queryClient = useQueryClient();
+
   // "Mua lại": thêm lại từng dòng vào giỏ, bỏ qua dòng lỗi (hết hàng / ngừng bán) và báo
   // tổng kết thay vì fail/succeed toàn bộ.
   const reorderMutation = useMutation({
     mutationFn: async () => {
       const results = await Promise.allSettled(
-        order.items.map((item) => addCartItem(item.productVariantId, item.quantity)),
+        order.items.map((item) =>
+          addCartItem({ productVariantId: item.productVariantId, quantity: item.quantity }),
+        ),
       );
       const succeeded = results.filter((r) => r.status === "fulfilled").length;
       return { succeeded, total: order.items.length };
     },
     onSuccess: ({ succeeded, total }) => {
+      if (succeeded > 0) queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
       if (succeeded === total) {
         toast.success(`Đã thêm ${succeeded} sản phẩm vào giỏ hàng.`);
       } else if (succeeded > 0) {
