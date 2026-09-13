@@ -29,8 +29,7 @@ export function SizeGuideDialog() {
       >
         Hướng dẫn chọn size
       </DialogTrigger>
-      {/* p-5 (thay p-4 mặc định) — bảng 4 cột hơi rộng, mobile thấy nội dung sát viền card. */}
-      <DialogContent className="max-w-125 p-5 sm:p-4">
+      <DialogContent className="max-w-[calc(100%-3rem)] sm:max-w-125">
         <DialogHeader>
           <DialogTitle>Hướng dẫn chọn size</DialogTitle>
         </DialogHeader>
