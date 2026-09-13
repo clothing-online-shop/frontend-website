@@ -79,7 +79,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             alt={name}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover transition-transform duration-200 ease-out"
+            className="object-cover transition-transform duration-200 ease-out select-none"
             style={
               isZoomed
                 ? {
@@ -88,6 +88,12 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
                   }
                 : undefined
             }
+            // <img> mặc định draggable=true — giữ chuột trái rồi rê (để pan lúc đang zoom) bị
+            // trình duyệt hiểu thành "kéo-thả ảnh ra ngoài" (native drag), cướp mất mousemove
+            // nên handleZoomMouseMove() không chạy, ảnh đứng yên dù vẫn đang giữ chuột kéo.
+            // Tắt hẳn native drag để mousemove luôn thuộc về logic pan của component.
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
             priority
           />
           <span className="absolute top-3 right-3 flex items-center gap-1 rounded-sm bg-background/90 px-2 py-1 text-xs font-medium text-foreground">
