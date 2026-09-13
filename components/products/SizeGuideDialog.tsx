@@ -18,7 +18,7 @@ const SIZE_GUIDE_ROWS = [
 
 export function SizeGuideDialog() {
   return (
-    <Dialog>
+    <Dialog >
       <DialogTrigger
         render={
           <button
@@ -29,7 +29,8 @@ export function SizeGuideDialog() {
       >
         Hướng dẫn chọn size
       </DialogTrigger>
-      <DialogContent className="max-w-[500px]">
+      {/* p-5 (thay p-4 mặc định) — bảng 4 cột hơi rộng, mobile thấy nội dung sát viền card. */}
+      <DialogContent className="max-w-125 p-5 sm:p-4">
         <DialogHeader>
           <DialogTitle>Hướng dẫn chọn size</DialogTitle>
         </DialogHeader>
