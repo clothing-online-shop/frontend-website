@@ -104,7 +104,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const heroTitle = activeCategory ? activeCategory.name : "Tất cả sản phẩm";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
       <ProductsBreadcrumb
         categories={categoriesQuery.data ?? []}
         activeCategory={activeCategory}
@@ -112,7 +112,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
       />
       {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
 
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-[270px_1fr]">
+      <div className="grid grid-cols-1 sm:gap-4 lg:gap-10 md:grid-cols-[270px_1fr]">
         <ProductFilters
           categories={categoriesQuery.data ?? []}
           activeCategorySlug={category}
@@ -122,9 +122,9 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
 
         <div>
           {search ? (
-            <div className="mb-8">
+            <div className="mb-4 lg:mb-8">
               <div className="flex items-start justify-between gap-3">
-                <h1 className="font-heading text-size-28 font-normal text-brand-10 sm:text-size-32">
+                <h1 className="font-heading text-size-20 lg:text-size-28 font-normal text-brand-10 sm:text-size-32">
                   {`Kết quả cho "${search}"`}
                 </h1>
                 <Button
@@ -144,7 +144,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
           ) : null}
 
           {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
-            <div className="mb-8">
+            <div className="mb-4 lg:mb-8">
               <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
               <div className="flex flex-wrap gap-2">
                 {recentSearchesQuery.data.map((keyword) => (
