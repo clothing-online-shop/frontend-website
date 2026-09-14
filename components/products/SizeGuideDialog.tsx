@@ -18,7 +18,7 @@ const SIZE_GUIDE_ROWS = [
 
 export function SizeGuideDialog() {
   return (
-    <Dialog>
+    <Dialog >
       <DialogTrigger
         render={
           <button
@@ -29,27 +29,27 @@ export function SizeGuideDialog() {
       >
         Hướng dẫn chọn size
       </DialogTrigger>
-      <DialogContent className="max-w-[500px]">
+      <DialogContent className="max-w-[calc(100%-3rem)] sm:max-w-125">
         <DialogHeader>
           <DialogTitle>Hướng dẫn chọn size</DialogTitle>
         </DialogHeader>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-center text-sm">
             <thead>
               <tr className="border-b border-border text-muted-foreground">
-                <th className="py-2 pr-2 font-medium">Size</th>
-                <th className="py-2 pr-2 font-medium">Ngực (cm)</th>
-                <th className="py-2 pr-2 font-medium">Eo (cm)</th>
-                <th className="py-2 font-medium">Dài áo (cm)</th>
+                <th className="px-2 py-2 font-medium">Size</th>
+                <th className="px-2 py-2 font-medium">Ngực (cm)</th>
+                <th className="px-2 py-2 font-medium">Eo (cm)</th>
+                <th className="px-2 py-2 font-medium">Dài áo (cm)</th>
               </tr>
             </thead>
             <tbody>
               {SIZE_GUIDE_ROWS.map((row) => (
                 <tr key={row.size} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-2 font-medium">{row.size}</td>
-                  <td className="py-2 pr-2">{row.chest}</td>
-                  <td className="py-2 pr-2">{row.waist}</td>
-                  <td className="py-2">{row.length}</td>
+                  <td className="px-2 py-2 font-medium">{row.size}</td>
+                  <td className="px-2 py-2">{row.chest}</td>
+                  <td className="px-2 py-2">{row.waist}</td>
+                  <td className="px-2 py-2">{row.length}</td>
                 </tr>
               ))}
             </tbody>

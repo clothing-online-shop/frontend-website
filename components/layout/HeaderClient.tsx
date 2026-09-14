@@ -140,14 +140,27 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
 
   return (
     <header className={cn("sticky top-0 z-50 bg-background-header transition-shadow", scrolled && "shadow-md")}>
-      <div className="mx-auto flex h-20 max-w-6xl items-center gap-3 px-4">
+      {/* Mobile: h-14, logo rút cỡ (text-size-20) — bản gốc dùng nguyên logo + 4 icon-có-nhãn
+          cỡ desktop, không đủ chỗ nên logo bị đẩy xuống dòng 2 (vỡ layout). Chỉ giữ icon Giỏ
+          hàng ở hàng đầu (thao tác nhanh mua hàng cần thấy ngay); Thông báo/Tài khoản/Đăng
+          xuất dồn vào drawer MobileNav — xem component đó. */}
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-20 md:gap-3">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-foreground" />
+        <Logo className="shrink-0 text-size-20 text-foreground md:text-size-30" />
 
         <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
 
-        <div className="ml-auto flex items-center gap-1">
+        <Link
+          href="/cart"
+          aria-label="Giỏ hàng"
+          className="relative ml-auto flex items-center justify-center rounded-md p-2 text-foreground/70 hover:text-foreground md:hidden"
+        >
+          <ShoppingBag className="size-5" />
+          {cart.itemCount > 0 && <CountBadge count={cart.itemCount} />}
+        </Link>
+
+        <div className="hidden items-center gap-1 md:ml-auto md:flex">
           {actionItems.map(({ key, ...item }) => (
             <HeaderActionItem key={key} {...item} />
           ))}

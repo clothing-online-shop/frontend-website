@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Menu, ShoppingBag, User } from "lucide-react";
+import { Bell, ChevronDown, ChevronRight, LogOut, Menu, ShoppingBag, UserRound } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuthStore } from "@/store/auth-store";
+import { useCart } from "@/hooks/useCart";
+import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 
 function CategoryThumb({ category }: { category: CategoryNode }) {
   return (
@@ -74,6 +77,9 @@ function MobileCategoryNode({
 
 export function MobileNav({ categories }: { categories: CategoryNode[] }) {
   const [open, setOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const cart = useCart();
 
   function close() {
     setOpen(false);
@@ -82,15 +88,80 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        render={<Button variant="ghost" size="icon" className="md:hidden" aria-label="Mở menu danh mục" />}
+        render={<Button variant="ghost" size="icon" className="md:hidden" aria-label="Mở menu" />}
       >
         <Menu className="size-5" />
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Danh mục</SheetTitle>
+          <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <nav className="flex flex-col gap-1 px-2 pb-4">
+
+        {/* Icon Thông báo/Tài khoản/Đăng xuất bị bỏ khỏi hàng đầu header ở mobile (không đủ
+            chỗ cạnh logo + hamburger) — dồn hết vào đây, đầu drawer, thay vì mất luôn. */}
+        {user ? (
+          <Link
+            href="/thong-tin-ca-nhan"
+            onClick={close}
+            className="mx-2 mb-2 flex items-center gap-3 rounded-md px-2 py-3 hover:bg-secondary"
+          >
+            <span className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-header-avatar-border bg-header-avatar-bg">
+              {user.avatarUrl ? (
+                <Image src={user.avatarUrl} alt="" fill sizes="40px" className="object-cover" />
+              ) : (
+                <UserRound className="size-5" />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">{user.fullName}</span>
+              <span className="text-xs text-muted-foreground">Xem tài khoản</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+          </Link>
+        ) : (
+          <Link
+            href="/login"
+            onClick={close}
+            className="mx-2 mb-2 block rounded-md bg-primary px-2 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+          >
+            Đăng nhập / Đăng ký
+          </Link>
+        )}
+
+        <nav className="flex flex-col gap-1 px-2" aria-label="Tài khoản">
+          <Link
+            href="/cart"
+            onClick={close}
+            className="flex items-center gap-3 rounded-md px-2 py-2 text-sm hover:bg-secondary"
+          >
+            <ShoppingBag className="size-4" />
+            <span className="flex-1">Giỏ hàng</span>
+            {cart.itemCount > 0 ? (
+              <span className="text-xs text-muted-foreground">{cart.itemCount}</span>
+            ) : null}
+          </Link>
+          <button
+            type="button"
+            className="flex items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-secondary"
+          >
+            <Bell className="size-4" />
+            Thông báo
+          </button>
+          {user ? (
+            <button
+              type="button"
+              onClick={() => setLogoutOpen(true)}
+              className="flex items-center gap-3 rounded-md px-2 py-2 text-left text-sm text-destructive hover:bg-destructive/10"
+            >
+              <LogOut className="size-4" />
+              Đăng xuất
+            </button>
+          ) : null}
+        </nav>
+
+        <div className="my-3 border-t border-border" />
+
+        <nav className="flex flex-col gap-1 px-2 pb-4" aria-label="Danh mục">
           <Link
             href="/san-pham"
             onClick={close}
@@ -101,25 +172,10 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
           {categories.map((category) => (
             <MobileCategoryNode key={category.id} category={category} onNavigate={close} />
           ))}
-          <div className="my-2 border-t border-border" />
-          <Link
-            href="/cart"
-            onClick={close}
-            className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-secondary"
-          >
-            <ShoppingBag className="size-4" />
-            Giỏ hàng
-          </Link>
-          <Link
-            href="/thong-tin-ca-nhan"
-            onClick={close}
-            className="flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-secondary"
-          >
-            <User className="size-4" />
-            Tài khoản
-          </Link>
         </nav>
       </SheetContent>
+
+      <LogoutConfirmDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </Sheet>
   );
 }
