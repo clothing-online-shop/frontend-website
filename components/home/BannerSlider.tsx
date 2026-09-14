@@ -65,7 +65,7 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
                 {/* Scrim tối phía dưới ảnh để chữ đè lên luôn đọc được kể cả trên ảnh sáng màu. */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                <div className="absolute left-[13%] top-1/2 -translate-y-1/2 inset-0 flex flex-col items-start justify-end gap-2 bg-white p-6 sm:max-w-md sm:gap-3 sm:p-10 lg:p-14 h-[400px]">
+                <div className="absolute left-[13%] top-1/2 -translate-y-1/2 inset-0 flex flex-col items-start justify-center gap-2 bg-white p-6 sm:max-w-md sm:gap-3 sm:p-10 lg:p-14 h-[400px]">
                   {banner.eyebrow && (
                     <p className="text-xs font-semibold tracking-wide text-brand-38 uppercase">{banner.eyebrow}</p>
                   )}

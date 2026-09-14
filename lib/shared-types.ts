@@ -311,6 +311,7 @@ export interface ActiveFlashSaleProduct {
   basePrice: number;
   salePrice: number;
   soldPercent: number;
+  soldCount: number;
   colors: string[];
 }
 

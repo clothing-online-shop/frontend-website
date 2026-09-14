@@ -11,7 +11,7 @@ export function PromoBar({ promo }: { promo: ActivePromoBar | null }) {
   return (
     <Link
       href={promo.linkUrl}
-      className="block bg-primary px-4 py-3 text-center text-size-15 leading-none text-primary-foreground"
+      className="font-heading block bg-primary px-4 py-3 text-center text-size-15 leading-none text-primary-foreground"
     >
       <span className="text-size-19 leading-none font-normal tracking-[0.76px] uppercase">
         {promo.label}
