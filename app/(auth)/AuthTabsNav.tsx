@@ -6,10 +6,8 @@ import { cn } from "@/lib/utils";
 
 const AUTH_TABS = [
   { label: "Đăng nhập", href: "/login", disabled: false },
-  // Chưa có mockup thiết kế — khoá click cho tới khi có UI sprint sau
-  { label: "Đăng ký", href: "/register", disabled: true },
-  { label: "OTP", href: "/verify-otp", disabled: true },
-  { label: "Quên mật khẩu", href: "/forgot-password", disabled: true },
+  { label: "Đăng ký", href: "/register", disabled: false },
+  { label: "Quên mật khẩu", href: "/forgot-password", disabled: false },
 ] as const;
 
 export function AuthTabsNav() {
@@ -17,7 +15,7 @@ export function AuthTabsNav() {
 
   return (
     <nav
-      className="mb-6.5 flex flex-wrap gap-3 border-b border-border sm:gap-4"
+      className="mb-6.5 flex flex-wrap border-b border-border justify-between"
       aria-label="Xác thực"
     >
       {AUTH_TABS.map(({ label, href, disabled }) => {
@@ -28,7 +26,7 @@ export function AuthTabsNav() {
             <span
               key={href}
               aria-disabled="true"
-              className="cursor-not-allowed border-b-2 border-transparent pb-3 text-size-14 font-semibold text-neutral-76706A transition-colors select-none"
+              className="cursor-not-allowed border-b-2 border-transparent pb-3 text-size-14 font-semibold text-neutral-76706A transition-colors select-none px-5.5"
             >
               {label}
             </span>
@@ -41,7 +39,7 @@ export function AuthTabsNav() {
             href={href}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "border-b-2 pb-3 text-size-14 font-semibold transition-colors",
+              "border-b-2 px-5.5 pb-3 text-size-14 font-semibold transition-colors",
               isActive
                 ? "border-brand-10 text-brand-10"
                 : "border-transparent text-neutral-76706A hover:text-brand-10",

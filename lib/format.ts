@@ -23,10 +23,3 @@ export function formatDayMonth(value: string | Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   return `${day}/${month}`;
 }
-
-// Che bớt SĐT lúc chưa bấm "Đổi" — giữ nguyên 4 số đầu + 2 số cuối, phần giữa thay bằng
-// "••••" bất kể còn lại bao nhiêu số, đúng kiểu hiển thị trong mockup.
-export function maskPhone(phone: string): string {
-  if (!phone || phone.length <= 6) return phone;
-  return `${phone.slice(0, 4)} •••• ${phone.slice(-2)}`;
-}

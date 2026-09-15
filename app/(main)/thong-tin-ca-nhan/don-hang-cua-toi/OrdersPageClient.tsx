@@ -4,7 +4,8 @@ import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import type { Order } from "@/lib/shared-types";
-import { listMyOrders } from "@/lib/orders-api";
+// import { listMyOrders } from "@/lib/orders-api";
+import { listMyOrdersMock } from "@/lib/orders-mock";
 import { ORDER_LIST_TABS } from "@/lib/orderStatus";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,7 +40,10 @@ export function OrdersPageClient() {
   const ordersQuery = useInfiniteQuery({
     queryKey: ["my-orders", tab.key],
     queryFn: ({ pageParam }) =>
-      listMyOrders({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT }),
+      // Chưa có luồng tạo đơn hàng thật để có dữ liệu test — dùng mock (lib/orders-mock.ts)
+      // thay cho API thật. Đổi lại dòng dưới khi có đơn hàng thật để hiển thị:
+      // listMyOrders({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT }),
+      Promise.resolve(listMyOrdersMock({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT })),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
