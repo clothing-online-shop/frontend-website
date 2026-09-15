@@ -53,19 +53,11 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
         <CarouselContent className="ml-0">
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="basis-full pl-0">
-              <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-3/1">
-                <Image
-                  src={banner.imageUrl}
-                  alt=""
-                  fill
-                  priority={index === 0}
-                  sizes="100vw"
-                  className="object-cover"
-                />
-                {/* Scrim tối phía dưới ảnh để chữ đè lên luôn đọc được kể cả trên ảnh sáng màu. */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-                <div className="absolute left-[13%] top-1/2 -translate-y-1/2 inset-0 flex flex-col items-start justify-center gap-2 bg-white p-6 sm:max-w-md sm:gap-3 sm:p-10 lg:p-14 h-[400px]">
+              {/* 2 cột đứng cạnh nhau (không còn chữ đè lên ảnh kiểu absolute nữa) — trái 40%
+                  nền trắng chứa chữ/nút, phải 60% là ảnh banner, cùng chiều cao (lg:h-full ở
+                  cột ảnh ăn theo chiều cao cột chữ, xem lg:items-stretch trên container). */}
+              <div className="flex flex-col lg:h-[600px] lg:flex-row lg:items-stretch">
+                <div className="flex flex-col items-start justify-center gap-2 bg-white p-6 sm:gap-3 sm:p-10 lg:w-[40%] lg:shrink-0 lg:p-14">
                   {banner.eyebrow && (
                     <p className="text-xs font-semibold tracking-wide text-brand-38 uppercase">{banner.eyebrow}</p>
                   )}
@@ -101,6 +93,34 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
                       )}
                     </div>
                   )}
+
+                  {/* Dot phân trang đặt ngay dưới nút, trong cột chữ — nền giờ là trắng (không
+                      còn đè lên ảnh) nên đổi màu dot sang tối thay vì trắng như bản cũ. */}
+                  <div className="mt-4 flex items-center gap-2">
+                    {banners.map((dotBanner, dotIndex) => (
+                      <button
+                        key={dotBanner.id}
+                        type="button"
+                        aria-label={`Xem banner ${dotIndex + 1}`}
+                        onClick={() => api?.scrollTo(dotIndex)}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all",
+                          dotIndex === selectedIndex ? "w-6 bg-brand-10" : "w-1.5 bg-brand-10/25",
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-auto lg:h-full lg:flex-1">
+                  <Image
+                    src={banner.imageUrl}
+                    alt=""
+                    fill
+                    priority={index === 0}
+                    sizes="(min-width: 1024px) 60vw, 100vw"
+                    className="object-cover"
+                  />
                 </div>
               </div>
             </CarouselItem>
@@ -109,21 +129,6 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
         <CarouselPrevious className="left-4" />
         <CarouselNext className="right-4" />
       </Carousel>
-
-      <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-2">
-        {banners.map((banner, index) => (
-          <button
-            key={banner.id}
-            type="button"
-            aria-label={`Xem banner ${index + 1}`}
-            onClick={() => api?.scrollTo(index)}
-            className={cn(
-              "h-1.5 rounded-full transition-all",
-              index === selectedIndex ? "w-6 bg-white" : "w-1.5 bg-white/50",
-            )}
-          />
-        ))}
-      </div>
     </div>
   );
 }

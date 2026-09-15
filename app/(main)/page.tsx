@@ -5,6 +5,7 @@ import { getActivePopup } from "@/lib/popups-api";
 import { getActiveFlashSale } from "@/lib/flash-sales-api";
 import { getLatestBlogPosts } from "@/lib/blog-api";
 import { BannerSlider } from "@/components/home/BannerSlider";
+import { ServiceHighlights } from "@/components/home/ServiceHighlights";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { FlashSaleSection } from "@/components/home/FlashSaleSection";
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
@@ -28,6 +29,7 @@ export default async function HomePage() {
   return (
     <div>
       <BannerSlider banners={banners} />
+      <ServiceHighlights />
       <FeaturedCategories categories={categories} />
       <FlashSaleSection flashSale={flashSale} />
       <FeaturedProducts products={featuredProducts} />

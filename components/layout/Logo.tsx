@@ -1,16 +1,33 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-// Chữ ký thương hiệu dạng chữ trơn (font-heading = Lora, serif) — không tự set màu chữ ở
-// đây (không có class text-*) để nơi gọi tự quyết theo nền của chính nó: header nền sáng
-// dùng text-foreground (chữ tối), footer nền tối dùng text-background (chữ sáng) — xem
-// Header/Footer.tsx.
-export function Logo({ className }: { className?: string }) {
+// 2 file riêng vì chữ trong ảnh có màu cố định, không tự đổi theo text-*/nền như bản chữ
+// "Phương Phương" cũ — "default" (chữ nâu đậm) dùng cho nền sáng (Header, trang login),
+// "footer" (chữ sáng) dành riêng cho nền tối của Footer.
+const LOGO_VARIANTS = {
+  default: { src: "/image/logo.png", width: 209, height: 50 },
+  footer: { src: "/image/logo-footer.png", width: 327, height: 47 },
+} as const;
+
+export function Logo({
+  className,
+  variant = "default",
+}: {
+  className?: string;
+  variant?: keyof typeof LOGO_VARIANTS;
+}) {
+  const { src, width, height } = LOGO_VARIANTS[variant];
   return (
     <Link href="/" className="inline-block">
-      <span className={cn("font-heading text-size-30 tracking-tight", className)}>
-         <span className="font-normal italic">Phương Phương</span>
-      </span>
+      <Image
+        src={src}
+        alt="Phương Phương"
+        width={width}
+        height={height}
+        priority
+        className={cn("h-8 w-auto", className)}
+      />
     </Link>
   );
 }

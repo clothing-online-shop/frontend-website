@@ -147,7 +147,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-20 md:gap-3">
         <MobileNav categories={categories} />
 
-        <Logo className="shrink-0 text-size-20 text-foreground md:text-size-30" />
+        <Logo className="h-7 shrink-0 md:h-[50px]" />
 
         <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
 
@@ -171,7 +171,11 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
         <SearchBar />
       </div>
 
-      <div className="hidden bg-brand-9 md:block">
+      {/* relative — làm điểm neo absolute cho panel mega menu (xem MegaMenu.tsx), div này đã
+          rộng full width sẵn (không bọc max-w-6xl) nên panel neo vào đây luôn đúng full màn
+          hình mà không cần biết trước chiều cao PromoBar/header (khác cách tính top cố định
+          bằng px trước đây, sai lúc PromoBar còn hiện chưa cuộn qua). */}
+      <div className="relative hidden bg-brand-9 md:block">
         <div className="mx-auto max-w-6xl px-4">
           <MegaMenu categories={categories} />
         </div>

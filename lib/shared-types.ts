@@ -83,6 +83,14 @@ export interface CategoryNode {
   // Tổng số sản phẩm ACTIVE của danh mục này cộng dồn cả nhánh con (xem
   // backend-user/src/modules/categories/categories.service.ts).
   productCount: number;
+  // Đánh dấu hiện trong mục "Hàng mới về"/"Sale corner" ở mega menu của danh mục gốc chứa nó
+  // (chỉ có ý nghĩa với danh mục cấp 2/3) — xem MegaMenu.tsx.
+  showInNewArrivals: boolean;
+  showInSaleCorner: boolean;
+  // 2 ảnh "look" bookend 2 đầu mega menu — chỉ có ý nghĩa với danh mục GỐC (parentId null),
+  // chỉ để xem, không điều hướng — xem MegaMenu.tsx.
+  megaMenuLeftImageUrl: string | null;
+  megaMenuRightImageUrl: string | null;
   createdAt: string;
   updatedAt: string;
   children: CategoryNode[];
