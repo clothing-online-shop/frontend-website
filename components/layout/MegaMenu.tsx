@@ -59,7 +59,7 @@ function collectFlaggedDescendants(
 // category.megaMenuLeftImageUrl/megaMenuRightImageUrl (CMS, chỉ có ở danh mục gốc).
 function MegaMenuLookImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden bg-secondary">
+    <div className="relative aspect-3/4 w-50 shrink-0 overflow-hidden bg-secondary">
       <Image src={src} alt={alt} fill sizes="160px" className="object-cover" />
     </div>
   );
