@@ -53,7 +53,7 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
         <CarouselContent className="ml-0">
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="basis-full pl-0">
-              <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-3/1">
+              <div className="relative aspect-4/5 w-full overflow-hidden sm:aspect-16/9 lg:aspect-auto lg:h-[420px]">
                 <Image
                   src={banner.imageUrl}
                   alt=""
