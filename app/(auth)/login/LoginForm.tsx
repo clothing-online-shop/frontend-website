@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,6 +56,18 @@ export function LoginForm() {
   function clearErrorOnEdit() {
     if (mutation.isError) mutation.reset();
   }
+
+  // Box lỗi tự biến mất sau 5s dù người dùng không gõ lại/submit — tránh treo mãi trên màn
+  // hình nếu họ chỉ đọc lỗi rồi để yên form đó.
+  useEffect(() => {
+    if (!mutation.isError) return;
+    const timer = setTimeout(() => mutation.reset(), 5000);
+    return () => clearTimeout(timer);
+    // mutation.reset là hàm ổn định (TanStack Query v5) — không dùng cả object `mutation`
+    // làm dep vì nó là snapshot mới mỗi render, sẽ khiến effect chạy lại liên tục và không
+    // bao giờ đủ 5s để tự clear.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mutation.isError, mutation.reset]);
 
   const onValid = (values: LoginFormValues) => {
     mutation.mutate(
