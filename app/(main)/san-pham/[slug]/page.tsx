@@ -1,15 +1,12 @@
 import { Fragment } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { isAxiosError } from "axios";
 import { getProductBySlug, getProducts } from "@/lib/products-api";
 import { formatPrice } from "@/lib/format";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductGallery } from "@/components/products/ProductGallery";
-import { ProductInfoHeader } from "@/components/products/ProductInfoHeader";
-import { ProductVariantPicker } from "@/components/products/ProductVariantPicker";
-import { ProductPolicyInfo } from "@/components/products/ProductPolicyInfo";
+import { ProductPurchasePanel } from "@/components/products/ProductPurchasePanel";
 import { ProductTabs } from "@/components/products/ProductTabs";
 import { ReviewSection } from "@/components/products/reviews/ReviewSection";
 import { RecentlyViewedSection } from "@/components/products/RecentlyViewedSection";
@@ -145,16 +142,11 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <ProductGallery images={images} name={product.name} />
 
         <div>
-          <ProductInfoHeader product={product} />
-          <div className="mt-6">
-            <ProductVariantPicker product={product} initialColor={initialColor} />
-          </div>
-
-          <ProductPolicyInfo />
+          <ProductPurchasePanel product={product} initialColor={initialColor} />
           <ProductTabs product={product} />
         </div>
       </div>

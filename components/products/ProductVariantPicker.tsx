@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Copy } from "lucide-react";
-import type { ProductDetail } from "@/lib/shared-types";
+import type { ProductDetail, ProductVariant } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
@@ -18,22 +18,25 @@ import { WishlistButton } from "@/components/products/WishlistButton";
 
 export function ProductVariantPicker({
   product,
-  initialColor,
+  sizes,
+  colors,
+  selectedSize,
+  selectedColor,
+  selectedVariant,
+  onSelectSize,
+  onSelectColor,
 }: {
   product: ProductDetail;
-  initialColor?: string;
+  sizes: string[];
+  colors: string[];
+  selectedSize: string | null;
+  selectedColor: string | null;
+  selectedVariant: ProductVariant | null;
+  onSelectSize: (size: string) => void;
+  onSelectColor: (color: string) => void;
 }) {
   const router = useRouter();
   const cart = useCart();
-
-  const sizes = useMemo(
-    () => Array.from(new Set(product.variants.map((v) => v.size))),
-    [product],
-  );
-  const colors = useMemo(
-    () => Array.from(new Set(product.variants.map((v) => v.color))),
-    [product],
-  );
 
   const { data: colorsData } = useQuery({ queryKey: ["colors"], queryFn: getColors });
   const colorHexMap = useMemo(() => {
@@ -42,16 +45,8 @@ export function ProductVariantPicker({
     return map;
   }, [colorsData]);
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(
-    (initialColor && colors.includes(initialColor) ? initialColor : colors[0]) ?? null,
-  );
   const [skuCopied, setSkuCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
-  const selectedVariant =
-    product.variants.find((v) => v.size === selectedSize && v.color === selectedColor) ??
-    null;
 
   function isSizeAvailable(size: string): boolean {
     return product.variants.some(
@@ -107,21 +102,6 @@ export function ProductVariantPicker({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        {selectedVariant ? (
-          <button
-            type="button"
-            onClick={handleCopySku}
-            className="flex items-center gap-1.5 transition-colors hover:text-foreground"
-          >
-            <span>
-              SKU: <span className="font-medium text-foreground">{selectedVariant.sku}</span>
-            </span>
-            {skuCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-          </button>
-        ) : null}
-      </div>
-
       <div className="flex items-center gap-3">
         <p className="text-2xl font-extrabold text-foreground">{formatPrice(displayPrice)}</p>
         {hasDiscount ? (
@@ -147,7 +127,7 @@ export function ProductVariantPicker({
               key={color}
               type="button"
               disabled={!isColorAvailable(color)}
-              onClick={() => setSelectedColor(color)}
+              onClick={() => onSelectColor(color)}
               aria-label={color}
               className={cn(
                 "size-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
@@ -174,7 +154,7 @@ export function ProductVariantPicker({
               key={size}
               type="button"
               disabled={!isSizeAvailable(size)}
-              onClick={() => setSelectedSize(size)}
+              onClick={() => onSelectSize(size)}
               className={cn(
                 "flex h-11 min-w-11 items-center justify-center rounded-sm border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                 selectedSize === size
@@ -193,7 +173,7 @@ export function ProductVariantPicker({
           ? "Vui lòng chọn màu sắc và kích cỡ"
           : outOfStock
             ? "Hết hàng"
-            : `Còn ${selectedVariant.stockQuantity} sản phẩm · size ${selectedVariant.size}`}
+            : `Còn hàng · size ${selectedVariant.size}`}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

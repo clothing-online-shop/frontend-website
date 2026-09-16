@@ -1,15 +1,14 @@
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// rating = displayRating (product) — đã cộng dồn "đánh giá ảo" admin nhập ở CMS với đánh
-// giá thật, xem lib/shared-types.ts. Không nhận nguyên ReviewSummary (có breakdown) vì dòng
-// này không hiện breakdown, tránh hiểu nhầm đây là số liệu breakdown-consistent.
 export function ProductRatingRow({
   rating,
   soldCount,
+  inStock,
 }: {
   rating: { average: number; count: number };
   soldCount: number;
+  inStock: boolean | null;
 }) {
   if (rating.count === 0 && soldCount === 0) return null;
 
@@ -34,8 +33,16 @@ export function ProductRatingRow({
           <span>· {rating.count} đánh giá</span>
         </span>
       ) : null}
-      {rating.count > 0 && soldCount > 0 ? <span className="text-border">|</span> : null}
-      {soldCount > 0 ? <span>Đã bán {soldCount.toLocaleString("vi-VN")}</span> : null}
+      {inStock !== null ? (
+        <p
+          className={cn(
+            "font-semibold text-size-12 py-1 px-2.5",
+            inStock ? "bg-order-done-bg text-order-done-fg" : "bg-order-cancel-bg text-order-cancel-fg",
+          )}
+        >
+          {inStock ? "Còn hàng" : "Hết hàng"}
+        </p>
+      ) : null}
     </div>
   );
 }
