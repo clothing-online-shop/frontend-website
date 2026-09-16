@@ -24,7 +24,9 @@ export function OrdersPageClient() {
 
   // Tab lưu trong URL (?tab=) — refresh / back / share link đều giữ đúng vị trí, đồng bộ với
   // cách trang /san-pham quản lý filter. Giá trị lạ → về tab mặc định.
-  const tab = ORDER_LIST_TABS.find((t) => t.key === searchParams.get("tab")) ?? DEFAULT_TAB;
+  const tab =
+    ORDER_LIST_TABS.find((t) => t.key === searchParams.get("tab")) ??
+    DEFAULT_TAB;
 
   function selectTab(key: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -34,19 +36,23 @@ export function OrdersPageClient() {
     router.push(query ? `${pathname}?${query}` : pathname);
   }
 
-  // queryKey prefix "my-orders" dùng chung để CancelOrderDialog invalidate mọi tab 1 lần.
-  // keepPreviousData: đổi sang tab chưa có cache thì giữ danh sách cũ (mờ đi) thay vì sụp về
-  // skeleton — tránh giật layout.
+ 
   const ordersQuery = useInfiniteQuery({
     queryKey: ["my-orders", tab.key],
     queryFn: ({ pageParam }) =>
-      // Chưa có luồng tạo đơn hàng thật để có dữ liệu test — dùng mock (lib/orders-mock.ts)
-      // thay cho API thật. Đổi lại dòng dưới khi có đơn hàng thật để hiển thị:
-      // listMyOrders({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT }),
-      Promise.resolve(listMyOrdersMock({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT })),
+      //listMyOrders({ statuses: tab.statuses, page: pageParam, limit: PAGE_LIMIT }),
+      Promise.resolve(
+        listMyOrdersMock({
+          statuses: tab.statuses,
+          page: pageParam,
+          limit: PAGE_LIMIT,
+        }),
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
+      lastPage.meta.page < lastPage.meta.totalPages
+        ? lastPage.meta.page + 1
+        : undefined,
     placeholderData: keepPreviousData,
   });
 
@@ -87,14 +93,24 @@ export function OrdersPageClient() {
       >
         {ordersQuery.isLoading ? (
           <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full" />)}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-40 w-full" />
+            ))}
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center border border-dashed border-neutral-E0DDDA py-16 text-center sm:py-24">
-            <p className="text-neutral-68625C">Chưa có đơn hàng nào ở mục này.</p>
+            <p className="text-neutral-68625C">
+              Chưa có đơn hàng nào ở mục này.
+            </p>
           </div>
         ) : (
-          orders.map((order) => <OrderCard key={order.id} order={order} onCancelClick={setCancelTarget} />)
+          orders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              onCancelClick={setCancelTarget}
+            />
+          ))
         )}
       </div>
 
@@ -106,12 +122,17 @@ export function OrdersPageClient() {
             onClick={() => ordersQuery.fetchNextPage()}
             disabled={ordersQuery.isFetchingNextPage}
           >
-            {ordersQuery.isFetchingNextPage ? "Đang tải..." : `Xem thêm ${remaining} đơn hàng`}
+            {ordersQuery.isFetchingNextPage
+              ? "Đang tải..."
+              : `Xem thêm ${remaining} đơn hàng`}
           </Button>
         </div>
       ) : null}
 
-      <CancelOrderDialog order={cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)} />
+      <CancelOrderDialog
+        order={cancelTarget}
+        onOpenChange={(open) => !open && setCancelTarget(null)}
+      />
     </div>
   );
 }

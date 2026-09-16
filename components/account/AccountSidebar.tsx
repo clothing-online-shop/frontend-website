@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogOut, UserRound } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { AuthUser } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,8 @@ import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 interface AccountNavItem {
   label: string;
   href: string;
-  // false/undefined = chưa có trang đích, render dạng disabled thay vì link 404.
+  // false/undefined = chưa có trang đích — vẫn bấm được nhưng chỉ báo toast "chưa phát
+  // triển" thay vì điều hướng tới link 404.
   enabled?: boolean;
 }
 
@@ -27,7 +29,7 @@ function isNavActive(pathname: string, href: string): boolean {
 
 const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan", enabled: true },
-  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi" },
+  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi"},
   { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", enabled: true },
   { label: "Đổi trả & hoàn tiền", href: "/thong-tin-ca-nhan/doi-tra-hoan-tien" },
   { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich" },
@@ -35,8 +37,6 @@ const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];
 
-// Dùng chung cho cả 2 khối <nav> (pill ngang + list dọc) — logic disabled/active giống nhau,
-// chỉ khác className qua `variant`.
 function AccountNavLink({
   item,
   active,
@@ -48,16 +48,17 @@ function AccountNavLink({
 }) {
   if (!item.enabled) {
     return (
-      <span
-        aria-disabled="true"
+      <button
+        type="button"
+        onClick={() => toast.info("Tính năng này chưa phát triển")}
         className={
           variant === "pill"
-            ? "shrink-0 cursor-not-allowed whitespace-nowrap rounded-full bg-muted/60 px-3.5 py-1.5 text-size-13 text-muted-foreground/50"
-            : "block cursor-not-allowed border-l-4 border-transparent px-4 py-3 text-muted-foreground/60"
+            ? "shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-muted/60 px-3.5 py-1.5 text-size-13 text-muted-foreground"
+            : "block w-full cursor-pointer border-l-4 border-transparent px-4 py-3 text-left text-muted-foreground"
         }
       >
         {item.label}
-      </span>
+      </button>
     );
   }
   return (

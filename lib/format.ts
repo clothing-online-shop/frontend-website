@@ -23,3 +23,9 @@ export function formatDayMonth(value: string | Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   return `${day}/${month}`;
 }
+
+// "0912345678" -> "0912 345 678" — chỉ để hiện đẹp hơn ở caption/label, không dùng để gửi
+// lên BE (BE luôn nhận số thuần, không dấu cách).
+export function formatPhoneDisplay(phone: string): string {
+  return phone.replace(/(\d{4})(\d{3})(\d+)/, "$1 $2 $3");
+}

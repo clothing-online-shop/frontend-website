@@ -7,6 +7,7 @@ import { useLogout } from "@/hooks/useLogout";
 import { useAuthStore } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { formatPhoneDisplay } from "@/lib/format";
 
 interface LogoutConfirmDialogProps {
   open: boolean;
@@ -18,11 +19,6 @@ function getInitials(fullName: string): string {
   if (words.length === 0) return "";
   if (words.length === 1) return words[0][0].toUpperCase();
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-}
-
-// "0912345678" -> "0912 345 678" — chỉ để hiện caption "Đăng nhập bằng ..." cho dễ đọc.
-function formatPhoneDisplay(phone: string): string {
-  return phone.replace(/(\d{4})(\d{3})(\d+)/, "$1 $2 $3");
 }
 
 export function LogoutConfirmDialog({
@@ -50,8 +46,8 @@ export function LogoutConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/10" />
-        <DialogPrimitive.Popup className="fixed top-1/2 left-1/2 z-50 w-105 -translate-x-1/2 -translate-y-1/2 bg-white text-center">
-          <div className="p-6 sm:p-10">
+        <DialogPrimitive.Popup className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 bg-white text-center sm:w-105">
+          <div className="p-5 sm:p-6 lg:p-10">
             <div className="mx-auto flex size-24 items-center justify-center rounded-full border border-neutral-E0DDDA">
               <div className="flex size-14 items-center justify-center rounded-full bg-brand-88 text-size-18 font-semibold text-brand-38">
                 {user ? getInitials(user.fullName) : null}
@@ -68,7 +64,7 @@ export function LogoutConfirmDialog({
               </DialogPrimitive.Description>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3">
+            <div className="mt-4 lg:mt-8 flex flex-col gap-3">
               <Button
                 type="button"
                 variant="dark"
