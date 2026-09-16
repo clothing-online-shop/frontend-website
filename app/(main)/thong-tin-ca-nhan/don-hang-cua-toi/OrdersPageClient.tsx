@@ -104,13 +104,7 @@ export function OrdersPageClient() {
             </p>
           </div>
         ) : (
-          orders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              onCancelClick={setCancelTarget}
-            />
-          ))
+          orders.map((order) => <OrderCard key={order.id} order={order} />)
         )}
       </div>
 

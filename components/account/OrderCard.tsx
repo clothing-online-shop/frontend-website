@@ -1,15 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Order } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatPrice } from "@/lib/format";
-import { getErrorMessage } from "@/lib/error";
-import { addCartItem } from "@/lib/cart-api";
-import { CART_QUERY_KEY } from "@/hooks/useCart";
 import { isOrderCancellable } from "@/lib/orderStatus";
 import { OrderStatusBadge } from "@/components/account/OrderStatusBadge";
 
@@ -18,40 +13,9 @@ const MAX_THUMBNAILS = 3;
 const SECONDARY_BTN =
   "h-9.5 w-full border-neutral-D0CDCA bg-white text-size-13 font-semibold text-brand-10 sm:w-auto";
 
-export function OrderCard({
-  order,
-  onCancelClick,
-}: {
-  order: Order;
-  onCancelClick: (order: Order) => void;
-}) {
-  const queryClient = useQueryClient();
+const NOT_READY_TOAST = "Tính năng này chưa phát triển";
 
-  // "Mua lại": thêm lại từng dòng vào giỏ, bỏ qua dòng lỗi (hết hàng / ngừng bán) và báo
-  // tổng kết thay vì fail/succeed toàn bộ.
-  const reorderMutation = useMutation({
-    mutationFn: async () => {
-      const results = await Promise.allSettled(
-        order.items.map((item) =>
-          addCartItem({ productVariantId: item.productVariantId, quantity: item.quantity }),
-        ),
-      );
-      const succeeded = results.filter((r) => r.status === "fulfilled").length;
-      return { succeeded, total: order.items.length };
-    },
-    onSuccess: ({ succeeded, total }) => {
-      if (succeeded > 0) queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
-      if (succeeded === total) {
-        toast.success(`Đã thêm ${succeeded} sản phẩm vào giỏ hàng.`);
-      } else if (succeeded > 0) {
-        toast.warning(`Đã thêm ${succeeded}/${total} sản phẩm — số còn lại hiện đã hết hàng.`);
-      } else {
-        toast.error("Không thêm được sản phẩm nào — đơn hàng đã hết hàng hoặc ngừng bán.");
-      }
-    },
-    onError: (err) => toast.error(getErrorMessage(err)),
-  });
-
+export function OrderCard({ order }: { order: Order }) {
   const extraCount = order.items.length - MAX_THUMBNAILS;
 
   return (
@@ -97,24 +61,29 @@ export function OrderCard({
       </div>
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+        {/* Đang mock dữ liệu đơn hàng (chưa có luồng tạo đơn thật) — Hủy đơn/Mua lại/Xem
+            chi tiết thao tác lên order/productVariantId giả nên tạm báo "chưa phát triển"
+            thay vì thao tác/điều hướng thật. */}
         {isOrderCancellable(order.status) ? (
-          <Button variant="outline" className={SECONDARY_BTN} onClick={() => onCancelClick(order)}>
+          <Button
+            variant="outline"
+            className={SECONDARY_BTN}
+            onClick={() => toast.info(NOT_READY_TOAST)}
+          >
             Hủy đơn
           </Button>
         ) : null}
         <Button
           variant="outline"
-          disabled={reorderMutation.isPending}
           className={SECONDARY_BTN}
-          onClick={() => reorderMutation.mutate()}
+          onClick={() => toast.info(NOT_READY_TOAST)}
         >
-          {reorderMutation.isPending ? "Đang thêm..." : "Mua lại"}
+          Mua lại
         </Button>
         <Button
           variant="dark"
           className="h-9.5 w-full bg-brand-10 text-size-13 text-white sm:w-auto"
-          nativeButton={false}
-          render={<Link href={`/thong-tin-ca-nhan/don-hang-cua-toi/${order.orderCode}`} />}
+          onClick={() => toast.info(NOT_READY_TOAST)}
         >
           Xem chi tiết
         </Button>
