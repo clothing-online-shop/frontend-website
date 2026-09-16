@@ -56,11 +56,6 @@ export function ProductCard({
         <WishlistButton productId={product.id} />
       </div>
       <Link href={`/san-pham/${product.slug}`} className="block space-y-1.5 p-4">
-        {product.brandName && (
-          <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
-            {product.brandName}
-          </p>
-        )}
         <h3 className="line-clamp-1 text-size-16 text-foreground text-brand-10 font-semibold">{product.name}</h3>
 
         {hasDiscount ? (

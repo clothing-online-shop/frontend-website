@@ -28,7 +28,6 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
   const color = searchParams.get("color") ?? undefined;
-  const brand = searchParams.get("brand") ?? undefined;
   const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -39,7 +38,6 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
     color,
-    brand,
     search,
     sort,
   };

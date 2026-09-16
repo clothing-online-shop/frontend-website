@@ -108,8 +108,6 @@ export function ProductVariantPicker({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        {product.brandName ? <span className="uppercase">{product.brandName}</span> : null}
-        {product.brandName && selectedVariant ? <span>·</span> : null}
         {selectedVariant ? (
           <button
             type="button"

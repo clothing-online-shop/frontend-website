@@ -1,14 +1,11 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import type { CategoryNode } from "@/lib/shared-types";
-import { getBrands } from "@/lib/brands-api";
 import { CategoryFilter } from "@/components/products/filters/CategoryFilter";
 import { PriceRangeFilter } from "@/components/products/filters/PriceRangeFilter";
 import { SizeFilter } from "@/components/products/filters/SizeFilter";
 import { ColorFilter } from "@/components/products/filters/ColorFilter";
-import { BrandFilter } from "@/components/products/filters/BrandFilter";
 import { ActiveFilterChips, buildPriceChipLabel } from "@/components/products/filters/ActiveFilterChips";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
@@ -28,11 +25,9 @@ export function ProductFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { data: brands } = useQuery({ queryKey: ["brands"], queryFn: getBrands });
 
   const selectedSizes = searchParams.get("size")?.split(",").filter(Boolean) ?? [];
   const selectedColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
-  const selectedBrandIds = searchParams.get("brand")?.split(",").filter(Boolean) ?? [];
   const minPrice = Number(searchParams.get("minPrice") ?? 0);
   const maxPrice = Number(searchParams.get("maxPrice") ?? PRICE_MAX);
 
@@ -45,14 +40,14 @@ export function ProductFilters({
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  function toggleMultiValue(key: "size" | "color" | "brand", value: string, current: string[]) {
+  function toggleMultiValue(key: "size" | "color", value: string, current: string[]) {
     const next = current.includes(value)
       ? current.filter((v) => v !== value)
       : [...current, value];
     updateParams({ [key]: next.length > 0 ? next.join(",") : null });
   }
 
-  function removeFromMultiValue(key: "size" | "color" | "brand", value: string, current: string[]) {
+  function removeFromMultiValue(key: "size" | "color", value: string, current: string[]) {
     const next = current.filter((v) => v !== value);
     updateParams({ [key]: next.length > 0 ? next.join(",") : null });
   }
@@ -61,7 +56,6 @@ export function ProductFilters({
   const hasActiveFilters =
     selectedSizes.length > 0 ||
     selectedColors.length > 0 ||
-    selectedBrandIds.length > 0 ||
     priceChipLabel !== null;
 
   const chips = [
@@ -75,11 +69,6 @@ export function ProductFilters({
       label: `Màu ${color}`,
       onRemove: () => removeFromMultiValue("color", color, selectedColors),
     })),
-    ...selectedBrandIds.map((brandId) => ({
-      key: `brand-${brandId}`,
-      label: brands?.find((b) => b.id === brandId)?.name ?? "Thương hiệu",
-      onRemove: () => removeFromMultiValue("brand", brandId, selectedBrandIds),
-    })),
     ...(priceChipLabel
       ? [
           {
@@ -92,7 +81,7 @@ export function ProductFilters({
   ];
 
   function clearAll() {
-    updateParams({ size: null, color: null, brand: null, minPrice: null, maxPrice: null });
+    updateParams({ size: null, color: null, minPrice: null, maxPrice: null });
   }
 
   // Định nghĩa 1 lần, render 2 chỗ (aside desktop + Sheet mobile) — không phải 2 bộ filter
@@ -117,10 +106,6 @@ export function ProductFilters({
       <ColorFilter
         selectedColors={selectedColors}
         onToggle={(color) => toggleMultiValue("color", color, selectedColors)}
-      />
-      <BrandFilter
-        selectedBrandIds={selectedBrandIds}
-        onToggle={(brandId) => toggleMultiValue("brand", brandId, selectedBrandIds)}
       />
     </>
   );

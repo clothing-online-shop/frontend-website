@@ -101,7 +101,6 @@ export interface ProductListItem {
   name: string;
   slug: string;
   thumbnail: string | null;
-  brandName: string | null;
   basePrice: number;
   salePrice: number | null;
   status: ProductStatus;
@@ -110,12 +109,6 @@ export interface ProductListItem {
   colors: string[];
   sizes: string[];
   createdAt: string;
-}
-
-export interface Brand {
-  id: string;
-  name: string;
-  productCount: number;
 }
 
 export interface Color {

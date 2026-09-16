@@ -5,13 +5,12 @@ import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/layout/So
 import { NewsletterForm } from "@/components/home/NewsletterForm";
 
 // "Sản phẩm mới" trỏ /san-pham?sort=newest (trang thật, đã có) — "Flash Sale" trỏ thẳng tới
-// section cùng tên ở trang chủ (xem id="flash-sale" ở FlashSaleSection.tsx). 2 mục còn lại
-// chưa có trang riêng (không có route /bo-suu-tap, /thuong-hieu) nên để "#" giống cách
-// POLICY_LINKS bên dưới đã làm với các trang chính sách chưa có nội dung thật.
+// section cùng tên ở trang chủ (xem id="flash-sale" ở FlashSaleSection.tsx). "Bộ sưu tập"
+// chưa có trang riêng (không có route /bo-suu-tap) nên để "#" giống cách POLICY_LINKS bên
+// dưới đã làm với các trang chính sách chưa có nội dung thật.
 const SHOP_LINKS = [
   { label: "Sản phẩm mới", href: "/san-pham?sort=newest" },
   { label: "Bộ sưu tập", href: "#" },
-  { label: "Thương hiệu", href: "#" },
   { label: "Flash Sale", href: "/#flash-sale" },
 ];
 
