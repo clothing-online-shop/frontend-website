@@ -24,9 +24,8 @@ export function formatDayMonth(value: string | Date): string {
   return `${day}/${month}`;
 }
 
-// Che bớt SĐT lúc chưa bấm "Đổi" — giữ nguyên 4 số đầu + 2 số cuối, phần giữa thay bằng
-// "••••" bất kể còn lại bao nhiêu số, đúng kiểu hiển thị trong mockup.
-export function maskPhone(phone: string): string {
-  if (!phone || phone.length <= 6) return phone;
-  return `${phone.slice(0, 4)} •••• ${phone.slice(-2)}`;
+// "0912345678" -> "0912 345 678" — chỉ để hiện đẹp hơn ở caption/label, không dùng để gửi
+// lên BE (BE luôn nhận số thuần, không dấu cách).
+export function formatPhoneDisplay(phone: string): string {
+  return phone.replace(/(\d{4})(\d{3})(\d+)/, "$1 $2 $3");
 }

@@ -9,11 +9,8 @@ import { toast } from "sonner";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { EditableField } from "@/components/account/EditableField";
-import { ChangeContactDialog } from "@/components/account/ChangeContactDialog";
 import { DatePicker } from "@/components/common/DatePicker";
 import { cn } from "@/lib/utils";
-import { maskPhone } from "@/lib/format";
 import type { AuthUser } from "@/lib/shared-types";
 import { updateProfile } from "@/lib/users-api";
 import { deleteImage, uploadImage } from "@/lib/upload-api";
@@ -27,10 +24,7 @@ const GENDER_LABELS: Record<(typeof GENDER_OPTIONS)[number], string> = {
   OTHER: "Khác",
 };
 
-// phone/email KHÔNG còn trong schema này — đổi 2 field đó phải qua OTP (xem
-// ChangeContactDialog), không đi qua submit chung của form nữa (trước đây "Lưu thay đổi"
-// coi như thành công dù gõ số/email mới nhưng thực chất không gửi lên BE, vì
-// UpdateProfileDto không nhận 2 field này).
+// phone/email KHÔNG còn trong schema này — 2 field này chỉ hiển thị, không cho đổi.
 const profileSchema = z.object({
   fullName: z.string().min(2, "Vui lòng nhập họ tên"),
   dateOfBirth: z
@@ -54,10 +48,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
   const [avatarPublicId, setAvatarPublicId] = useState(user.avatarPublicId);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
-  // Field nào đang mở dialog đổi SĐT/Email — null nghĩa là không dialog nào đang mở. Khác
-  // avatar (chỉnh xong nhấn "Lưu thay đổi" mới ghi), đổi SĐT/Email tự ghi thẳng qua OTP nên
-  // không cần state theo dõi trong RHF nữa, chỉ cần biết đang mở dialog cho field nào.
-  const [contactDialogField, setContactDialogField] = useState<"phone" | "email" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, control, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({
@@ -171,28 +161,31 @@ export function ProfileForm({ user }: { user: AuthUser }) {
               )}
             </div>
 
-            {/* isEditing luôn false — field này giờ chỉ hiển thị, không gõ trực tiếp được
-                nữa. Bấm "Đổi" mở ChangeContactDialog (flow OTP riêng, xem component đó),
-                không còn gộp vào submit chung của form như trước (giá trị gõ tạm trước đây
-                không thực sự được gửi lên BE dù toast báo "Lưu thành công"). */}
-            <EditableField
-              label="Số điện thoại"
-              value={user.phone ?? ""}
-              onChange={() => undefined}
-              isEditing={false}
-              onToggleEdit={() => setContactDialogField("phone")}
-              formatDisplay={maskPhone}
-              inputProps={{ id: "profile-phone", placeholder: "Chưa cập nhật" }}
-            />
+            <div>
+              <p className={cn(LABEL_CLASS, "mt-2.25")}>Số điện thoại</p>
+              <Input
+                id="profile-phone"
+                aria-label="Số điện thoại"
+                className={INPUT_CLASS}
+                value={user.phone ?? ""}
+                placeholder="Chưa cập nhật"
+                disabled
+                readOnly
+              />
+            </div>
 
-            <EditableField
-              label="Email"
-              value={user.email}
-              onChange={() => undefined}
-              isEditing={false}
-              onToggleEdit={() => setContactDialogField("email")}
-              inputProps={{ id: "profile-email", type: "email" }}
-            />
+            <div>
+              <p className={cn(LABEL_CLASS, "mt-2.25")}>Email</p>
+              <Input
+                id="profile-email"
+                type="email"
+                aria-label="Email"
+                className={INPUT_CLASS}
+                value={user.email}
+                disabled
+                readOnly
+              />
+            </div>
 
             <div>
               <p className={cn(LABEL_CLASS, "mt-2.25")}>Giới tính</p>
@@ -230,10 +223,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
                 Đổi mật khẩu
               </Button>
             </div>
-
-            <p className="col-span-full text-size-12 text-neutral-76706A">
-              Đổi số điện thoại hoặc email cần xác thực lại bằng mã OTP.
-            </p>
           </form>
         </div>
 
@@ -286,8 +275,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
           </Button>
         </div>
       </div>
-
-      <ChangeContactDialog field={contactDialogField} onOpenChange={(open) => !open && setContactDialogField(null)} />
     </div>
   );
 }

@@ -45,17 +45,11 @@ export function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { identifier: "", password: "", remember: true },
-    // onChange để isValid cập nhật ngay khi gõ — dùng khoá nút "Đăng nhập" lúc chưa nhập đủ
-    // thông tin, thay vì chỉ biết form invalid sau khi bấm submit lần đầu.
     mode: "onChange",
   });
 
   const mutation = useMutation({ mutationFn: login });
 
-  // Box lỗi (kể cả message khoá tài khoản) chỉ tự mất khi bấm lại "Đăng nhập" (React Query
-  // reset state lúc gọi mutate() mới) — người dùng không có cách nào chủ động xoá đi ngay
-  // khi họ đang sửa lại thông tin. Xoá lỗi cũ ngay khi gõ lại 1 trong 2 ô, để box biến mất
-  // đúng lúc người dùng bắt đầu thao tác tiếp theo thay vì treo mãi tới lần submit sau.
   const identifierField = register("identifier");
   const passwordField = register("password");
 
