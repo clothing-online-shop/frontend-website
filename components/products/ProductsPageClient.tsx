@@ -122,6 +122,7 @@ export function ProductsPageClient({
       ? activeCategory.name
       : "Tất cả sản phẩm";
   const heroDescription = collection ? collectionQuery.data?.description : undefined;
+  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.image;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
@@ -135,6 +136,7 @@ export function ProductsPageClient({
           title={heroTitle}
           description={heroDescription}
           total={productsQuery.data ? total : undefined}
+          imageUrl={heroImageUrl}
         />
       )}
 

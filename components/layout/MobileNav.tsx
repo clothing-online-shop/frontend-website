@@ -140,13 +140,15 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
               <span className="text-xs text-muted-foreground">{cart.itemCount}</span>
             ) : null}
           </Link>
-          <button
-            type="button"
-            className="flex items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-secondary"
-          >
-            <Bell className="size-4" />
-            Thông báo
-          </button>
+          {user ? (
+            <button
+              type="button"
+              className="flex items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-secondary"
+            >
+              <Bell className="size-4" />
+              Thông báo
+            </button>
+          ) : null}
           {user ? (
             <button
               type="button"

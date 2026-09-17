@@ -32,7 +32,7 @@ const ACCOUNT_NAV: AccountNavItem[] = [
   { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi"},
   { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", enabled: true },
   { label: "Đổi trả & hoàn tiền", href: "/thong-tin-ca-nhan/doi-tra-hoan-tien" },
-  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich" },
+  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich", enabled: true },
   { label: "Điểm & hạng thành viên", href: "/thong-tin-ca-nhan/diem-hang-thanh-vien" },
   { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];

@@ -58,9 +58,8 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
           <p className="text-sm leading-[22px] text-neutral-33">{popup.description}</p>
         )}
 
-        <div className="mt-1 flex items-center gap-4">
+        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
           <Button
-            className="w-[230px]"
             variant="dark"
             size="xl"
             nativeButton={false}
@@ -71,7 +70,7 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="w-[50px] cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+            className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
           >
             Để sau
           </button>

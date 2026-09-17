@@ -20,7 +20,7 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <h2 className="font-heading text-size-30 font-normal">Mua theo danh mục</h2>
+        <h2 className="font-heading text-size-30 font-normal">Danh mục sản phẩm nổi bật</h2>
         <Link
           href="/san-pham?sort=best_selling"
           className="text-sm font-bold text-primary hover:underline"
@@ -52,8 +52,8 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="left-2 2xl:-left-3" />
+        <CarouselNext className="right-2 2xl:-right-3" />
       </Carousel>
     </section>
   );

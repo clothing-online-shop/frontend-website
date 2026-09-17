@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, LogOut, ShoppingBag, User } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, Heart, LogOut, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { Logo } from "@/components/layout/Logo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
@@ -12,6 +14,7 @@ import { SearchBar } from "@/components/layout/SearchBar";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import { useAuthStore } from "@/store/auth-store";
+import { getWishlist } from "@/lib/wishlist-api";
 import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 
 // Badge số lượng dùng chung cho các icon ở header (thông báo, giỏ hàng...) — quá MAX_COUNT
@@ -86,6 +89,13 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const cart = useCart();
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
+
+  // Cùng queryKey ["wishlist"] với WishlistButton (React Query dedupe, không gọi API 2 lần) —
+  // bấm tim ở bất kỳ ProductCard nào cũng tự cập nhật badge số này ngay, không cần refresh.
+  const wishlistQuery = useQuery({ queryKey: ["wishlist"], queryFn: getWishlist, enabled: !!user });
+  const wishlistCount = wishlistQuery.data?.length ?? 0;
 
   useEffect(() => {
     function onScroll() {
@@ -122,12 +132,27 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
         },
         { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => setLogoutOpen(true) },
       ]
-    : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
+    // Đang ở ngay trang /login thì bỏ luôn icon "Đăng nhập" — bấm vào cũng chỉ ở nguyên trang
+    // đó, không có ý nghĩa gì.
+    : isLoginPage
+      ? []
+      : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
 
-  // Chưa có API thông báo thật nên badge tạm để 0 — giỏ hàng đã nối thật (xem hooks/useCart.ts).
+  // Thông báo gắn với tài khoản — chưa đăng nhập thì chưa có gì để xem, ẩn hẳn icon thay vì
+  // hiện rồi bấm vào không làm gì. Badge tạm để 0 vì chưa có API thông báo thật; giỏ hàng đã
+  // nối thật (xem hooks/useCart.ts).
   const actionItems: HeaderActionItemData[] = [
-    { key: "notification", label: "Thông báo", icon: Bell, badge: 0, onAction: handleNotificationAction },
+    ...(user
+      ? [{ key: "notification", label: "Thông báo", icon: Bell, badge: 0, onAction: handleNotificationAction }]
+      : []),
     ...accountItems,
+    {
+      key: "wishlist",
+      label: "Yêu thích",
+      icon: Heart,
+      href: "/thong-tin-ca-nhan/san-pham-yeu-thich",
+      badge: wishlistCount,
+    },
     {
       key: "cart",
       label: "Giỏ hàng",
