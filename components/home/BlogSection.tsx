@@ -1,12 +1,22 @@
 import Image from "next/image";
 import type { BlogPostSummary } from "@/lib/shared-types";
 import { formatDate } from "@/lib/format";
+import Link from "next/link";
 
 export function BlogSection({ posts }: { posts: BlogPostSummary[] }) {
   if (posts.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <h2 className="font-heading text-size-30 font-normal">Cẩm nang mặc đẹp</h2>
+        <Link
+          href="#"
+          className="text-sm font-bold text-primary hover:underline"
+        >
+          Tất cả bài viết →
+        </Link>
+      </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {posts.map((post) => (
           <article key={post.id}>

@@ -300,6 +300,15 @@ export interface ActivePromoBar {
   endDate: string;
 }
 
+export interface ActiveCollection {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageUrl: string | null;
+  productCount: number;
+}
+
 export interface ActivePopup {
   id: string;
   eyebrow: string | null;

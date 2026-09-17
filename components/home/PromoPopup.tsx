@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { ActivePopup } from "@/lib/shared-types";
 
-// Đóng 1 lần thì không hiện lại trong cùng phiên truy cập — dùng sessionStorage (mất khi
-// đóng hẳn trình duyệt), không dùng localStorage vì yêu cầu chỉ giới hạn trong 1 phiên.
-const SESSION_KEY = "promo-popup-dismissed";
+// Không phải modal (không overlay, không chặn tương tác trang) — 1 thẻ nhỏ ghim cố định ở
+// góc màn hình bằng position: fixed, nên tự "đi theo" khi cuộn trang. Theo yêu cầu: luôn hiện
+// lại mỗi lần vào trang, chỉ mất khi người dùng bấm đóng trong lần xem đó (không lưu trạng
+// thái đã đóng vào storage).
 const OPEN_DELAY_MS = 600;
 
 export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
@@ -17,64 +19,64 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
 
   useEffect(() => {
     if (!popup) return;
-    if (sessionStorage.getItem(SESSION_KEY)) return;
     const timer = setTimeout(() => setOpen(true), OPEN_DELAY_MS);
     return () => clearTimeout(timer);
   }, [popup]);
 
-  function handleOpenChange(next: boolean) {
-    setOpen(next);
-    if (!next) sessionStorage.setItem(SESSION_KEY, "1");
-  }
-
   if (!popup) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-sm gap-0 overflow-hidden p-0 sm:max-w-[760px] rounded-none">
-        <DialogTitle className="sr-only">{popup.title}</DialogTitle>
-        {popup.description && <DialogDescription className="sr-only">{popup.description}</DialogDescription>}
+    <div
+      role="dialog"
+      aria-label={popup.title}
+      aria-hidden={!open}
+      className={cn(
+        "fixed right-4 bottom-4 left-4 z-50 max-w-[400px] overflow-hidden bg-popover shadow-xl ring-1 ring-foreground/10 transition-all duration-300 sm:left-auto sm:w-[400px]",
+        open ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+      )}
+    >
+      <div className="relative aspect-34/15 w-full">
+        <Image src={popup.imageUrl} alt={popup.title} fill sizes="400px" className="object-cover" />
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          aria-label="Đóng"
+          className="absolute top-3 right-3 flex size-9 cursor-pointer items-center justify-center bg-white text-foreground shadow-md transition-colors hover:bg-white/90"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
 
-        <div className="flex flex-col sm:flex-row min-h-[440px]">
-          <div className="relative aspect-4/3 w-full sm:aspect-auto sm:w-[65%]">
-            <Image
-              src={popup.imageUrl}
-              alt={popup.title}
-              fill
-              sizes="(min-width: 640px) 400px, 90vw"
-              className="object-cover"
-            />
-          </div>
+      <div className="flex flex-col gap-3 p-6">
+        {popup.eyebrow && (
+          <p className="text-xs font-semibold tracking-wide text-primary uppercase">{popup.eyebrow}</p>
+        )}
+        <h2 className="font-heading text-size-24 leading-[34.5px] font-normal text-foreground">
+          {popup.title}
+        </h2>
+        {popup.description && (
+          <p className="text-sm leading-[22px] text-neutral-33">{popup.description}</p>
+        )}
 
-          <div className="flex flex-col gap-3 p-6 text-center sm:w-1/2 sm:justify-center sm:p-8 sm:text-left">
-            {popup.eyebrow && (
-              <p className="text-xs font-semibold tracking-wide text-primary uppercase">{popup.eyebrow}</p>
-            )}
-            <h2 className="font-normal text-xl leading-tight text-foreground sm:text-size-30 sm:leading-[34.5px]">
-              {popup.title}
-            </h2>
-            {popup.description && <p className="text-size-14 leading-[22px] text-neutral-33">{popup.description}</p>}
-            {popup.discountCode && (
-              <p className="self-center rounded-md border border-dashed border-border px-3 py-1.5 text-sm font-semibold tracking-wide text-foreground sm:self-start">
-                {popup.discountCode}
-              </p>
-            )}
-
-            <Button
-              variant="dark"
-              size="xl"
-              className="mt-1 w-full"
-              nativeButton={false}
-              render={<Link href={popup.ctaLinkUrl} onClick={() => handleOpenChange(false)} />}
-            >
-              {popup.ctaLabel}
-            </Button>
-            <DialogClose render={<Button variant="ghost" className="cursor-pointer w-full text-muted-foreground" />}>
-              <span className="cursor-pointer">Để sau</span>
-            </DialogClose>
-          </div>
+        <div className="mt-1 flex items-center gap-4">
+          <Button
+            className="w-[230px]"
+            variant="dark"
+            size="xl"
+            nativeButton={false}
+            render={<Link href={popup.ctaLinkUrl} onClick={() => setOpen(false)} />}
+          >
+            {popup.ctaLabel}
+          </Button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="w-[50px] cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+          >
+            Để sau
+          </button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import type {
 
 export interface ListProductsParams {
   category?: string;
+  collection?: string;
   minPrice?: number;
   maxPrice?: number;
   size?: string;
