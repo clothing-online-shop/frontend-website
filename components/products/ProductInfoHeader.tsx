@@ -18,7 +18,7 @@ export function ProductInfoHeader({
         render={<h1 />}
         className="line-clamp-3 wrap-break-word font-heading text-size-40 leading-12 font-normal tracking-[-0.4px]"
       />
-      <ProductRatingRow rating={product.displayRating} soldCount={product.soldCount} inStock={inStock} />
+      <ProductRatingRow rating={product.displayRating} inStock={inStock} />
     </div>
   );
 }

@@ -18,6 +18,9 @@ const RETURN_POLICY_TEXT =
 // chỉ đóng khi bấm đúng title/icon của chính panel đó.
 export function ProductTabs({ product }: { product: ProductDetail }) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  // Sản phẩm chưa nhập mô tả/chất liệu/bảo quản thì bỏ hẳn mục "Thông tin chi tiết" — mở ra chỉ
+  // thấy panel trống.
+  const hasDetails = Boolean(product.description || product.material || product.careInstructions);
 
   function toggle(value: string) {
     setOpenItems((current) => {
@@ -30,36 +33,38 @@ export function ProductTabs({ product }: { product: ProductDetail }) {
 
   return (
     <div className="mt-10 divide-y divide-neutral-EDEBE8 border-t border-neutral-EDEBE8">
-      <div>
-        <button
-          type="button"
-          onClick={() => toggle("chi-tiet")}
-          aria-expanded={openItems.has("chi-tiet")}
-          className="group flex w-full cursor-pointer items-center justify-between py-6.5 text-left text-size-22 text-foreground transition-colors outline-none hover:text-brand-10"
-        >
-          Thông tin chi tiết
-          <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-aria-expanded:rotate-45" />
-        </button>
-        {openItems.has("chi-tiet") ? (
-          <div className="pb-4 text-sm text-foreground/90">
-            {product.description ? (
-              <div className="rich-content -mt-2.5 mb-6 text-justify" dangerouslySetInnerHTML={{ __html: product.description }} />
-            ) : null}
-            {product.material ? (
-              <div>
-                <p className="mb-2 font-semibold text-size-14 text-brand-10">Chất liệu</p>
-                <p  className="mb-6.5 text-size-14 text-neutral-3F3A34 text-justify">{product.material}</p>
-              </div>
-            ) : null}
-            {product.careInstructions ? (
-              <div>
-                <p className="mb-2 font-semibold text-size-14 text-brand-10">Hướng dẫn bảo quản</p>
-                <p className="mb-6.5 text-size-14 text-neutral-3F3A34 text-justify">{product.careInstructions}</p>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
+      {hasDetails ? (
+        <div>
+          <button
+            type="button"
+            onClick={() => toggle("chi-tiet")}
+            aria-expanded={openItems.has("chi-tiet")}
+            className="group flex w-full cursor-pointer items-center justify-between py-6.5 text-left text-size-22 text-foreground transition-colors outline-none hover:text-brand-10"
+          >
+            Thông tin chi tiết
+            <Plus className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-aria-expanded:rotate-45" />
+          </button>
+          {openItems.has("chi-tiet") ? (
+            <div className="pb-4 text-sm text-foreground/90">
+              {product.description ? (
+                <div className="rich-content -mt-2.5 mb-6 text-justify" dangerouslySetInnerHTML={{ __html: product.description }} />
+              ) : null}
+              {product.material ? (
+                <div>
+                  <p className="mb-2 font-semibold text-size-14 text-brand-10">Chất liệu</p>
+                  <p  className="mb-6.5 text-size-14 text-neutral-3F3A34 text-justify">{product.material}</p>
+                </div>
+              ) : null}
+              {product.careInstructions ? (
+                <div>
+                  <p className="mb-2 font-semibold text-size-14 text-brand-10">Hướng dẫn bảo quản</p>
+                  <p className="mb-6.5 text-size-14 text-neutral-3F3A34 text-justify">{product.careInstructions}</p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div>
         <button

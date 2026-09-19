@@ -3,14 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CategoryNode } from "@/lib/shared-types";
+import { flattenCategories } from "@/lib/categoryTree";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const MAX_FEATURED_CATEGORIES = 8;
-
-function flattenCategories(categories: CategoryNode[]): CategoryNode[] {
-  return categories.flatMap((category) => [category, ...flattenCategories(category.children)]);
-}
 
 export function FeaturedCategories({ categories }: { categories: CategoryNode[] }) {
   const featured = flattenCategories(categories).slice(0, MAX_FEATURED_CATEGORIES);

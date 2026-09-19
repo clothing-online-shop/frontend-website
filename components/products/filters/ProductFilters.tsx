@@ -2,14 +2,13 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
+import { PRICE_FILTER_MAX } from "@/lib/constants";
 import { CategoryFilter } from "@/components/products/filters/CategoryFilter";
 import { PriceRangeFilter } from "@/components/products/filters/PriceRangeFilter";
 import { SizeFilter } from "@/components/products/filters/SizeFilter";
 import { ColorFilter } from "@/components/products/filters/ColorFilter";
 import { ActiveFilterChips, buildPriceChipLabel } from "@/components/products/filters/ActiveFilterChips";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-
-const PRICE_MAX = 2_000_000;
 
 export function ProductFilters({
   categories,
@@ -29,7 +28,7 @@ export function ProductFilters({
   const selectedSizes = searchParams.get("size")?.split(",").filter(Boolean) ?? [];
   const selectedColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
   const minPrice = Number(searchParams.get("minPrice") ?? 0);
-  const maxPrice = Number(searchParams.get("maxPrice") ?? PRICE_MAX);
+  const maxPrice = Number(searchParams.get("maxPrice") ?? PRICE_FILTER_MAX);
 
   function updateParams(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -52,7 +51,7 @@ export function ProductFilters({
     updateParams({ [key]: next.length > 0 ? next.join(",") : null });
   }
 
-  const priceChipLabel = buildPriceChipLabel(minPrice, maxPrice, PRICE_MAX);
+  const priceChipLabel = buildPriceChipLabel(minPrice, maxPrice, PRICE_FILTER_MAX);
   const hasActiveFilters =
     selectedSizes.length > 0 ||
     selectedColors.length > 0 ||
@@ -95,7 +94,7 @@ export function ProductFilters({
         onCommit={(min, max) =>
           updateParams({
             minPrice: min > 0 ? String(min) : null,
-            maxPrice: max < PRICE_MAX ? String(max) : null,
+            maxPrice: max < PRICE_FILTER_MAX ? String(max) : null,
           })
         }
       />

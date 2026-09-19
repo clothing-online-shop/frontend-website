@@ -302,6 +302,9 @@ export interface ActiveCollection {
   slug: string;
   description: string | null;
   imageUrl: string | null;
+  // Ảnh nền ngang cho hero trang bộ sưu tập (admin tải lên riêng) — khác imageUrl là banner
+  // vuông dùng ở khối quảng bá trang chủ.
+  backgroundImageUrl: string | null;
   productCount: number;
 }
 

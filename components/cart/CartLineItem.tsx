@@ -4,14 +4,14 @@ import type { UnifiedCartItem } from "@/hooks/useCart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClampedText } from "@/components/common/ClampedText";
 import { QuantityStepper } from "@/components/products/QuantityStepper";
-import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
+import { LOW_STOCK_THRESHOLD, STOCK_LABEL } from "@/lib/constants";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 function getStockStatusText(stockQuantity: number): string {
-  if (stockQuantity <= 0) return "Hết hàng";
+  if (stockQuantity <= 0) return STOCK_LABEL.outOfStock;
   if (stockQuantity <= LOW_STOCK_THRESHOLD) return `Còn ${stockQuantity} sản phẩm trong kho`;
-  return "Còn hàng";
+  return STOCK_LABEL.inStock;
 }
 
 export function CartLineItem({
