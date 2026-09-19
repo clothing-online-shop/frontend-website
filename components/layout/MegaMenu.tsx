@@ -59,7 +59,7 @@ function collectFlaggedDescendants(
 // category.megaMenuLeftImageUrl/megaMenuRightImageUrl (CMS, chỉ có ở danh mục gốc).
 function MegaMenuLookImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative aspect-3/4 w-50 shrink-0 overflow-hidden bg-secondary">
+    <div className="relative aspect-3/4 w-36 shrink-0 overflow-hidden bg-secondary lg:w-50">
       <Image src={src} alt={alt} fill sizes="160px" className="object-cover" />
     </div>
   );
@@ -81,13 +81,13 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
     // justify-between — dàn đều 2 bên trong container max-w-[1440px] (ảnh look đầu sát trái,
     // ảnh look cuối sát phải) thay vì để mặc định dồn hết về trái, gap-10 chỉ còn là khoảng
     // cách tối thiểu giữa các phần khi không đủ chỗ giãn.
-    <div className="flex justify-between gap-10">
+    <div className="flex flex-wrap justify-between gap-6 lg:gap-10">
       {category.megaMenuLeftImageUrl ? (
         <MegaMenuLookImage src={category.megaMenuLeftImageUrl} alt="" />
       ) : null}
 
       {columns.map((column, index) => (
-        <div key={index} className="w-40 shrink-0 space-y-6">
+        <div key={index} className="w-32 shrink-0 space-y-6 lg:w-40">
           {column.map((group) => (
             <div key={group.id}>
               <Link
@@ -114,7 +114,7 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
       ))}
 
       {promoGroups.length > 0 ? (
-        <div className="w-40 shrink-0 space-y-6">
+        <div className="w-32 shrink-0 space-y-6 lg:w-40">
           {promoGroups.map((group) => (
             <div key={group.title}>
               <p className="mb-2.5 text-sm font-bold text-primary uppercase">{group.title}</p>

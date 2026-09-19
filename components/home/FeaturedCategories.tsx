@@ -19,13 +19,21 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14">
-      <h2 className="mb-6 font-heading text-size-30 font-normal">Danh mục nổi bật</h2>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <h2 className="font-heading text-size-30 font-normal">Danh mục sản phẩm nổi bật</h2>
+        <Link
+          href="/san-pham?sort=best_selling"
+          className="text-sm font-bold text-primary hover:underline"
+        >
+          Tất cả danh mục →
+        </Link>
+      </div>
       <Carousel opts={{ align: "start" }} className="w-full">
         <CarouselContent>
           {featured.map((category) => (
             <CarouselItem key={category.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6">
-              <Link href={`/danh-muc/${category.slug}`} className="group flex flex-col items-center gap-3 text-center">
-                <div className="relative aspect-square w-full overflow-hidden rounded-full bg-secondary">
+              <Link href={`/danh-muc/${category.slug}`} className="group flex flex-col items-start gap-3">
+                <div className="relative aspect-4/5 w-full overflow-hidden bg-secondary">
                   <Image
                     src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
                     alt={category.name}
@@ -34,15 +42,18 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                <span className="text-sm font-bold uppercase transition-colors group-hover:text-primary sm:text-base">
-                  {category.name}
-                </span>
+                <div>
+                  <p className="text-sm font-bold transition-colors group-hover:text-primary sm:text-base">
+                    {category.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{category.productCount} mẫu</p>
+                </div>
               </Link>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="left-2 2xl:-left-3" />
+        <CarouselNext className="right-2 2xl:-right-3" />
       </Carousel>
     </section>
   );

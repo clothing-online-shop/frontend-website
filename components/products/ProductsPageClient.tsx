@@ -8,6 +8,7 @@ import { SlidersHorizontal } from "lucide-react";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { getCollectionBySlug } from "@/lib/collections-api";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,13 @@ import { ProductGrid } from "@/components/products/ProductGrid";
 
 const PAGE_LIMIT = 9;
 
-export function ProductsPageClient({ category: categoryProp }: { category?: string }) {
+export function ProductsPageClient({
+  category: categoryProp,
+  collection,
+}: {
+  category?: string;
+  collection?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,6 +41,7 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
 
   const queryParams = {
     category,
+    collection,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
@@ -45,6 +53,13 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
   const categoriesQuery = useQuery({
     queryKey: ["categories", "tree"],
     queryFn: getCategoryTree,
+  });
+
+  const collectionQuery = useQuery({
+    queryKey: ["collection", collection],
+    queryFn: () => getCollectionBySlug(collection!),
+    enabled: Boolean(collection),
+    retry: false,
   });
 
   // Đổi bất kỳ filter/sort nào ở trên đều đổi queryKey -> React Query tự coi là query mới,
@@ -99,7 +114,13 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const heroTitle = activeCategory ? activeCategory.name : "Tất cả sản phẩm";
+  const heroTitle = collection
+    ? (collectionQuery.data?.name ?? "Bộ sưu tập")
+    : activeCategory
+      ? activeCategory.name
+      : "Tất cả sản phẩm";
+  const heroDescription = collection ? collectionQuery.data?.description : undefined;
+  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.image;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
@@ -108,7 +129,14 @@ export function ProductsPageClient({ category: categoryProp }: { category?: stri
         activeCategory={activeCategory}
         search={search}
       />
-      {!search && <CategoryHero title={heroTitle} total={productsQuery.data ? total : undefined} />}
+      {!search && (
+        <CategoryHero
+          title={heroTitle}
+          description={heroDescription}
+          total={productsQuery.data ? total : undefined}
+          imageUrl={heroImageUrl}
+        />
+      )}
 
       <div className="grid grid-cols-1 sm:gap-4 lg:gap-10 md:grid-cols-[270px_1fr]">
         <ProductFilters

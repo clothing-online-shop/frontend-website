@@ -17,6 +17,7 @@ import { CartSkeleton } from "@/components/cart/CartSkeleton";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyCartState } from "@/components/cart/EmptyCartState";
 import { FreeShippingBar } from "@/components/cart/FreeShippingBar";
+import { CartSuggestedProducts } from "@/components/cart/CartSuggestedProducts";
 
 export function CartView() {
   const router = useRouter();
@@ -172,6 +173,8 @@ export function CartView() {
           canCheckout={selectedItems.length > 0}
         />
       </div>
+
+      <CartSuggestedProducts excludeProductIds={cart.items.map((item) => item.productId)} />
     </div>
   );
 }

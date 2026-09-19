@@ -126,8 +126,8 @@ export function BannerSlider({ banners }: { banners: HeroBanner[] }) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-4" />
-        <CarouselNext className="right-4" />
+        <CarouselPrevious className="hidden left-4 lg:flex" />
+        <CarouselNext className="hidden right-4 lg:flex" />
       </Carousel>
     </div>
   );
