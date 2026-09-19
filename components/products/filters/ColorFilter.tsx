@@ -11,8 +11,8 @@ export function ColorFilter({
   onToggle: (color: string) => void;
 }) {
   // GET /colors chỉ trả màu đang có ít nhất 1 sản phẩm ACTIVE (xem backend-user
-  // ColorsService.findAllForStorefront) — khớp lý do BrandFilter.tsx dùng /brands thay vì
-  // 1 danh sách brand cứng: bộ lọc chỉ nên hiện lựa chọn thực sự lọc ra được sản phẩm.
+  // ColorsService.findAllForStorefront) — bộ lọc chỉ nên hiện lựa chọn thực sự lọc ra
+  // được sản phẩm, không phải danh sách màu cứng.
   const { data: colors } = useQuery({ queryKey: ["colors"], queryFn: getColors });
 
   if (!colors || colors.length === 0) return null;

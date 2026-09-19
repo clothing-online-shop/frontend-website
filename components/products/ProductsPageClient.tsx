@@ -8,6 +8,7 @@ import { SlidersHorizontal } from "lucide-react";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { findCategoryPathBySlug } from "@/lib/categoryTree";
 import { getCollectionBySlug } from "@/lib/collections-api";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
@@ -35,7 +36,6 @@ export function ProductsPageClient({
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
   const color = searchParams.get("color") ?? undefined;
-  const brand = searchParams.get("brand") ?? undefined;
   const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -47,7 +47,6 @@ export function ProductsPageClient({
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
     color,
-    brand,
     search,
     sort,
   };
@@ -105,9 +104,8 @@ export function ProductsPageClient({
     return map;
   }, [colorsQuery.data]);
 
-  const activeCategory = categoriesQuery.data
-    ?.flatMap((c) => [c, ...c.children])
-    .find((c) => c.slug === category);
+  const categoryPath = category ? findCategoryPathBySlug(categoriesQuery.data ?? [], category) : [];
+  const activeCategory = categoryPath[categoryPath.length - 1];
 
   function updateSort(value: string | null) {
     if (!value) return;
@@ -122,12 +120,14 @@ export function ProductsPageClient({
       ? activeCategory.name
       : "Tất cả sản phẩm";
   const heroDescription = collection ? collectionQuery.data?.description : undefined;
-  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.image;
+  const heroImageUrl = collection
+    ? collectionQuery.data?.backgroundImageUrl
+    : activeCategory?.bannerImageUrl;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
       <ProductsBreadcrumb
-        categories={categoriesQuery.data ?? []}
+        ancestors={categoryPath.slice(0, -1)}
         activeCategory={activeCategory}
         search={search}
       />

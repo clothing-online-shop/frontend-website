@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getCategoryTree } from "@/lib/categories-api";
+import { flattenCategories } from "@/lib/categoryTree";
 import { ProductsPageClient } from "@/components/products/ProductsPageClient";
 
 export const revalidate = 60;
@@ -12,9 +13,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { category } = await params;
   const categories = await getCategoryTree().catch(() => []);
-  const match = categories
-    .flatMap((c) => [c, ...c.children])
-    .find((c) => c.slug === category);
+  const match = flattenCategories(categories).find((c) => c.slug === category);
 
   return {
     title: match ? `${match.name} | Clothing Shop` : "Sản phẩm | Clothing Shop",

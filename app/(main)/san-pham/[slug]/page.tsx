@@ -111,7 +111,7 @@ export default async function ProductDetailPage({
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <Breadcrumb className="mb-6">
@@ -146,7 +146,7 @@ export default async function ProductDetailPage({
         <ProductGallery images={images} name={product.name} />
 
         <div>
-          <ProductPurchasePanel product={product} initialColor={initialColor} />
+          <ProductPurchasePanel key={product.id} product={product} initialColor={initialColor} />
           <ProductTabs product={product} />
         </div>
       </div>

@@ -3,14 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CategoryNode } from "@/lib/shared-types";
+import { flattenCategories } from "@/lib/categoryTree";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const MAX_FEATURED_CATEGORIES = 8;
-
-function flattenCategories(categories: CategoryNode[]): CategoryNode[] {
-  return categories.flatMap((category) => [category, ...flattenCategories(category.children)]);
-}
 
 export function FeaturedCategories({ categories }: { categories: CategoryNode[] }) {
   const featured = flattenCategories(categories).slice(0, MAX_FEATURED_CATEGORIES);
@@ -33,13 +30,13 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
           {featured.map((category) => (
             <CarouselItem key={category.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6">
               <Link href={`/danh-muc/${category.slug}`} className="group flex flex-col items-start gap-3">
-                <div className="relative aspect-4/5 w-full overflow-hidden bg-secondary">
+                <div className="relative aspect-3/4 w-full overflow-hidden bg-secondary">
                   <Image
                     src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
                     alt={category.name}
                     fill
                     sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 40vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 <div>

@@ -2,15 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import type { UnifiedCartItem } from "@/hooks/useCart";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ClampedText } from "@/components/common/ClampedText";
 import { QuantityStepper } from "@/components/products/QuantityStepper";
-import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
+import { LOW_STOCK_THRESHOLD, STOCK_LABEL } from "@/lib/constants";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 function getStockStatusText(stockQuantity: number): string {
-  if (stockQuantity <= 0) return "Hết hàng";
+  if (stockQuantity <= 0) return STOCK_LABEL.outOfStock;
   if (stockQuantity <= LOW_STOCK_THRESHOLD) return `Còn ${stockQuantity} sản phẩm trong kho`;
-  return "Còn hàng";
+  return STOCK_LABEL.inStock;
 }
 
 export function CartLineItem({
@@ -56,9 +57,11 @@ export function CartLineItem({
         </div>
 
         <div className="flex flex-1 flex-col gap-2">
-          <Link href={`/san-pham/${item.productSlug}`} className="font-bold hover:underline">
-            {item.productName}
-          </Link>
+          <ClampedText
+            text={item.productName}
+            render={<Link href={`/san-pham/${item.productSlug}`} />}
+            className="line-clamp-2 wrap-break-word font-bold hover:underline"
+          />
           <p className="text-sm text-muted-foreground">
             Màu {item.color} · Size {item.size}
           </p>

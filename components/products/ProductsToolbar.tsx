@@ -44,8 +44,11 @@ export function ProductsToolbar({
           <SlidersHorizontal className="size-4" />
           Bộ lọc
         </Button>
+        <span id="product-sort-label" className="text-size-14 text-neutral-76706A">
+          Sắp xếp
+        </span>
         <Select value={sort} onValueChange={onSortChange}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-44" aria-labelledby="product-sort-label">
             <SelectValue placeholder="Sắp xếp">
               {(value: ProductSort) =>
                 SORT_OPTIONS.find((option) => option.value === value)?.label ?? "Sắp xếp"
