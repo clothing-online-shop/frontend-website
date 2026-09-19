@@ -91,6 +91,9 @@ export interface CategoryNode {
   // chỉ để xem, không điều hướng — xem MegaMenu.tsx.
   megaMenuLeftImageUrl: string | null;
   megaMenuRightImageUrl: string | null;
+  // Ảnh nền banner ở đầu trang danh mục (CategoryHero) — admin tải lên ở form danh mục, chữ
+  // tiêu đề đè lên trên ảnh. Khác `image` (ảnh thẻ dọc ở trang chủ/mega menu).
+  bannerImageUrl: string | null;
   createdAt: string;
   updatedAt: string;
   children: CategoryNode[];

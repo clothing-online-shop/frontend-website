@@ -120,7 +120,7 @@ export function ProductsPageClient({
       ? activeCategory.name
       : "Tất cả sản phẩm";
   const heroDescription = collection ? collectionQuery.data?.description : undefined;
-  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.image;
+  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.bannerImageUrl;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
