@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { useLogout } from "@/hooks/useLogout";
@@ -49,8 +51,13 @@ export function LogoutConfirmDialog({
         <DialogPrimitive.Popup className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 bg-white text-center sm:w-105">
           <div className="p-5 sm:p-6 lg:p-10">
             <div className="mx-auto flex size-24 items-center justify-center rounded-full border border-neutral-E0DDDA">
-              <div className="flex size-14 items-center justify-center rounded-full bg-brand-88 text-size-18 font-semibold text-brand-38">
-                {user ? getInitials(user.fullName) : null}
+              {/* Có avatar thì hiện ảnh, chưa có thì rơi về chữ viết tắt của tên. */}
+              <div className="relative flex size-14 items-center justify-center overflow-hidden rounded-full bg-brand-88 text-size-18 font-semibold text-brand-38">
+                {user?.avatarUrl ? (
+                  <Image src={user.avatarUrl} alt={user.fullName} fill sizes="56px" className="object-cover" />
+                ) : user ? (
+                  getInitials(user.fullName)
+                ) : null}
               </div>
             </div>
 
@@ -72,7 +79,8 @@ export function LogoutConfirmDialog({
                 className="h-12.5 text-size-14 text-white"
                 onClick={handleConfirm}
               >
-                {loggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+                Đăng xuất
+                {loggingOut ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
               </Button>
               <Button
                 type="button"

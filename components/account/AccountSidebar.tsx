@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogOut, UserRound } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { AuthUser } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
@@ -14,9 +13,6 @@ import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 interface AccountNavItem {
   label: string;
   href: string;
-  // false/undefined = chưa có trang đích — vẫn bấm được nhưng chỉ báo toast "chưa phát
-  // triển" thay vì điều hướng tới link 404.
-  enabled?: boolean;
 }
 
 // Khớp cả route con (trang chi tiết đơn) — trừ "/thong-tin-ca-nhan" là tiền tố của mọi route
@@ -27,12 +23,14 @@ function isNavActive(pathname: string, href: string): boolean {
   return pathname.startsWith(`${href}/`);
 }
 
+// Mục chưa có tính năng vẫn có route riêng (hiện FeaturePlaceholder "Tính năng chờ phát triển"),
+// không báo toast — sau này chỉ cần thay nội dung page tương ứng.
 const ACCOUNT_NAV: AccountNavItem[] = [
-  { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan", enabled: true },
-  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi"},
-  { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", enabled: true },
+  { label: "Hồ sơ cá nhân", href: "/thong-tin-ca-nhan" },
+  { label: "Địa chỉ", href: "/thong-tin-ca-nhan/dia-chi" },
+  { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi" },
   { label: "Đổi trả & hoàn tiền", href: "/thong-tin-ca-nhan/doi-tra-hoan-tien" },
-  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich", enabled: true },
+  { label: "Sản phẩm yêu thích", href: "/thong-tin-ca-nhan/san-pham-yeu-thich" },
   { label: "Điểm & hạng thành viên", href: "/thong-tin-ca-nhan/diem-hang-thanh-vien" },
   { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao" },
 ];
@@ -46,21 +44,6 @@ function AccountNavLink({
   active: boolean;
   variant: "pill" | "row";
 }) {
-  if (!item.enabled) {
-    return (
-      <button
-        type="button"
-        onClick={() => toast.info("Tính năng này chưa phát triển")}
-        className={
-          variant === "pill"
-            ? "shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-muted/60 px-3.5 py-1.5 text-size-13 text-muted-foreground"
-            : "block w-full cursor-pointer border-l-4 border-transparent px-4 py-3 text-left text-muted-foreground"
-        }
-      >
-        {item.label}
-      </button>
-    );
-  }
   return (
     <Link
       href={item.href}
@@ -127,7 +110,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
+            active={isNavActive(pathname, item.href)}
             variant="pill"
           />
         ))}
@@ -138,7 +121,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
           <AccountNavLink
             key={item.href}
             item={item}
-            active={Boolean(item.enabled && isNavActive(pathname, item.href))}
+            active={isNavActive(pathname, item.href)}
             variant="row"
           />
         ))}
@@ -146,7 +129,7 @@ export function AccountSidebar({ user }: { user: AuthUser }) {
         <button
           type="button"
           onClick={() => setLogoutOpen(true)}
-          className="block w-full border-l-4 border-transparent px-4 py-3 text-left text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="block w-full cursor-pointer border-l-4 border-transparent px-4 py-3 text-left text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           Đăng xuất
         </button>

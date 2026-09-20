@@ -17,6 +17,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       duration={TOAST_DURATION_MS}
+      // Mặc định sonner xếp chồng toast: cái cũ bị thu nhỏ + ẩn nội dung phía sau toast mới nhất, chỉ
+      // hiện đủ khi rê chuột. expand = luôn xếp dọc, toast nào cũng thấy đủ chữ và thanh tiến trình.
+      expand
+      visibleToasts={4}
       icons={{
         success: (
           <CircleCheckIcon className="size-4" />

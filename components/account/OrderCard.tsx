@@ -13,7 +13,7 @@ const MAX_THUMBNAILS = 3;
 const SECONDARY_BTN =
   "h-9.5 w-full border-neutral-D0CDCA bg-white text-size-13 font-semibold text-brand-10 sm:w-auto";
 
-const NOT_READY_TOAST = "Tính năng này chưa phát triển";
+const NOT_READY_TOAST = "Tính năng này đang chờ phát triển";
 
 export function OrderCard({ order }: { order: Order }) {
   const extraCount = order.items.length - MAX_THUMBNAILS;
