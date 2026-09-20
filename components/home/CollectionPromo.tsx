@@ -10,7 +10,7 @@ export function CollectionPromo({ collection }: { collection: ActiveCollection |
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex flex-col border border-border sm:flex-row">
-        <div className="relative aspect-[1400/680] w-full sm:w-[60%]">
+        <div className="relative aspect-1400/680 w-full sm:w-[60%]">
           <Image
             src={collection.imageUrl ?? COLLECTION_FALLBACK_IMAGE(collection.slug)}
             alt={collection.name}

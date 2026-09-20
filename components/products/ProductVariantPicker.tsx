@@ -32,8 +32,8 @@ export function ProductVariantPicker({
   selectedSize: string | null;
   selectedColor: string | null;
   selectedVariant: ProductVariant | null;
-  onSelectSize: (size: string) => void;
-  onSelectColor: (color: string) => void;
+  onSelectSize: (size: string | null) => void;
+  onSelectColor: (color: string | null) => void;
 }) {
   const router = useRouter();
   const cart = useCart();
@@ -53,6 +53,9 @@ export function ProductVariantPicker({
     ? Math.max(1, Math.min(quantity, selectedVariant.stockQuantity))
     : quantity;
 
+  // Kiểu Shopee: lựa chọn không có hàng với phân loại ĐANG chọn ở trục còn lại thì làm mờ, không bấm
+  // được; muốn đổi sang tổ hợp khác thì bấm lại nút đang chọn để bỏ chọn (toggle) rồi chọn lại —
+  // nên không bao giờ bị kẹt ở 1 tổ hợp (vd chỉ có M×Tím than và XL×Rêu).
   function isSizeAvailable(size: string): boolean {
     return product.variants.some(
       (v) => v.size === size && (!selectedColor || v.color === selectedColor) && v.stockQuantity > 0,
@@ -63,6 +66,14 @@ export function ProductVariantPicker({
     return product.variants.some(
       (v) => v.color === color && (!selectedSize || v.size === selectedSize) && v.stockQuantity > 0,
     );
+  }
+
+  function handleSelectSize(size: string) {
+    onSelectSize(selectedSize === size ? null : size);
+  }
+
+  function handleSelectColor(color: string) {
+    onSelectColor(selectedColor === color ? null : color);
   }
 
   function handleAddToCart() {
@@ -124,8 +135,8 @@ export function ProductVariantPicker({
             <button
               key={color}
               type="button"
-              disabled={!isColorAvailable(color)}
-              onClick={() => onSelectColor(color)}
+              disabled={selectedColor !== color && !isColorAvailable(color)}
+              onClick={() => handleSelectColor(color)}
               aria-label={color}
               className={cn(
                 "size-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
@@ -151,8 +162,8 @@ export function ProductVariantPicker({
             <button
               key={size}
               type="button"
-              disabled={!isSizeAvailable(size)}
-              onClick={() => onSelectSize(size)}
+              disabled={selectedSize !== size && !isSizeAvailable(size)}
+              onClick={() => handleSelectSize(size)}
               className={cn(
                 "flex h-11 min-w-11 items-center justify-center rounded-sm border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                 selectedSize === size

@@ -36,7 +36,7 @@ export function FeaturedCategories({ categories }: { categories: CategoryNode[] 
                     alt={category.name}
                     fill
                     sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 40vw"
-                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 <div>

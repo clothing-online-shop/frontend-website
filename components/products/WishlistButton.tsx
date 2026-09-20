@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { getWishlist } from "@/lib/wishlist-api";
 import { useAuthStore } from "@/store/auth-store";
 import { WISHLIST_KEY, useWishlistActions } from "@/hooks/useWishlistActions";
+import { useHydrated } from "@/hooks/useHydrated";
 import { cn } from "@/lib/utils";
 
 export function WishlistButton({
@@ -23,7 +24,12 @@ export function WishlistButton({
     enabled: !!user,
   });
 
-  const isWishlisted = wishlistQuery.data?.some((item) => item.productId === productId) ?? false;
+  // Chưa hydrate xong thì luôn coi là chưa yêu thích: cache ["wishlist"] dùng chung với header, header
+  // có thể đã nạp xong trước khi khối chứa nút này hydrate → trái tim tô đặc ở client nhưng HTML
+  // server là tim rỗng (Hydration failed).
+  const hydrated = useHydrated();
+  const isWishlisted =
+    hydrated && (wishlistQuery.data?.some((item) => item.productId === productId) ?? false);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();

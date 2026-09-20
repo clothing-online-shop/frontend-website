@@ -10,6 +10,7 @@ import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
 import { findCategoryPathBySlug } from "@/lib/categoryTree";
 import { getCollectionBySlug } from "@/lib/collections-api";
+import { useHydrated } from "@/hooks/useHydrated";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
 import { Button } from "@/components/ui/button";
@@ -88,6 +89,10 @@ export function ProductsPageClient({
       .catch(() => undefined);
   }, [search, queryClient]);
 
+  // Chỉ hiện "Từ khóa tìm gần đây" sau khi hydrate xong: query ["search-history"] dùng chung với ô
+  // tìm kiếm ở header, header hydrate trước và nạp xong dữ liệu trước khi khối trang này hydrate
+  // → client render ra khối này còn HTML server thì chưa có (Hydration failed).
+  const hydrated = useHydrated();
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,
@@ -171,7 +176,7 @@ export function ProductsPageClient({
             </div>
           ) : null}
 
-          {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
+          {hydrated && search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
             <div className="mb-4 lg:mb-8">
               <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
               <div className="flex flex-wrap gap-2">

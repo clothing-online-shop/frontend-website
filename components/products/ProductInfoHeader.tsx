@@ -1,16 +1,14 @@
-import type { ProductDetail, ProductVariant } from "@/lib/shared-types";
+import type { ProductDetail } from "@/lib/shared-types";
 import { ProductRatingRow } from "@/components/products/ProductRatingRow";
 import { ClampedText } from "@/components/common/ClampedText";
 
 export function ProductInfoHeader({
   product,
-  selectedVariant,
+  inStock,
 }: {
   product: ProductDetail;
-  selectedVariant: ProductVariant | null;
+  inStock: boolean;
 }) {
-  const inStock = selectedVariant ? selectedVariant.stockQuantity > 0 : null;
-
   return (
     <div>
       <ClampedText
