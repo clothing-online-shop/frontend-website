@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ProductListItem } from "@/lib/shared-types";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
+import { STOCK_LABEL } from "@/lib/constants";
 import { resolveColorHex } from "@/lib/color-swatches";
 import { WishlistButton } from "@/components/products/WishlistButton";
 
@@ -46,7 +47,7 @@ export function ProductCard({
             variant="secondary"
             className="absolute top-2 left-2 rounded-sm bg-background/90 text-foreground"
           >
-            Hết hàng
+            {STOCK_LABEL.outOfStock}
           </Badge>
         ) : hasDiscount ? (
           <Badge className="absolute top-2 left-2 rounded-sm bg-brand-10 font-bold text-primary-foreground">
@@ -56,11 +57,6 @@ export function ProductCard({
         <WishlistButton productId={product.id} />
       </div>
       <Link href={`/san-pham/${product.slug}`} className="block space-y-1.5 p-4">
-        {product.brandName && (
-          <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
-            {product.brandName}
-          </p>
-        )}
         <h3 className="line-clamp-1 text-size-16 text-foreground text-brand-10 font-semibold">{product.name}</h3>
 
         {hasDiscount ? (

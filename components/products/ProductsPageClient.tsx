@@ -8,7 +8,9 @@ import { SlidersHorizontal } from "lucide-react";
 import type { ProductSort } from "@/lib/shared-types";
 import { getProducts } from "@/lib/products-api";
 import { getCategoryTree } from "@/lib/categories-api";
+import { findCategoryPathBySlug } from "@/lib/categoryTree";
 import { getCollectionBySlug } from "@/lib/collections-api";
+import { useHydrated } from "@/hooks/useHydrated";
 import { getRecentSearches, recordSearch } from "@/lib/search-history-api";
 import { getColors } from "@/lib/colors-api";
 import { Button } from "@/components/ui/button";
@@ -35,7 +37,6 @@ export function ProductsPageClient({
   const maxPrice = searchParams.get("maxPrice");
   const size = searchParams.get("size") ?? undefined;
   const color = searchParams.get("color") ?? undefined;
-  const brand = searchParams.get("brand") ?? undefined;
   const search = searchParams.get("search") ?? undefined;
   const sort = (searchParams.get("sort") as ProductSort | null) ?? "newest";
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -47,7 +48,6 @@ export function ProductsPageClient({
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     size,
     color,
-    brand,
     search,
     sort,
   };
@@ -89,6 +89,10 @@ export function ProductsPageClient({
       .catch(() => undefined);
   }, [search, queryClient]);
 
+  // Chỉ hiện "Từ khóa tìm gần đây" sau khi hydrate xong: query ["search-history"] dùng chung với ô
+  // tìm kiếm ở header, header hydrate trước và nạp xong dữ liệu trước khi khối trang này hydrate
+  // → client render ra khối này còn HTML server thì chưa có (Hydration failed).
+  const hydrated = useHydrated();
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,
@@ -105,9 +109,8 @@ export function ProductsPageClient({
     return map;
   }, [colorsQuery.data]);
 
-  const activeCategory = categoriesQuery.data
-    ?.flatMap((c) => [c, ...c.children])
-    .find((c) => c.slug === category);
+  const categoryPath = category ? findCategoryPathBySlug(categoriesQuery.data ?? [], category) : [];
+  const activeCategory = categoryPath[categoryPath.length - 1];
 
   function updateSort(value: string | null) {
     if (!value) return;
@@ -122,12 +125,14 @@ export function ProductsPageClient({
       ? activeCategory.name
       : "Tất cả sản phẩm";
   const heroDescription = collection ? collectionQuery.data?.description : undefined;
-  const heroImageUrl = collection ? collectionQuery.data?.imageUrl : activeCategory?.image;
+  const heroImageUrl = collection
+    ? collectionQuery.data?.backgroundImageUrl
+    : activeCategory?.bannerImageUrl;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 lg:py-10">
       <ProductsBreadcrumb
-        categories={categoriesQuery.data ?? []}
+        ancestors={categoryPath.slice(0, -1)}
         activeCategory={activeCategory}
         search={search}
       />
@@ -171,7 +176,7 @@ export function ProductsPageClient({
             </div>
           ) : null}
 
-          {search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
+          {hydrated && search && recentSearchesQuery.data && recentSearchesQuery.data.length > 0 ? (
             <div className="mb-4 lg:mb-8">
               <p className="mb-3 text-size-14 text-neutral-68625C">Từ khóa tìm gần đây</p>
               <div className="flex flex-wrap gap-2">

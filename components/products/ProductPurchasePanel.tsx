@@ -24,17 +24,31 @@ export function ProductPurchasePanel({
     [product],
   );
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(
-    (initialColor && colors.includes(initialColor) ? initialColor : colors[0]) ?? null,
+  // Kiểu Shopee: vào trang chưa chọn sẵn size/màu (chọn sẵn cả 2 thì 2 trục lọc chéo làm kẹt ở 1 tổ
+  // hợp) — chọn màu thì chỉ size còn hàng của màu đó bấm được, chọn size thì ngược lại. Chỉ giữ sẵn
+  // màu từ ?color= trên URL (bấm từ chấm màu ở ProductCard) nếu màu đó còn hàng.
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(() =>
+    initialColor && product.variants.some((v) => v.color === initialColor && v.stockQuantity > 0)
+      ? initialColor
+      : null,
   );
 
   const selectedVariant =
     product.variants.find((v) => v.size === selectedSize && v.color === selectedColor) ?? null;
 
+  // Badge tồn kho theo phần đã chọn: chưa chọn gì = cả sản phẩm, chọn màu/size = trong phạm vi đó,
+  // chọn đủ 2 = đúng biến thể.
+  const inStock = product.variants.some(
+    (v) =>
+      (!selectedSize || v.size === selectedSize) &&
+      (!selectedColor || v.color === selectedColor) &&
+      v.stockQuantity > 0,
+  );
+
   return (
     <div>
-      <ProductInfoHeader product={product} selectedVariant={selectedVariant} />
+      <ProductInfoHeader product={product} inStock={inStock} />
       <div className="mt-6">
         <ProductVariantPicker
           product={product}

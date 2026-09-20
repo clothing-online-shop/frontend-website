@@ -1,14 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
-import { toast } from "sonner";
-import { addWishlistItem, getWishlist, removeWishlistItem } from "@/lib/wishlist-api";
+import { getWishlist } from "@/lib/wishlist-api";
 import { useAuthStore } from "@/store/auth-store";
+import { WISHLIST_KEY, useWishlistActions } from "@/hooks/useWishlistActions";
+import { useHydrated } from "@/hooks/useHydrated";
 import { cn } from "@/lib/utils";
-
-const WISHLIST_KEY = ["wishlist"];
 
 export function WishlistButton({
   productId,
@@ -17,9 +15,8 @@ export function WishlistButton({
   productId: string;
   className?: string;
 }) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
+  const { add, remove, requireLogin, isPending } = useWishlistActions();
 
   const wishlistQuery = useQuery({
     queryKey: WISHLIST_KEY,
@@ -27,38 +24,30 @@ export function WishlistButton({
     enabled: !!user,
   });
 
-  const isWishlisted = wishlistQuery.data?.some((item) => item.productId === productId) ?? false;
-
-  const toggleMutation = useMutation({
-    mutationFn: async () => {
-      if (isWishlisted) {
-        await removeWishlistItem(productId);
-      } else {
-        await addWishlistItem(productId);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: WISHLIST_KEY });
-    },
-    onError: () => toast.error("Có lỗi xảy ra, vui lòng thử lại."),
-  });
+  // Chưa hydrate xong thì luôn coi là chưa yêu thích: cache ["wishlist"] dùng chung với header, header
+  // có thể đã nạp xong trước khi khối chứa nút này hydrate → trái tim tô đặc ở client nhưng HTML
+  // server là tim rỗng (Hydration failed).
+  const hydrated = useHydrated();
+  const isWishlisted =
+    hydrated && (wishlistQuery.data?.some((item) => item.productId === productId) ?? false);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      router.push("/login");
+      requireLogin();
       return;
     }
-    toggleMutation.mutate();
+    if (isWishlisted) remove.mutate(productId);
+    else add.mutate(productId);
   }
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={toggleMutation.isPending}
+      disabled={isPending}
       aria-label={isWishlisted ? "Bỏ khỏi yêu thích" : "Thêm vào yêu thích"}
       aria-pressed={isWishlisted}
       className={cn(

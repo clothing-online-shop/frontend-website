@@ -2,26 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
-import { toast } from "sonner";
-import { getWishlist, removeWishlistItem } from "@/lib/wishlist-api";
+import { getWishlist } from "@/lib/wishlist-api";
+import { WISHLIST_KEY, useWishlistActions } from "@/hooks/useWishlistActions";
 import { formatPrice } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Cùng queryKey với WishlistButton (components/products) — bỏ tim ở đây thì badge header và
-// nút tim ở ProductCard nơi khác cũng tự cập nhật theo, không cần refresh trang.
-const WISHLIST_KEY = ["wishlist"];
-
 export function WishlistPageClient() {
-  const queryClient = useQueryClient();
   const wishlistQuery = useQuery({ queryKey: WISHLIST_KEY, queryFn: getWishlist });
-
-  const removeMutation = useMutation({
-    mutationFn: removeWishlistItem,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: WISHLIST_KEY }),
-    onError: () => toast.error("Có lỗi xảy ra, vui lòng thử lại."),
-  });
+  const { remove } = useWishlistActions();
 
   return (
     <div>
@@ -64,8 +54,8 @@ export function WishlistPageClient() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => removeMutation.mutate(item.productId)}
-                  disabled={removeMutation.isPending}
+                  onClick={() => remove.mutate(item.productId)}
+                  disabled={remove.isPending}
                   aria-label="Bỏ khỏi yêu thích"
                   className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm transition-colors hover:text-primary disabled:opacity-60"
                 >

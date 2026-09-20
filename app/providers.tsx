@@ -12,7 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       {children}
       <CartSessionSync />
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }

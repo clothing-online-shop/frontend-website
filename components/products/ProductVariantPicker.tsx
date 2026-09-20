@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Copy } from "lucide-react";
 import type { ProductDetail, ProductVariant } from "@/lib/shared-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format";
+import { STOCK_LABEL } from "@/lib/constants";
 import { getColors } from "@/lib/colors-api";
 import { resolveColorHex } from "@/lib/color-swatches";
 import { cn } from "@/lib/utils";
@@ -32,8 +32,8 @@ export function ProductVariantPicker({
   selectedSize: string | null;
   selectedColor: string | null;
   selectedVariant: ProductVariant | null;
-  onSelectSize: (size: string) => void;
-  onSelectColor: (color: string) => void;
+  onSelectSize: (size: string | null) => void;
+  onSelectColor: (color: string | null) => void;
 }) {
   const router = useRouter();
   const cart = useCart();
@@ -45,9 +45,17 @@ export function ProductVariantPicker({
     return map;
   }, [colorsData]);
 
-  const [skuCopied, setSkuCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  // Đổi sang biến thể ít hàng hơn số đang chọn thì kéo số lượng xuống đúng tồn kho (quantity gốc
+  // giữ nguyên trong state để chọn lại biến thể nhiều hàng vẫn ra số cũ) — không thì "Thêm vào
+  // giỏ" gửi số lượng vượt tồn kho.
+  const effectiveQuantity = selectedVariant
+    ? Math.max(1, Math.min(quantity, selectedVariant.stockQuantity))
+    : quantity;
 
+  // Kiểu Shopee: lựa chọn không có hàng với phân loại ĐANG chọn ở trục còn lại thì làm mờ, không bấm
+  // được; muốn đổi sang tổ hợp khác thì bấm lại nút đang chọn để bỏ chọn (toggle) rồi chọn lại —
+  // nên không bao giờ bị kẹt ở 1 tổ hợp (vd chỉ có M×Tím than và XL×Rêu).
   function isSizeAvailable(size: string): boolean {
     return product.variants.some(
       (v) => v.size === size && (!selectedColor || v.color === selectedColor) && v.stockQuantity > 0,
@@ -60,11 +68,19 @@ export function ProductVariantPicker({
     );
   }
 
+  function handleSelectSize(size: string) {
+    onSelectSize(selectedSize === size ? null : size);
+  }
+
+  function handleSelectColor(color: string) {
+    onSelectColor(selectedColor === color ? null : color);
+  }
+
   function handleAddToCart() {
     if (!selectedVariant) return;
     cart.addItem({
       productVariantId: selectedVariant.id,
-      quantity,
+      quantity: effectiveQuantity,
       snapshot: {
         productId: product.id,
         productSlug: product.slug,
@@ -84,13 +100,6 @@ export function ProductVariantPicker({
     // thêm thay vì qua /cart — hiện /checkout vẫn là stub nên tạm điều hướng vào giỏ hàng.
     handleAddToCart();
     router.push("/cart");
-  }
-
-  async function handleCopySku() {
-    if (!selectedVariant) return;
-    await navigator.clipboard.writeText(selectedVariant.sku);
-    setSkuCopied(true);
-    setTimeout(() => setSkuCopied(false), 1500);
   }
 
   const hasDiscount = product.salePrice != null && product.salePrice < product.basePrice;
@@ -126,8 +135,8 @@ export function ProductVariantPicker({
             <button
               key={color}
               type="button"
-              disabled={!isColorAvailable(color)}
-              onClick={() => onSelectColor(color)}
+              disabled={selectedColor !== color && !isColorAvailable(color)}
+              onClick={() => handleSelectColor(color)}
               aria-label={color}
               className={cn(
                 "size-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30",
@@ -153,8 +162,8 @@ export function ProductVariantPicker({
             <button
               key={size}
               type="button"
-              disabled={!isSizeAvailable(size)}
-              onClick={() => onSelectSize(size)}
+              disabled={selectedSize !== size && !isSizeAvailable(size)}
+              onClick={() => handleSelectSize(size)}
               className={cn(
                 "flex h-11 min-w-11 items-center justify-center rounded-sm border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                 selectedSize === size
@@ -172,13 +181,13 @@ export function ProductVariantPicker({
         {!selectedVariant
           ? "Vui lòng chọn màu sắc và kích cỡ"
           : outOfStock
-            ? "Hết hàng"
-            : `Còn hàng · size ${selectedVariant.size}`}
+            ? STOCK_LABEL.outOfStock
+            : `${STOCK_LABEL.inStock} · size ${selectedVariant.size}`}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <QuantityStepper value={quantity} onChange={setQuantity} max={selectedVariant?.stockQuantity} />
+          <QuantityStepper value={effectiveQuantity} onChange={setQuantity} max={selectedVariant?.stockQuantity} />
           <WishlistButton
             productId={product.id}
             className="cursor-pointer static top-auto right-auto z-auto size-13 shrink-0 rounded-none border border-border bg-white shadow-none sm:hidden"

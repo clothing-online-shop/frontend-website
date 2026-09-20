@@ -1,25 +1,46 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { getRecentSearches } from "@/lib/search-history-api";
 
-export function SearchBar({
-  className,
-  defaultValue,
-}: {
-  className?: string;
-  defaultValue?: string;
-}) {
+// useSearchParams bắt buộc nằm trong Suspense (Next.js yêu cầu để các trang tĩnh vẫn build được);
+// fallback là khung ô trống cùng kích thước để layout header không nhảy khi ô thật hiện ra.
+export function SearchBar({ className }: { className?: string }) {
+  return (
+    <Suspense
+      fallback={
+        <div className={cn("relative", className)}>
+          <div className="h-11 w-full border border-neutral-E0DDDA bg-white" />
+        </div>
+      }
+    >
+      <SearchBarField className={className} />
+    </Suspense>
+  );
+}
+
+function SearchBarField({ className }: { className?: string }) {
   const router = useRouter();
+  // Từ khóa đang tìm nằm trên URL (?search=) — ô nhập phải phản ánh nó, không thì tải lại trang
+  // kết quả (hoặc mở link chia sẻ) là ô tìm kiếm trống trơn dù đang xem kết quả của 1 từ khóa.
+  const urlKeyword = useSearchParams().get("search") ?? "";
   const [open, setOpen] = useState(false);
-  const [text, setText] = useState(defaultValue ?? "");
+  const [text, setText] = useState(urlKeyword);
+  // Đồng bộ lại ô nhập mỗi khi từ khóa trên URL đổi (chọn từ khóa gần đây, bấm back/forward, rời
+  // trang kết quả thì ô về rỗng). "Điều chỉnh state khi prop đổi" ngay lúc render — cách React
+  // khuyến nghị thay cho useEffect+setState. Gõ dở trong ô không bị ghi đè vì URL chưa đổi.
+  const [syncedKeyword, setSyncedKeyword] = useState(urlKeyword);
+  if (urlKeyword !== syncedKeyword) {
+    setSyncedKeyword(urlKeyword);
+    setText(urlKeyword);
+  }
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,

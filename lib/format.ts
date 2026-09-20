@@ -29,3 +29,15 @@ export function formatDayMonth(value: string | Date): string {
 export function formatPhoneDisplay(phone: string): string {
   return phone.replace(/(\d{4})(\d{3})(\d+)/, "$1 $2 $3");
 }
+
+// 2000000 -> "2.000.000" — hiện số nguyên có dấu chấm ngăn cách hàng nghìn (không kèm đơn vị tiền,
+// khác formatPrice()), dùng cho ô nhập số tiền cần đọc rõ.
+export function formatThousands(value: number): string {
+  return new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);
+}
+
+// "1.250.000" / "1250000" -> 1250000 — bỏ mọi ký tự không phải số (kể cả dấu chấm ngăn cách);
+// chuỗi rỗng -> 0.
+export function parseDigits(text: string): number {
+  return Number(text.replace(/\D/g, "")) || 0;
+}

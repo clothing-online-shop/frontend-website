@@ -91,6 +91,9 @@ export interface CategoryNode {
   // chỉ để xem, không điều hướng — xem MegaMenu.tsx.
   megaMenuLeftImageUrl: string | null;
   megaMenuRightImageUrl: string | null;
+  // Ảnh nền banner ở đầu trang danh mục (CategoryHero) — admin tải lên ở form danh mục, chữ
+  // tiêu đề đè lên trên ảnh. Khác `image` (ảnh thẻ dọc ở trang chủ/mega menu).
+  bannerImageUrl: string | null;
   createdAt: string;
   updatedAt: string;
   children: CategoryNode[];
@@ -101,7 +104,6 @@ export interface ProductListItem {
   name: string;
   slug: string;
   thumbnail: string | null;
-  brandName: string | null;
   basePrice: number;
   salePrice: number | null;
   status: ProductStatus;
@@ -110,12 +112,6 @@ export interface ProductListItem {
   colors: string[];
   sizes: string[];
   createdAt: string;
-}
-
-export interface Brand {
-  id: string;
-  name: string;
-  productCount: number;
 }
 
 export interface Color {
@@ -306,6 +302,9 @@ export interface ActiveCollection {
   slug: string;
   description: string | null;
   imageUrl: string | null;
+  // Ảnh nền ngang cho hero trang bộ sưu tập (admin tải lên riêng) — khác imageUrl là banner
+  // vuông dùng ở khối quảng bá trang chủ.
+  backgroundImageUrl: string | null;
   productCount: number;
 }
 

@@ -23,9 +23,15 @@ export function useCountdown(endsAt: number) {
   const [remaining, setRemaining] = useState<ReturnType<typeof getRemaining> | null>(null);
 
   useEffect(() => {
-    setRemaining(getRemaining(endsAt));
-    const timer = setInterval(() => setRemaining(getRemaining(endsAt)), 1000);
-    return () => clearInterval(timer);
+    const tick = () => setRemaining(getRemaining(endsAt));
+    // Tick đầu tiên đẩy sang timeout 0ms thay vì gọi setState đồng bộ ngay trong effect (React
+    // báo "cascading renders") — vẫn chạy ngay sau lần render hydrate, người dùng không thấy khác.
+    const first = setTimeout(tick, 0);
+    const timer = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
   }, [endsAt]);
 
   if (!remaining) {

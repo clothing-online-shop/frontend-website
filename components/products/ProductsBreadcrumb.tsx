@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { CategoryNode } from "@/lib/shared-types";
 import {
   Breadcrumb,
@@ -8,27 +9,17 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-// Tìm danh mục cha thật của activeCategory trong cây (categories đã là cây lồng cấp
-// cha/con từ getCategoryTree()) — trước đây breadcrumb luôn chèn cứng "Sản phẩm" làm mục
-// giữa thay vì tên danh mục cha, sai khác design (vd "Trang chủ / Nữ / Áo sơ mi").
-function findParent(categories: CategoryNode[], childId: string): CategoryNode | undefined {
-  for (const category of categories) {
-    if (category.children.some((child) => child.id === childId)) return category;
-  }
-  return undefined;
-}
-
+// ancestors = các danh mục tổ tiên của activeCategory từ gốc xuống (rỗng nếu là danh mục gốc) —
+// hiện đủ cả chuỗi (vd "Trang chủ / Nam / Áo sơ mi / Sơ mi trắng"), không chỉ cha trực tiếp.
 export function ProductsBreadcrumb({
-  categories,
+  ancestors,
   activeCategory,
   search,
 }: {
-  categories: CategoryNode[];
+  ancestors: CategoryNode[];
   activeCategory: CategoryNode | undefined;
   search?: string;
 }) {
-  const parent = activeCategory ? findParent(categories, activeCategory.id) : undefined;
-
   return (
     <Breadcrumb className="mb-6">
       <BreadcrumbList>
@@ -42,14 +33,14 @@ export function ProductsBreadcrumb({
           </BreadcrumbItem>
         ) : activeCategory ? (
           <>
-            {parent ? (
-              <>
+            {ancestors.map((ancestor) => (
+              <Fragment key={ancestor.id}>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href={`/danh-muc/${parent.slug}`}>{parent.name}</BreadcrumbLink>
+                  <BreadcrumbLink href={`/danh-muc/${ancestor.slug}`}>{ancestor.name}</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
-              </>
-            ) : null}
+              </Fragment>
+            ))}
             <BreadcrumbItem>
               <BreadcrumbPage>{activeCategory.name}</BreadcrumbPage>
             </BreadcrumbItem>

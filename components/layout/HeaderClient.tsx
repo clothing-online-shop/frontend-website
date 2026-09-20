@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import { useAuthStore } from "@/store/auth-store";
 import { getWishlist } from "@/lib/wishlist-api";
+import { WISHLIST_KEY } from "@/hooks/useWishlistActions";
 import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
 
 // Badge số lượng dùng chung cho các icon ở header (thông báo, giỏ hàng...) — quá MAX_COUNT
@@ -94,7 +95,7 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
 
   // Cùng queryKey ["wishlist"] với WishlistButton (React Query dedupe, không gọi API 2 lần) —
   // bấm tim ở bất kỳ ProductCard nào cũng tự cập nhật badge số này ngay, không cần refresh.
-  const wishlistQuery = useQuery({ queryKey: ["wishlist"], queryFn: getWishlist, enabled: !!user });
+  const wishlistQuery = useQuery({ queryKey: WISHLIST_KEY, queryFn: getWishlist, enabled: !!user });
   const wishlistCount = wishlistQuery.data?.length ?? 0;
 
   useEffect(() => {

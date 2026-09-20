@@ -274,3 +274,60 @@
 .rich-content strong {
   font-weight: 600;
 }
+
+/* Toast (sonner, xem components/ui/sonner.tsx): nền trắng, góc vuông như nút/ô nhập của site, icon +
+   thanh tiến trình cùng màu theo loại. Selector có tiền tố .toaster để thắng độ ưu tiên của style
+   mặc định sonner tự chèn lúc chạy. */
+.toaster [data-sonner-toast].app-toast {
+  --toast-accent: var(--brand-38);
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 17px;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--brand-10) 14%, transparent);
+}
+
+.toaster [data-sonner-toast].app-toast[data-type="success"] { --toast-accent: var(--success); }
+.toaster [data-sonner-toast].app-toast[data-type="error"] { --toast-accent: var(--destructive); }
+.toaster [data-sonner-toast].app-toast[data-type="warning"] { --toast-accent: var(--neutral-B46E00); }
+
+.toaster [data-sonner-toast].app-toast [data-icon] {
+  color: var(--toast-accent);
+}
+
+/* Thanh tiến trình: đầy → cạn trong đúng thời gian toast tồn tại, người dùng biết khi nào nó mất.
+   Rê chuột vào vùng toast thì sonner dừng đếm giờ, thanh cũng dừng theo. */
+.toaster [data-sonner-toast].app-toast::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--toast-accent);
+  transform-origin: left center;
+  animation: toast-progress var(--toast-duration, 1000ms) linear forwards;
+}
+
+.toaster:hover [data-sonner-toast].app-toast::after {
+  animation-play-state: paused;
+}
+
+/* Toast loading không tự tắt nên không có thanh đếm ngược. */
+.toaster [data-sonner-toast].app-toast[data-type="loading"]::after {
+  display: none;
+}
+
+.toaster [data-sonner-toast].app-toast .app-toast-action {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 0;
+  background: var(--brand-10);
+  color: var(--primary-foreground);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@keyframes toast-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
