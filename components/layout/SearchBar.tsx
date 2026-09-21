@@ -4,9 +4,15 @@ import { Suspense, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { getRecentSearches } from "@/lib/search-history-api";
+
+// Tìm kiếm chưa demo: false = bấm tìm (icon, Enter) chỉ báo toast "chờ phát triển" thay vì chuyển sang
+// /san-pham?search=, và ẩn danh sách lịch sử tìm kiếm. Bật lại khi sẵn sàng — phần tìm kiếm bên dưới giữ nguyên.
+const SEARCH_READY = false as boolean;
+const SEARCH_NOT_READY_TOAST = "Tính năng đang chờ phát triển";
 
 // useSearchParams bắt buộc nằm trong Suspense (Next.js yêu cầu để các trang tĩnh vẫn build được);
 // fallback là khung ô trống cùng kích thước để layout header không nhảy khi ô thật hiện ra.
@@ -44,9 +50,11 @@ function SearchBarField({ className }: { className?: string }) {
   const recentSearchesQuery = useQuery({
     queryKey: ["search-history"],
     queryFn: getRecentSearches,
+    // Tìm kiếm chưa bật thì không có lịch sử để hiện — khỏi gọi API vô ích.
+    enabled: SEARCH_READY,
   });
   const history = recentSearchesQuery.data ?? [];
-  const showHistory = open && history.length > 0;
+  const showHistory = SEARCH_READY && open && history.length > 0;
 
   function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
     if (!containerRef.current?.contains(e.relatedTarget as Node | null)) {
@@ -55,6 +63,11 @@ function SearchBarField({ className }: { className?: string }) {
   }
 
   function goSearch(keyword: string) {
+    if (!SEARCH_READY) {
+      setOpen(false);
+      toast.info(SEARCH_NOT_READY_TOAST);
+      return;
+    }
     const trimmed = keyword.trim();
     if (!trimmed) return;
     setText(keyword);

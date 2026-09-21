@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, ChevronDown, Heart, LogOut, Package, ShoppingBag, UserRound } from "lucide-react";
+// Tạm ẩn Thông báo (chưa có tính năng) — bật lại cùng mục Thông báo trong menuLinks bên dưới.
+// import { Bell } from "lucide-react";
+import { ChevronDown, Heart, LogOut, Package, ShoppingBag, UserRound } from "lucide-react";
 import type { AuthUser } from "@/lib/shared-types";
 import { cn } from "@/lib/utils";
 import { formatPhoneDisplay } from "@/lib/format";
@@ -46,7 +48,8 @@ export function AccountMenu({
     { label: "Đơn hàng của tôi", href: "/thong-tin-ca-nhan/don-hang-cua-toi", icon: Package },
     { label: "Yêu thích", href: WISHLIST_PAGE_PATH, icon: Heart, tabletOnly: true, count: wishlistCount },
     { label: "Giỏ hàng", href: "/cart", icon: ShoppingBag, tabletOnly: true, count: cartCount },
-    { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao", icon: Bell },
+    // Tạm ẩn Thông báo (chưa có tính năng) — không xoá, biết đâu sau này lại dùng.
+    // { label: "Thông báo", href: "/thong-tin-ca-nhan/thong-bao", icon: Bell },
   ];
 
   return (
