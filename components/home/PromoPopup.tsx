@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ActivePopup } from "@/lib/shared-types";
 
@@ -35,8 +34,15 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
         open ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       )}
     >
-      <div className="relative aspect-34/15 w-full">
-        <Image src={popup.imageUrl} alt={popup.title} fill sizes="400px" className="object-cover" />
+      <div className="relative aspect-34/15 w-full h-[200px]">
+        <Link
+          href={popup.ctaLinkUrl}
+          onClick={() => setOpen(false)}
+          aria-label={popup.ctaLabel}
+          className="absolute inset-0"
+        >
+          <Image src={popup.imageUrl} alt={popup.title} fill sizes="400px" className="object-cover" />
+        </Link>
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -55,26 +61,8 @@ export function PromoPopup({ popup }: { popup: ActivePopup | null }) {
           {popup.title}
         </h2>
         {popup.description && (
-          <p className="text-sm leading-[22px] text-neutral-33">{popup.description}</p>
+          <p className="text-base leading-[24px] text-neutral-33">{popup.description}</p>
         )}
-
-        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <Button
-            variant="dark"
-            size="xl"
-            nativeButton={false}
-            render={<Link href={popup.ctaLinkUrl} onClick={() => setOpen(false)} />}
-          >
-            {popup.ctaLabel}
-          </Button>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
-          >
-            Để sau
-          </button>
-        </div>
       </div>
     </div>
   );
