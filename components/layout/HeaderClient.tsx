@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Heart, LogOut, ShoppingBag, User } from "lucide-react";
+import { Heart, ShoppingBag, User } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { Logo } from "@/components/layout/Logo";
 import { MegaMenu } from "@/components/layout/MegaMenu";
@@ -15,73 +13,29 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import { useAuthStore } from "@/store/auth-store";
 import { getWishlist } from "@/lib/wishlist-api";
-import { WISHLIST_KEY } from "@/hooks/useWishlistActions";
+import { WISHLIST_KEY, WISHLIST_PAGE_PATH } from "@/hooks/useWishlistActions";
 import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog";
+import { AccountMenu } from "@/components/layout/AccountMenu";
+import {
+  CountBadge,
+  HEADER_ACTION_CLASS,
+  HeaderActionContent,
+  type HeaderActionContentProps,
+} from "@/components/layout/HeaderAction";
 
-// Badge số lượng dùng chung cho các icon ở header (thông báo, giỏ hàng...) — quá MAX_COUNT
-// thì rút gọn thành "99+" thay vì hiện số dài tràn khỏi hình tròn.
-const MAX_COUNT = 99;
-
-function CountBadge({ count }: { count: number }) {
-  return (
-    <span className="absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-bold text-primary-foreground">
-      {count > MAX_COUNT ? `${MAX_COUNT}+` : count}
-    </span>
-  );
-}
-
-type HeaderActionItemData = {
+type HeaderActionItemData = HeaderActionContentProps & {
   key: string;
-  label: string;
-  icon: typeof User;
-  // true = mục "Tài khoản" — luôn có khung tròn nền/viền riêng (Figma: 18x18, bg
-  // #DAE2FD, border 1px #C6C6CD) chứa ảnh đại diện thật nếu có, hoặc icon fallback nếu
-  // chưa có avatar — khác các icon phẳng còn lại (Thông báo/Giỏ hàng/Đăng xuất...).
-  isAvatar?: boolean;
-  avatarUrl?: string | null;
-  href?: string;
-  badge?: number;
-  onAction?: () => void;
-  labelClassName?: string;
+  href: string;
+  className?: string;
 };
 
-// 1 component dùng chung cho mọi icon-action ở header (Thông báo, Đăng nhập/Tài khoản, Đăng
-// xuất, Giỏ hàng...) — có href thì render Link (điều hướng thật), không có thì render button
-// (chưa có trang/API thật, vd Thông báo). onAction luôn được nơi gọi truyền vào riêng biệt.
-function HeaderActionItem({ label, icon: Icon, isAvatar, avatarUrl, href, badge, onAction, labelClassName }: Omit<HeaderActionItemData, "key">) {
-  const className = "relative flex flex-col items-center gap-0.5 rounded-md px-2 py-1 text-foreground/70 transition-colors hover:text-foreground cursor-pointer";
-  const children = (
-    <>
-      <span className="relative">
-        {isAvatar ? (
-          <span className="relative flex size-4.5 items-center justify-center overflow-hidden rounded-full border border-header-avatar-border bg-header-avatar-bg">
-            {avatarUrl ? (
-              <Image src={avatarUrl} alt="" fill sizes="18px" className="object-cover" />
-            ) : (
-              <Icon className="size-3" />
-            )}
-          </span>
-        ) : (
-          <Icon className="size-5" />
-        )}
-        {badge !== undefined && badge > 0 && <CountBadge count={badge} />}
-      </span>
-      <span className={labelClassName ?? "text-neutral-37322C text-size-12 font-medium"}>{label}</span>
-    </>
-  );
-
-  if (href) {
-    return (
-      <Link href={href} onClick={onAction} className={className}>
-        {children}
-      </Link>
-    );
-  }
-
+// Icon-action ở header (Yêu thích, Giỏ hàng, Tài khoản khi chưa đăng nhập) — đều là Link điều hướng
+// thật. Khi đã đăng nhập, "Tài khoản" là dropdown riêng (xem AccountMenu).
+function HeaderActionItem({ href, className, ...content }: Omit<HeaderActionItemData, "key">) {
   return (
-    <button type="button" onClick={onAction} className={className}>
-      {children}
-    </button>
+    <Link href={href} className={cn(HEADER_ACTION_CLASS, className)}>
+      <HeaderActionContent {...content} />
+    </Link>
   );
 }
 
@@ -90,8 +44,6 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const cart = useCart();
-  const pathname = usePathname();
-  const isLoginPage = pathname === "/login";
 
   // Cùng queryKey ["wishlist"] với WishlistButton (React Query dedupe, không gọi API 2 lần) —
   // bấm tim ở bất kỳ ProductCard nào cũng tự cập nhật badge số này ngay, không cần refresh.
@@ -107,52 +59,20 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Mỗi icon nhận 1 hàm onAction riêng — tách để nơi khác (vd. analytics, mở panel thông
-  // báo khi có API thật) có thể thay đổi hành vi từng nút mà không đụng vào component hiển thị.
-  function handleNotificationAction() {
-    // TODO: mở panel thông báo khi có API/store thông báo thật.
-  }
-
-  function handleLoginAction() {
-    // Điều hướng /login đã do Link đảm nhiệm — hook này dành cho logic phụ (vd. analytics).
-  }
-
-  function handleCartAction() {
-    // Điều hướng /cart đã do Link đảm nhiệm — hook này dành cho logic phụ (vd. analytics).
-  }
-
-  const accountItems: HeaderActionItemData[] = user
-    ? [
-        {
-          key: "account",
-          label: "Tài khoản",
-          icon: User,
-          isAvatar: true,
-          avatarUrl: user.avatarUrl,
-          href: "/thong-tin-ca-nhan",
-        },
-        { key: "logout", label: "Đăng xuất", icon: LogOut, onAction: () => setLogoutOpen(true) },
-      ]
-    // Đang ở ngay trang /login thì bỏ luôn icon "Đăng nhập" — bấm vào cũng chỉ ở nguyên trang
-    // đó, không có ý nghĩa gì.
-    : isLoginPage
-      ? []
-      : [{ key: "login", label: "Đăng nhập", icon: User, href: "/login", onAction: handleLoginAction }];
-
-  // Thông báo gắn với tài khoản — chưa đăng nhập thì chưa có gì để xem, ẩn hẳn icon thay vì
-  // hiện rồi bấm vào không làm gì. Badge tạm để 0 vì chưa có API thông báo thật; giỏ hàng đã
-  // nối thật (xem hooks/useCart.ts).
+  // Yêu thích / Giỏ hàng đứng bên trái, Tài khoản ở ngoài cùng bên phải (đã đăng nhập = dropdown
+  // AccountMenu chứa hồ sơ/đơn hàng/thông báo/đăng xuất; chưa đăng nhập = link sang /login).
+  // Đã đăng nhập thì ở tablet (dưới lg) Yêu thích/Giỏ hàng ẩn khỏi header, chuyển vào dropdown
+  // AccountMenu để ô tìm kiếm dài ra; khách chưa đăng nhập không có dropdown nên vẫn hiện.
+  const collapseOnTablet = user ? "max-lg:hidden" : undefined;
   const actionItems: HeaderActionItemData[] = [
-    ...(user
-      ? [{ key: "notification", label: "Thông báo", icon: Bell, badge: 0, onAction: handleNotificationAction }]
-      : []),
-    ...accountItems,
     {
       key: "wishlist",
       label: "Yêu thích",
       icon: Heart,
-      href: "/thong-tin-ca-nhan/san-pham-yeu-thich",
+      // Chưa đăng nhập thì sang thẳng /login, không vào trang yêu thích rồi mới bị useRequireAuth đá ra.
+      href: user ? WISHLIST_PAGE_PATH : "/login",
       badge: wishlistCount,
+      className: collapseOnTablet,
     },
     {
       key: "cart",
@@ -160,8 +80,11 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
       icon: ShoppingBag,
       href: "/cart",
       badge: cart.itemCount,
-      onAction: handleCartAction,
+      className: collapseOnTablet,
     },
+    ...(user
+      ? []
+      : [{ key: "account", label: "Tài khoản", icon: User, isAvatar: true, href: "/login" }]),
   ];
 
   return (
@@ -173,9 +96,9 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-20 md:gap-3">
         <MobileNav categories={categories} />
 
-        <Logo className="h-7 shrink-0 md:h-[50px]" />
+        <Logo className="h-7 shrink-0 md:h-12.5" />
 
-        <SearchBar className="mx-4 hidden max-w-xl flex-1 md:block" />
+        <SearchBar className="mx-4 hidden flex-1 md:block lg:max-w-xl" />
 
         <Link
           href="/cart"
@@ -190,6 +113,14 @@ export function HeaderClient({ categories }: { categories: CategoryNode[] }) {
           {actionItems.map(({ key, ...item }) => (
             <HeaderActionItem key={key} {...item} />
           ))}
+          {user ? (
+            <AccountMenu
+              user={user}
+              wishlistCount={wishlistCount}
+              cartCount={cart.itemCount}
+              onLogout={() => setLogoutOpen(true)}
+            />
+          ) : null}
         </div>
       </div>
 
