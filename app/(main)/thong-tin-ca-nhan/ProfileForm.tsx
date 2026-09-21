@@ -217,11 +217,12 @@ export function ProfileForm({ user }: { user: AuthUser }) {
                 disabled={isSubmitting}
                 className="bg-brand-10 h-11.5 px-6 text-size-13 font-semibold hover:bg-brand-10/90 disabled:opacity-60"
               >
-                {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
+                Lưu thay đổi
+                {isSubmitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
               </Button>
-              <Button type="button" disabled variant="outline" className="h-11.5 px-6 text-size-13 bg-white font-semibold">
+              {/* <Button type="button" disabled variant="outline" className="h-11.5 px-6 text-size-13 bg-white font-semibold">
                 Đổi mật khẩu
-              </Button>
+              </Button> */}
             </div>
           </form>
         </div>

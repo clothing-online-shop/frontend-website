@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, ChevronDown, ChevronRight, LogOut, Menu, ShoppingBag, UserRound } from "lucide-react";
+// Tạm ẩn Thông báo (chưa có tính năng) — bật lại cùng nút Thông báo bên dưới.
+// import { Bell } from "lucide-react";
+import { ChevronDown, ChevronRight, LogOut, Menu, ShoppingBag, UserRound } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { Button } from "@/components/ui/button";
@@ -140,6 +142,7 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
               <span className="text-xs text-muted-foreground">{cart.itemCount}</span>
             ) : null}
           </Link>
+          {/* Tạm ẩn Thông báo (chưa có tính năng) — không xoá, biết đâu sau này lại dùng.
           {user ? (
             <button
               type="button"
@@ -149,6 +152,7 @@ export function MobileNav({ categories }: { categories: CategoryNode[] }) {
               Thông báo
             </button>
           ) : null}
+          */}
           {user ? (
             <button
               type="button"

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -158,7 +158,8 @@ export function LoginForm() {
         className={cn(AUTH_SUBMIT_BUTTON_CLASS, "disabled:pointer-events-auto disabled:cursor-not-allowed")}
         disabled={!isValid || mutation.isPending}
       >
-        {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
+        Đăng nhập
+        {mutation.isPending ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
       </Button>
 
       {mutation.isError && <div className={AUTH_ERROR_BOX_CLASS}>{getErrorMessage(mutation.error)}</div>}

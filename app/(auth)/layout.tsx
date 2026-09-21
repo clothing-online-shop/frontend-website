@@ -5,9 +5,10 @@ import { AuthTabsNav } from "./AuthTabsNav";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <MainLayout>
-      <div className="px-4 my-6 sm:my-10 md:my-0 md:px-0">
+      {/* Ảnh nền chỉ từ lg (desktop); mobile/tablet chỉ có thẻ đăng nhập trắng, canh giữa. */}
+      <div className="px-4 my-6 sm:my-10 lg:my-0 lg:px-0">
         <div className="relative overflow-hidden">
-          <div className="relative hidden min-h-215 md:block">
+          <div className="relative hidden min-h-215 lg:block">
             <Image
               src="/image/login_banner.png"
               alt=""
@@ -17,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               priority
             />
           </div>
-          <div className="bg-white p-5 shadow-sm sm:p-8 sm:pl-8.5 sm:py-9 md:shadow-none md:absolute md:top-80 md:left-1/2 md:w-105 md:-translate-x-1/2 md:-translate-y-1/2 md:max-h-109 lg:left-88 lg:translate-x-0 min-h-109">
+          <div className="mx-auto bg-white p-5 shadow-sm sm:max-w-105 sm:p-8 sm:pl-8.5 sm:py-9 lg:mx-0 lg:shadow-none lg:absolute lg:top-80 lg:left-88 lg:w-105 lg:max-w-none lg:-translate-y-1/2 lg:max-h-109 min-h-109">
             <AuthTabsNav />
             {children}
           </div>
