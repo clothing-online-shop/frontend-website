@@ -93,7 +93,7 @@ export function CartView() {
 
   function handleCheckout() {
     if (!user) {
-      toast.error("Vui lòng đăng nhập để thanh toán.");
+      toast.info("Vui lòng đăng nhập để thanh toán.");
       router.push("/login");
       return;
     }
