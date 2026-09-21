@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useCart } from "@/hooks/useCart";
+import { useCart, type UnifiedCartItem } from "@/hooks/useCart";
 import { getErrorMessage } from "@/lib/error";
 import type { VoucherValidationResult } from "@/lib/shared-types";
 import { validateVoucher } from "@/lib/vouchers-api";
@@ -18,6 +18,7 @@ import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyCartState } from "@/components/cart/EmptyCartState";
 import { FreeShippingBar } from "@/components/cart/FreeShippingBar";
 import { CartSuggestedProducts } from "@/components/cart/CartSuggestedProducts";
+import { RemoveCartItemDialog } from "@/components/cart/RemoveCartItemDialog";
 
 export function CartView() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export function CartView() {
   // productVariantId không đổi, nên trạng thái chọn "sống sót" qua bước merge miễn phí.
   const [selectedVariantIds, setSelectedVariantIds] = useState<Set<string>>(new Set());
   const [appliedVoucher, setAppliedVoucher] = useState<VoucherValidationResult | null>(null);
+  const [itemToRemove, setItemToRemove] = useState<UnifiedCartItem | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
 
   // Id lần đầu xuất hiện -> mặc định chọn. Id đã thấy trước đó -> giữ nguyên trạng thái chọn
@@ -91,12 +93,17 @@ export function CartView() {
 
   function handleCheckout() {
     if (!user) {
-      toast.error("Vui lòng đăng nhập để tiến hành thanh toán.");
+      toast.error("Vui lòng đăng nhập để thanh toán.");
       router.push("/login");
       return;
     }
-    const ids = selectedItems.map((item) => item.id);
-    router.push(`/checkout?items=${ids.join(",")}`);
+    toast.info("Tính năng đang chờ phát triển.");
+  }
+
+  function handleConfirmRemove() {
+    if (!itemToRemove) return;
+    cart.removeItem(itemToRemove.id);
+    setItemToRemove(null);
   }
 
   if (cart.isLoading) {
@@ -150,7 +157,7 @@ export function CartView() {
                 checked={selectedVariantIds.has(item.productVariantId)}
                 onCheckedChange={() => toggleOne(item.productVariantId)}
                 onQuantityChange={(quantity) => cart.updateQuantity(item.id, quantity)}
-                onRemove={() => cart.removeItem(item.id)}
+                onRemove={() => setItemToRemove(item)}
                 isPending={cart.pendingItemId === item.id}
               />
             ))}
@@ -175,6 +182,12 @@ export function CartView() {
       </div>
 
       <CartSuggestedProducts excludeProductIds={cart.items.map((item) => item.productId)} />
+
+      <RemoveCartItemDialog
+        productName={itemToRemove?.productName ?? null}
+        onOpenChange={(open) => !open && setItemToRemove(null)}
+        onConfirm={handleConfirmRemove}
+      />
     </div>
   );
 }
