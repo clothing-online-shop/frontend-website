@@ -50,7 +50,10 @@ export function CategoryFilter({
 }) {
   return (
     <FilterSection title="Danh mục">
-      <ul className="space-y-1">
+      {/* Cuộn riêng bên trong khối này (không phải cả sidebar) — số root category đã tăng
+          nhiều (Nam/Nữ/Bé Trai/Bé Gái/Final Sale/...), nếu để cao tự do sẽ đẩy Khoảng giá/
+          Size/Màu xuống rất xa, gần như không thấy được nếu không cuộn qua hết cây danh mục. */}
+      <ul className="max-h-80 space-y-1 overflow-y-auto pr-1">
         {categories.map((category) => (
           <li key={category.id}>
             <CategoryRow category={category} activeCategorySlug={activeCategorySlug} />
