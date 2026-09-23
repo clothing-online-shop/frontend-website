@@ -55,7 +55,8 @@ export function ProductFilters({
   const hasActiveFilters =
     selectedSizes.length > 0 ||
     selectedColors.length > 0 ||
-    priceChipLabel !== null;
+    priceChipLabel !== null ||
+    Boolean(activeCategorySlug);
 
   const chips = [
     ...selectedSizes.map((size) => ({
@@ -80,7 +81,13 @@ export function ProductFilters({
   ];
 
   function clearAll() {
-    updateParams({ size: null, color: null, minPrice: null, maxPrice: null });
+    // Trang /danh-muc/[slug]: category nằm trong route path, không phải query param, nên
+    // updateParams (chỉ sửa query string) không bỏ được — phải điều hướng hẳn sang /san-pham.
+    if (pathname.startsWith("/danh-muc/")) {
+      router.push("/san-pham");
+      return;
+    }
+    updateParams({ category: null, size: null, color: null, minPrice: null, maxPrice: null });
   }
 
   // Định nghĩa 1 lần, render 2 chỗ (aside desktop + Sheet mobile) — không phải 2 bộ filter
