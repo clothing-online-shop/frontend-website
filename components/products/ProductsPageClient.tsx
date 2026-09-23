@@ -20,7 +20,7 @@ import { CategoryHero } from "@/components/products/CategoryHero";
 import { ProductsToolbar } from "@/components/products/ProductsToolbar";
 import { ProductGrid } from "@/components/products/ProductGrid";
 
-const PAGE_LIMIT = 9;
+const PAGE_LIMIT = 12;
 
 export function ProductsPageClient({
   category: categoryProp,
