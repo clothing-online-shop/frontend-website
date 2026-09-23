@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import type { CategoryNode } from "@/lib/shared-types";
 import { cn } from "@/lib/utils";
 import { FilterSection } from "@/components/products/filters/FilterSection";
@@ -48,8 +48,13 @@ function CategoryRow({
         className,
       )}
     >
-      <span>{category.name}</span>
-      <span className="text-xs text-muted-foreground">{category.productCount}</span>
+      <span className="min-w-0 flex-1 truncate">{category.name}</span>
+      <span className="flex shrink-0 items-center gap-1">
+        <span className="text-xs text-muted-foreground">{category.productCount}</span>
+        {/* Danh mục đang active bấm lại đã tự về /san-pham (xem categoryHref) — icon này chỉ
+            làm rõ hành động đó, không có logic riêng. */}
+        {isActive ? <X className="size-3.5 text-primary" /> : null}
+      </span>
     </Link>
   );
 }
