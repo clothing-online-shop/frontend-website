@@ -78,10 +78,11 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
   ].filter((group) => group.items.length > 0);
 
   return (
-    // justify-between — dàn đều 2 bên trong container max-w-[1440px] (ảnh look đầu sát trái,
-    // ảnh look cuối sát phải) thay vì để mặc định dồn hết về trái, gap-10 chỉ còn là khoảng
-    // cách tối thiểu giữa các phần khi không đủ chỗ giãn.
-    <div className="flex flex-wrap justify-between gap-6 lg:gap-10">
+    // justify-start (không phải justify-between) — danh mục ít nhóm cấp 2 (vd chỉ 1 cột) từng
+    // bị justify-between đẩy ảnh look cuối sát mép phải, để lại khoảng trắng rất lớn ở giữa.
+    // Căn trái + gap cố định trông ổn định ở mọi số lượng cột, kể cả khi danh mục có đủ
+    // taxonomy dày như Nam/Nữ.
+    <div className="flex flex-wrap justify-start gap-6 lg:gap-10">
       {category.megaMenuLeftImageUrl ? (
         <MegaMenuLookImage src={category.megaMenuLeftImageUrl} alt="" />
       ) : null}
