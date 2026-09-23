@@ -57,9 +57,9 @@ function collectFlaggedDescendants(
 
 // Chỉ để xem, không điều hướng (không có href) — 2 ảnh "look" lấy trực tiếp từ
 // category.megaMenuLeftImageUrl/megaMenuRightImageUrl (CMS, chỉ có ở danh mục gốc).
-function MegaMenuLookImage({ src, alt }: { src: string; alt: string }) {
+function MegaMenuLookImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return (
-    <div className="relative aspect-3/4 w-36 shrink-0 overflow-hidden bg-secondary lg:w-50">
+    <div className={cn("relative aspect-3/4 w-36 shrink-0 overflow-hidden bg-secondary lg:w-50", className)}>
       <Image src={src} alt={alt} fill sizes="160px" className="object-cover" />
     </div>
   );
@@ -78,10 +78,12 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
   ].filter((group) => group.items.length > 0);
 
   return (
-    // justify-start (không phải justify-between) — danh mục ít nhóm cấp 2 (vd chỉ 1 cột) từng
-    // bị justify-between đẩy ảnh look cuối sát mép phải, để lại khoảng trắng rất lớn ở giữa.
-    // Căn trái + gap cố định trông ổn định ở mọi số lượng cột, kể cả khi danh mục có đủ
-    // taxonomy dày như Nam/Nữ.
+    // justify-start (không phải justify-between trên cả hàng) — trước đây justify-between đẩy
+    // TOÀN BỘ item dàn đều theo khoảng cách bằng nhau, nên danh mục ít cột (1 cột) bị khoảng
+    // trắng khổng lồ giữa cột chữ và ảnh phải. Giờ nội dung (ảnh trái + các cột) tự nhiên căn
+    // trái sát nhau, chỉ riêng ảnh phải dùng ml-auto để luôn ghim đúng mép phải container
+    // (max-w-[1440px] w-full, xem MegaMenuItem) — đúng ý đồ gốc (ảnh bookend 2 đầu) ở MỌI số
+    // lượng cột, không phụ thuộc nội dung ở giữa nhiều hay ít.
     <div className="flex flex-wrap justify-start gap-6 lg:gap-10">
       {category.megaMenuLeftImageUrl ? (
         <MegaMenuLookImage src={category.megaMenuLeftImageUrl} alt="" />
@@ -134,7 +136,7 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
       ) : null}
 
       {category.megaMenuRightImageUrl ? (
-        <MegaMenuLookImage src={category.megaMenuRightImageUrl} alt="" />
+        <MegaMenuLookImage src={category.megaMenuRightImageUrl} alt="" className="ml-auto" />
       ) : null}
     </div>
   );
