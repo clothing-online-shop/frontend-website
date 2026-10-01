@@ -78,43 +78,49 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
   ].filter((group) => group.items.length > 0);
 
   return (
-    // justify-start (không phải justify-between trên cả hàng) — trước đây justify-between đẩy
-    // TOÀN BỘ item dàn đều theo khoảng cách bằng nhau, nên danh mục ít cột (1 cột) bị khoảng
-    // trắng khổng lồ giữa cột chữ và ảnh phải. Giờ nội dung (ảnh trái + các cột) tự nhiên căn
-    // trái sát nhau, chỉ riêng ảnh phải dùng ml-auto để luôn ghim đúng mép phải container
-    // (max-w-[1440px] w-full, xem MegaMenuItem) — đúng ý đồ gốc (ảnh bookend 2 đầu) ở MỌI số
-    // lượng cột, không phụ thuộc nội dung ở giữa nhiều hay ít.
-    <div className="flex flex-wrap justify-start gap-6 lg:gap-10">
+    // 3 khối "cố định, không bao giờ wrap" đứng ở hàng NGOÀI CÙNG: ảnh trái, cột promo, ảnh
+    // phải — chỉ riêng khối CÁC CỘT NHÓM ở giữa (min-w-0 + flex-1 + flex-wrap) được phép tự
+    // xuống dòng khi danh mục có nhiều nhóm (vd 5-6 cột). Trước đây promo nằm CHUNG 1 flex-wrap
+    // với các cột nhóm nên khi khối đó tràn dòng, promo (luôn là item cuối) bị đẩy xuống hẳn
+    // dòng 2 — dòng 2 lại bắt đầu ngay dưới cột nhóm CAO NHẤT ở dòng 1 nên trông như rớt hẳn
+    // xuống cuối trang, mất liên kết với ảnh phải ngay bên cạnh nó theo thiết kế. Tách promo ra
+    // thành item riêng ở hàng ngoài thì nó luôn đứng ngay trước ảnh phải, bất kể khối cột nhóm
+    // có tràn dòng hay không.
+    <div className="flex items-start gap-6 lg:gap-10">
       {category.megaMenuLeftImageUrl ? (
         <MegaMenuLookImage src={category.megaMenuLeftImageUrl} alt="" />
       ) : null}
 
-      {columns.map((column, index) => (
-        <div key={index} className="w-32 shrink-0 space-y-6 lg:w-40">
-          {column.map((group) => (
-            <div key={group.id}>
-              <Link
-                href={`/danh-muc/${group.slug}`}
-                className="mb-2.5 block text-sm font-bold text-foreground uppercase hover:text-primary"
-              >
-                {group.name}
-              </Link>
-              <ul className="space-y-1.5">
-                {group.children.map((leaf) => (
-                  <li key={leaf.id}>
-                    <Link
-                      href={`/danh-muc/${leaf.slug}`}
-                      className="text-sm text-muted-foreground hover:text-primary"
-                    >
-                      {leaf.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      ))}
+      {/* Không flex-wrap — mỗi cột flex-1 min-w-0 nên khi nhiều cột (6+ nhóm) thì cả khối tự co
+          hẹp đều nhau để vừa đúng 1 hàng, thay vì tràn rồi rớt cột xuống dòng dưới. */}
+      <div className="flex min-w-0 flex-1 justify-start gap-4 lg:gap-8">
+        {columns.map((column, index) => (
+          <div key={index} className="min-w-0 flex-1 space-y-6">
+            {column.map((group) => (
+              <div key={group.id}>
+                <Link
+                  href={`/danh-muc/${group.slug}`}
+                  className="mb-2.5 block text-sm font-bold text-foreground uppercase hover:text-primary"
+                >
+                  {group.name}
+                </Link>
+                <ul className="space-y-1.5">
+                  {group.children.map((leaf) => (
+                    <li key={leaf.id}>
+                      <Link
+                        href={`/danh-muc/${leaf.slug}`}
+                        className="text-sm text-muted-foreground hover:text-primary"
+                      >
+                        {leaf.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
 
       {promoGroups.length > 0 ? (
         <div className="w-32 shrink-0 space-y-6 lg:w-40">
@@ -136,7 +142,7 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
       ) : null}
 
       {category.megaMenuRightImageUrl ? (
-        <MegaMenuLookImage src={category.megaMenuRightImageUrl} alt="" className="ml-auto" />
+        <MegaMenuLookImage src={category.megaMenuRightImageUrl} alt="" />
       ) : null}
     </div>
   );
