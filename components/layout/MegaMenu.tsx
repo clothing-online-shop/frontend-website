@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentProps } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { CategoryNode } from "@/lib/shared-types";
 import { FEATURED_CATEGORY_FALLBACK_IMAGE } from "@/lib/home-mock";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,25 @@ function navItemClass(isActive: boolean) {
     isActive
       ? "bg-background text-brand-7"
       : "text-background/85 hover:bg-background hover:text-brand-7 aria-expanded:bg-background aria-expanded:text-brand-7"
+  );
+}
+
+// Link trong panel dropdown — panel luôn nằm sẵn trong DOM (chỉ ẩn bằng visibility), mà
+// prefetch mặc định của <Link> dựa IntersectionObserver vốn bỏ qua visibility, nên mọi link
+// trong mọi panel đều bị coi là "trong viewport" và prefetch ngay khi vào trang (hàng trăm
+// request ?_rsc=). Tắt prefetch theo viewport, chỉ prefetch khi rê chuột vào đúng link đó.
+function PanelLink({ href, onMouseEnter, ...props }: ComponentProps<typeof Link> & { href: string }) {
+  const router = useRouter();
+  return (
+    <Link
+      {...props}
+      href={href}
+      prefetch={false}
+      onMouseEnter={(event) => {
+        router.prefetch(href);
+        onMouseEnter?.(event);
+      }}
+    />
   );
 }
 
@@ -98,21 +117,21 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
           <div key={index} className="min-w-0 flex-1 space-y-6">
             {column.map((group) => (
               <div key={group.id}>
-                <Link
+                <PanelLink
                   href={`/danh-muc/${group.slug}`}
                   className="mb-2.5 block text-sm font-bold text-foreground uppercase hover:text-primary"
                 >
                   {group.name}
-                </Link>
+                </PanelLink>
                 <ul className="space-y-1.5">
                   {group.children.map((leaf) => (
                     <li key={leaf.id}>
-                      <Link
+                      <PanelLink
                         href={`/danh-muc/${leaf.slug}`}
                         className="text-sm text-muted-foreground hover:text-primary"
                       >
                         {leaf.name}
-                      </Link>
+                      </PanelLink>
                     </li>
                   ))}
                 </ul>
@@ -130,9 +149,9 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
               <ul className="space-y-1.5">
                 {group.items.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">
+                    <PanelLink href={item.href} className="text-sm text-muted-foreground hover:text-primary">
                       {item.label}
-                    </Link>
+                    </PanelLink>
                   </li>
                 ))}
               </ul>
@@ -151,7 +170,7 @@ function MegaMenuRichPanel({ category }: { category: CategoryNode }) {
 function MegaMenuChildLink({ child }: { child: CategoryNode }) {
   return (
     <>
-      <Link href={`/danh-muc/${child.slug}`} className="group flex items-center gap-3 py-1.5">
+      <PanelLink href={`/danh-muc/${child.slug}`} className="group flex items-center gap-3 py-1.5">
         <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-secondary">
           <Image
             src={child.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(child.slug)}
@@ -163,19 +182,19 @@ function MegaMenuChildLink({ child }: { child: CategoryNode }) {
         </span>
         <span className="text-sm font-medium text-foreground group-hover:text-primary">{child.name}</span>
         <span className="ml-auto text-xs text-muted-foreground">{child.productCount}</span>
-      </Link>
+      </PanelLink>
       {/* Cấp 3 (nếu có) — thụt lề dưới tên danh mục cấp 2, khớp mép trái điểm bắt đầu chữ
           (size-11 + gap-3 = 56px, không phải dưới thumbnail). */}
       {child.children.length > 0 ? (
         <ul className="mb-1.5 ml-14 space-y-1">
           {child.children.map((grandchild) => (
             <li key={grandchild.id}>
-              <Link
+              <PanelLink
                 href={`/danh-muc/${grandchild.slug}`}
                 className="text-sm text-muted-foreground hover:text-primary"
               >
                 {grandchild.name}
-              </Link>
+              </PanelLink>
             </li>
           ))}
         </ul>
@@ -200,15 +219,15 @@ function MegaMenuSimplePanel({ category }: { category: CategoryNode }) {
             </li>
           ))}
         </ul>
-        <Link
+        <PanelLink
           href={`/danh-muc/${category.slug}`}
           className="mt-4 inline-block text-sm font-semibold text-primary hover:underline"
         >
           Xem tất cả {category.name} →
-        </Link>
+        </PanelLink>
       </div>
 
-      <Link href={`/danh-muc/${category.slug}`} className="group/img block w-40 shrink-0">
+      <PanelLink href={`/danh-muc/${category.slug}`} className="group/img block w-40 shrink-0">
         <div className="relative aspect-3/4 overflow-hidden bg-secondary">
           <Image
             src={category.image ?? FEATURED_CATEGORY_FALLBACK_IMAGE(category.slug)}
@@ -221,7 +240,7 @@ function MegaMenuSimplePanel({ category }: { category: CategoryNode }) {
         <p className="mt-2 text-sm font-bold text-foreground uppercase group-hover/img:text-primary">
           {category.name}
         </p>
-      </Link>
+      </PanelLink>
     </div>
   );
 }
